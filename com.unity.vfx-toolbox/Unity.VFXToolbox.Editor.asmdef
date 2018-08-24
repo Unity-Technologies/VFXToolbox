@@ -1,0 +1,9 @@
+{
+    "name": "Unity.VFXToolbox.Editor",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
