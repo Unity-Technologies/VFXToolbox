@@ -322,7 +322,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                 if(QualitySettings.activeColorSpace == ColorSpace.Gamma)
                 {
-                    EditorGUILayout.HelpBox("Your project is configured to use Gamma color space. While this is not a breaking setting for the ImageSequencer to work, It will produce a different and unexpected results than when used in linear color space.", MessageType.Warning);
+                    EditorGUILayout.HelpBox("Your project is configured to use Gamma color space. While this is not a breaking setting for the Image Sequencer to work, it will produce a different and unexpected results than when used in Linear color space.", MessageType.Warning);
                     GUILayout.Space(8);
                 }
             }
