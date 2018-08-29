@@ -63,8 +63,8 @@ namespace UnityEditor.VFXToolbox.VolumeEditor
             m_SlicePosition = 0.5f;
             m_PreviewMeshMaterial = new Material(Shader.Find("Hidden/VFXToolbox/VolumeEditor/VolumeTrail"));
             m_HeatMap = new List<Texture2D>();
-            m_HeatMap.Add(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/VFXToolbox/VolumeEditor/Editor/Textures/heatmap.tga"));
-            m_HeatMap.Add(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/VFXToolbox/VolumeEditor/Editor/Textures/heatmap2.tga"));
+            m_HeatMap.Add(AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.unity.vfx-toolbox/VolumeEditor/Editor/Textures/heatmap.tga"));
+            m_HeatMap.Add(AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.unity.vfx-toolbox/VolumeEditor/Editor/Textures/heatmap2.tga"));
 
             m_PreviewMeshMaterial.SetInt("_NumPointsPerTrail", NUM_POINTS_PER_TRAIL);
         }
