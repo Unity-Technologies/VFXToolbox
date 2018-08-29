@@ -1,4 +1,4 @@
-Shader "VFXToolbox/ImageScripter/FlowMapPaint"
+Shader "Hidden/VFXToolbox/ImageScripter/FlowMapPaint"
 {
 	Properties 
 	{

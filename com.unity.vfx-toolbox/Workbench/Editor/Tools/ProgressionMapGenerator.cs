@@ -177,7 +177,7 @@ namespace UnityEditor.VFXToolbox.Workbench
         public override void Initialize()
         {
             m_RenderTexture = RenderTexture.GetTemporary(PaintDataWidth, PaintDataHeight, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-            m_Material = new Material(Shader.Find("VFXToolbox/ImageScripter/FlowMapPaint"));
+            m_Material = new Material(Shader.Find("Hidden/VFXToolbox/ImageScripter/FlowMapPaint"));
             if (PaintData != null)
             {
                 Texture2D temp = new Texture2D(PaintDataWidth, PaintDataHeight, TextureFormat.ARGB32, false, true);
@@ -242,7 +242,7 @@ namespace UnityEditor.VFXToolbox.Workbench
                             m_PreviewRT = RenderTexture.GetTemporary(PaintDataWidth, PaintDataHeight, 0, RenderTextureFormat.ARGB32);
                         }
                         if (m_PreviewMaterial == null)
-                            m_PreviewMaterial = new Material(Shader.Find("VFXToolbox/ImageScripter/FlowMapPainter.DisplayFlow"));
+                            m_PreviewMaterial = new Material(Shader.Find("Hidden/VFXToolbox/ImageScripter/FlowMapPainter.DisplayFlow"));
 
                         m_PreviewMaterial.SetTexture("_MainTex", BaseTexture);
                         m_PreviewMaterial.SetTexture("_FlowTex", m_RenderTexture);

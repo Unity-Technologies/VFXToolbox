@@ -1,5 +1,4 @@
-// Based on 3d Value noise (iQ https://www.shadertoy.com/view/4sfGzS)
-Shader "VFXToolbox/ImageScripter/NoiseGen"
+Shader "Hidden/VFXToolbox/ImageScripter/NoiseGen"
 {
 	Properties
 	{

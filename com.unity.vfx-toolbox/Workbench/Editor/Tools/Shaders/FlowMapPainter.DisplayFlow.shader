@@ -1,4 +1,4 @@
-Shader "VFXToolbox/ImageScripter/FlowMapPainter.DisplayFlow"
+Shader "Hidden/VFXToolbox/ImageScripter/FlowMapPainter.DisplayFlow"
 {
 	Properties 
 	{

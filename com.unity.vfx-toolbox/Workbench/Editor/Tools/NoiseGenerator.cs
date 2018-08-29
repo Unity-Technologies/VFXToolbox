@@ -75,7 +75,7 @@ namespace UnityEditor.VFXToolbox.Workbench
         public override void Initialize()
         {
             m_RenderTexture = RenderTexture.GetTemporary(Width, Height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-            m_Material = new Material(Shader.Find("VFXToolbox/ImageScripter/NoiseGen"));
+            m_Material = new Material(Shader.Find("Hidden/VFXToolbox/ImageScripter/NoiseGen"));
         }
 
         public override bool OnCanvasGUI(WorkbenchImageCanvas canvas)
