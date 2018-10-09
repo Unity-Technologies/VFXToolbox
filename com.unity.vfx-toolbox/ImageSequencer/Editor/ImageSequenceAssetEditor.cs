@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [CustomEditor(typeof(ImageSequence))]
-    public class ImageSequenceAssetEditor : Editor
+    internal class ImageSequenceAssetEditor : Editor
     {
         private bool m_PreviewInput = false;
         private bool m_PreviewOutput = false;

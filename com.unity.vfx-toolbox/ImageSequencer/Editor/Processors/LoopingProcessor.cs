@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class LoopingProcessor : GPUFrameProcessor<LoopingProcessorSettings>
+    class LoopingProcessor : GPUFrameProcessor<LoopingProcessorSettings>
     {
         CurveDrawer m_CurveDrawer;
 

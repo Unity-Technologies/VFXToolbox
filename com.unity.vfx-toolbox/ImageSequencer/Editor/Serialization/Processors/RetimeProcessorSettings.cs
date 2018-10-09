@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Sequence","Retime", typeof(RetimeProcessor))]
-    public class RetimeProcessorSettings : ProcessorSettingsBase
+    class RetimeProcessorSettings : ProcessorSettingsBase
     {
         public AnimationCurve curve;
         public int outputSequenceLength;

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class AssembleProcessor : GPUFrameProcessor<AssembleProcessorSettings>
+    class AssembleProcessor : GPUFrameProcessor<AssembleProcessorSettings>
     {
         public AssembleProcessor(FrameProcessorStack processorStack, ProcessorInfo info)
             : base ("Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/AssembleBlit.shader", processorStack, info)

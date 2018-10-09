@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public partial class ImageSequencer : EditorWindow
+    internal partial class ImageSequencer : EditorWindow
     {
         [System.NonSerialized]
         ProcessorDataProvider m_ProcessorDataProvider;

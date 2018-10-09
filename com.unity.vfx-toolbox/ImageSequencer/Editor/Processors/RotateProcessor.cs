@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class RotateProcessor : GPUFrameProcessor<RotateProcessorSettings>
+    class RotateProcessor : GPUFrameProcessor<RotateProcessorSettings>
     {
 
         public RotateProcessor(FrameProcessorStack processorStack, ProcessorInfo info)

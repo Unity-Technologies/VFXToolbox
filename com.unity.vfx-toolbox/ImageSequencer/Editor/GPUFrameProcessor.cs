@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public abstract class GPUFrameProcessor<T> : FrameProcessor<T> where T : ProcessorSettingsBase
+    internal abstract class GPUFrameProcessor<T> : FrameProcessor<T> where T : ProcessorSettingsBase
     {
         protected Shader m_Shader;
         protected Material m_Material;

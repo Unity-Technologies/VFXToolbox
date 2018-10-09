@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class ProcessingFrameSequence
+    internal class ProcessingFrameSequence
     {
         public int numU
         {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public partial class ImageSequencer : EditorWindow
+    internal partial class ImageSequencer : EditorWindow
     {
         [MenuItem("Window/Visual Effects/Image Sequencer")]
         public static void OpenEditor()

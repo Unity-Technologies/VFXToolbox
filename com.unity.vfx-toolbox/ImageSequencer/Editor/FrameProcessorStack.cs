@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public partial class FrameProcessorStack
+    internal partial class FrameProcessorStack
     {
         public ProcessingFrameSequence inputSequence
         {

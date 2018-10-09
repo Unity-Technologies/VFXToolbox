@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class RetimeProcessor : GPUFrameProcessor<RetimeProcessorSettings>
+    class RetimeProcessor : GPUFrameProcessor<RetimeProcessorSettings>
     {
         CurveDrawer m_CurveDrawer;
 

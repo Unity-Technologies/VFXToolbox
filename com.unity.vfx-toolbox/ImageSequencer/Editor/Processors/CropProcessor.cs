@@ -4,7 +4,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     class CropProcessor : GPUFrameProcessor<CropProcessorSettings>
     {
-
         public CropProcessor(FrameProcessorStack stack, ProcessorInfo info) 
             : base("Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Crop.shader", stack, info)
         { }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox
 {
-    public static class VFXToolboxStyles
+    internal static class VFXToolboxStyles
     {
         // Custom Toggleable Header (in VFXToolboxGUIUtility)
         public static GUIStyle Header;

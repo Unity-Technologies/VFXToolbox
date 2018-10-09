@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class FadeProcessor : GPUFrameProcessor<FadeProcessorSettings>
+    class FadeProcessor : GPUFrameProcessor<FadeProcessorSettings>
     {
         CurveDrawer m_CurveDrawer;
 

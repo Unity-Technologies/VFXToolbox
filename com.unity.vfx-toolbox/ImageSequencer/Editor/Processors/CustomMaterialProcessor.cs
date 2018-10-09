@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class CustomMaterialProcessor : GPUFrameProcessor<CustomMaterialProcessorSettings>
+    class CustomMaterialProcessor : GPUFrameProcessor<CustomMaterialProcessorSettings>
     {
         private Editor m_MaterialEditor;
         private Shader m_CachedShader; 

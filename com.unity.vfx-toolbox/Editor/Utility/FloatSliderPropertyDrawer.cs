@@ -4,7 +4,7 @@ using UnityEngine.VFXToolbox;
 namespace UnityEditor.VFXToolbox
 {
     [CustomPropertyDrawer(typeof(FloatSliderAttribute))]
-    public class FloatSliderPropertyDrawer : PropertyDrawer
+    internal class FloatSliderPropertyDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

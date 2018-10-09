@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public partial class ImageSequencer : EditorWindow
+    internal partial class ImageSequencer : EditorWindow
     {
         private Splitter m_Splitter;
         private ReorderableList m_InputFramesReorderableList;

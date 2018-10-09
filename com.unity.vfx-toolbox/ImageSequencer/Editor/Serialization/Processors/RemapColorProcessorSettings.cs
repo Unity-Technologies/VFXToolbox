@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Color","Remap Color", typeof(RemapColorProcessor))]
-    public class RemapColorProcessorSettings : ProcessorSettingsBase
+    class RemapColorProcessorSettings : ProcessorSettingsBase
     {
         public enum RemapColorSource
         {

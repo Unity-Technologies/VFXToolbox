@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox
 {
-    class VFXToolboxGUIUtility
+    internal class VFXToolboxGUIUtility
     {
         #region GUIContent caching
         private static Dictionary<string, GUIContent> s_GUIContentCache;

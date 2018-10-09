@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox
 {
-    public class CurveDrawer
+    internal class CurveDrawer
     {
         private string m_CurveEditName;
         private int m_WidgetDefaultHeight;

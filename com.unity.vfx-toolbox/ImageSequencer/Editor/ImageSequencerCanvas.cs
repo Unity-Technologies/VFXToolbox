@@ -4,7 +4,7 @@ using System;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class ImageSequencerCanvas : VFXToolboxCanvas
+    internal class ImageSequencerCanvas : VFXToolboxCanvas
     {
 
         public bool showExtraInfo

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class RemoveBackgroundBlendingProcessor : GPUFrameProcessor<RemoveBackgroundSettings>
+    class RemoveBackgroundBlendingProcessor : GPUFrameProcessor<RemoveBackgroundSettings>
     {
 
         public RemoveBackgroundBlendingProcessor(FrameProcessorStack processorStack, ProcessorInfo info)

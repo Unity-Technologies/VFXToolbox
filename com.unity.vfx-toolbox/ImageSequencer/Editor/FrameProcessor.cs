@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public abstract class FrameProcessor
+    internal abstract class FrameProcessor
     {
         public int OutputWidth
         {
@@ -243,7 +243,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
     }
 
-    public abstract class FrameProcessor<T> : FrameProcessor where T : ProcessorSettingsBase
+    internal abstract class FrameProcessor<T> : FrameProcessor where T : ProcessorSettingsBase
     {
         public T settings { get { return m_Settings; } private set { m_Settings = value;  m_SerializedObject = new SerializedObject(m_Settings); } }
 

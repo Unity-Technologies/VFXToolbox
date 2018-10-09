@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class ProcessingFrame
+    internal class ProcessingFrame
     {
         public Texture texture
         {

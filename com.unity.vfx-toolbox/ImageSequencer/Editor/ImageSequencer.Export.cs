@@ -3,7 +3,7 @@ using System.IO;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public partial class ImageSequencer : EditorWindow
+    internal partial class ImageSequencer : EditorWindow
     {
         private string GetNumberedFileName(string pattern, int number, int maxFrames)
         {

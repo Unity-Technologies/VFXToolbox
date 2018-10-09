@@ -1,7 +1,7 @@
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Common","Resize", typeof(ResizeProcessor))]
-    public class ResizeProcessorSettings : ProcessorSettingsBase
+    class ResizeProcessorSettings : ProcessorSettingsBase
     {
         public ushort Width;
         public ushort Height;

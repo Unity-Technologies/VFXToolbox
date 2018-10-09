@@ -1,7 +1,7 @@
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Color","Premultiply Alpha", typeof(PremultiplyAlphaProcessor))]
-    public class PremultiplyAlphaProcessorSettings : ProcessorSettingsBase
+    class PremultiplyAlphaProcessorSettings : ProcessorSettingsBase
     {
         public bool RemoveAlpha;
         public float AlphaValue;

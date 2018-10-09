@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class ProcessorDataProvider : IProvider
+    internal class ProcessorDataProvider : IProvider
     {
         private Dictionary<Type, ProcessorAttribute> m_dataSource;
         private FrameProcessorStack m_processorStack;

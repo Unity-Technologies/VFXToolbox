@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Sequence","Loop Sequence", typeof(LoopingProcessor))]
-    public class LoopingProcessorSettings : ProcessorSettingsBase
+    class LoopingProcessorSettings : ProcessorSettingsBase
     {
         public AnimationCurve curve;
         public int syncFrame;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class BreakFlipbookProcessor : GPUFrameProcessor<BreakFilpbookProcessorSettings>
+    class BreakFlipbookProcessor : GPUFrameProcessor<BreakFilpbookProcessorSettings>
     {
         private bool m_BypassSecurityCheck = false;
 

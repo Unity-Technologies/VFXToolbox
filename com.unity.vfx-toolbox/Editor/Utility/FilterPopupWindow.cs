@@ -7,14 +7,14 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox
 {
-    public interface IProvider
+    internal interface IProvider
     {
         void CreateComponentTree(List<FilterPopupWindow.Element> tree);
         bool GoToChild(FilterPopupWindow.Element element, bool addIfComponent);
     }
 
     [InitializeOnLoad]
-    public class FilterPopupWindow : EditorWindow
+    internal class FilterPopupWindow : EditorWindow
     {
         public static readonly float DefaultWidth = 240f;
         public static readonly float DefaultHeight = 300f;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public partial class ImageSequencer : EditorWindow
+    internal partial class ImageSequencer : EditorWindow
     {
         static Styles s_Styles = null;
         public static Styles styles { get { if (s_Styles == null) s_Styles = new Styles(); return s_Styles; } }

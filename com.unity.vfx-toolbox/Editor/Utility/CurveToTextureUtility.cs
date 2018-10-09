@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox
 {
-    public class CurveToTextureUtility
+    internal class CurveToTextureUtility
     {
         public static void CurveToTexture(AnimationCurve curve, ref Texture2D texture)
         {

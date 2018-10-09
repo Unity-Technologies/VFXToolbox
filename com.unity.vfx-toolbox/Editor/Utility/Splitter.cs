@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox
 {
-    public class Splitter
+    internal class Splitter
     {
         public enum SplitLockMode
         {

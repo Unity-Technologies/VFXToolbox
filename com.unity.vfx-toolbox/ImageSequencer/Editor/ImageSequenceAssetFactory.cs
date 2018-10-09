@@ -5,7 +5,7 @@ using System.IO;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    public class ImageSequenceAssetFactory
+    internal class ImageSequenceAssetFactory
     {
         [MenuItem("Assets/Create/Visual Effects/Image Sequence", priority = 301)]
         private static void MenuCreatePostProcessingProfile()
@@ -32,7 +32,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         }
     }
 
-    public class ImageSequenceAssetCallbackHandler
+    internal class ImageSequenceAssetCallbackHandler
     {
         [OnOpenAsset(1)]
         public static bool OpenImageSequenceAsset(int instanceID, int line)

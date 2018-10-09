@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Color","Remove Background", typeof(RemoveBackgroundBlendingProcessor))]
-    public class RemoveBackgroundSettings : ProcessorSettingsBase
+    class RemoveBackgroundSettings : ProcessorSettingsBase
     {
         public Color BackgroundColor;
 

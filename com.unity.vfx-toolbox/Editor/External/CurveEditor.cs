@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox
 {
-    public sealed class CurveEditor
+    internal sealed class CurveEditor
     {
         #region Enums
 

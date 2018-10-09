@@ -4,7 +4,7 @@ using UnityEngine.VFXToolbox;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Common","Fix Borders", typeof(FixBordersProcessor))]
-    public class FixBordersProcessorSettings : ProcessorSettingsBase
+    class FixBordersProcessorSettings : ProcessorSettingsBase
     {
         public Vector4 FixFactors;
         public Color FadeToColor;

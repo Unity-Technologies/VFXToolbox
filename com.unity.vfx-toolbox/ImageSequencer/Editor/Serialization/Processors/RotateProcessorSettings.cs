@@ -1,7 +1,7 @@
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Common","Rotate", typeof(RotateProcessor))]
-    public class RotateProcessorSettings : ProcessorSettingsBase
+    class RotateProcessorSettings : ProcessorSettingsBase
     {
         public enum RotateMode
         {
