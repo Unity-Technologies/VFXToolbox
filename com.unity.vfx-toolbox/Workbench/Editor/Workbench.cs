@@ -7,7 +7,6 @@ namespace UnityEditor.VFXToolbox.Workbench
     public class Workbench : EditorWindow
     {
         Splitter m_Splitter;
-        WorkbenchImageCanvas m_Canvas;
         Texture2D m_Texture;
         private bool m_Dirty;
 
@@ -61,7 +60,8 @@ namespace UnityEditor.VFXToolbox.Workbench
         public void ReloadAsset()
         {
             m_Asset.tool.Dispose();
-            m_Asset.tool.Initialize();
+            m_Asset.tool.InitializeRuntime();
+            m_Asset.tool.InitializeEditor(this);
             Invalidate();
         }
 
@@ -80,7 +80,8 @@ namespace UnityEditor.VFXToolbox.Workbench
 
             if(m_Asset.tool != null)
             {
-                m_Asset.tool.Initialize();
+                m_Asset.tool.InitializeRuntime();
+                m_Asset.tool.InitializeEditor(this);
                 wantsMouseMove = true;
             }
 
@@ -110,9 +111,6 @@ namespace UnityEditor.VFXToolbox.Workbench
             if (m_Splitter == null)
                 m_Splitter = new Splitter(320.0f, OnDrawInspector, OnDrawCanvas, Splitter.SplitLockMode.LeftMinMax, new Vector2(320,480));
 
-            if (m_Canvas == null)
-                m_Canvas = new WorkbenchImageCanvas(splitterRect,this);
-
             using (new GUILayout.AreaScope(toolbarRect, GUIContent.none, EditorStyles.toolbar))
             using (new GUILayout.HorizontalScope())
             {
@@ -123,82 +121,26 @@ namespace UnityEditor.VFXToolbox.Workbench
 
             m_Splitter.DoSplitter(splitterRect);
 
-            HandleDropData();
-
             if (m_Dirty)
                 Repaint();
         }
 
         private void OnDrawToolbar()
         {
-            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+            // Get the toolbar from the current asset
+            if (m_Asset != null)
             {
-                bool prev;
-
-                bool bMaskR = m_Canvas.maskR;
-                bool bMaskG = m_Canvas.maskG;
-                bool bMaskB = m_Canvas.maskB;
-                bool bMaskA = m_Canvas.maskA;
-                bool bMaskRGB = bMaskR && bMaskG && bMaskB;
-
-                bMaskRGB = GUILayout.Toggle(bMaskRGB, styles.iconRGB, EditorStyles.toolbarButton);
-
-                if(bMaskRGB != (bMaskR && bMaskG && bMaskB))
-                {
-                    bMaskR = bMaskG = bMaskB = bMaskRGB;
-
-                    m_Canvas.maskR = bMaskR;
-                    m_Canvas.maskG = bMaskG;
-                    m_Canvas.maskB = bMaskB;
-
-                }
-
-                prev = bMaskR;
-                bMaskR = GUILayout.Toggle(bMaskR, VFXToolboxGUIUtility.Get("R"),styles.MaskRToggle);
-
-                if (bMaskR != prev)
-                    m_Canvas.maskR = bMaskR;
-
-                prev = bMaskG;
-                bMaskG = GUILayout.Toggle(bMaskG, VFXToolboxGUIUtility.Get("G"),styles.MaskGToggle);
-                if (bMaskG != prev)
-                    m_Canvas.maskG = bMaskG;
-
-                prev = bMaskB;
-                bMaskB = GUILayout.Toggle(bMaskB, VFXToolboxGUIUtility.Get("B"),styles.MaskBToggle);
-                if (bMaskB != prev)
-                    m_Canvas.maskB = bMaskB;
-
-                prev = bMaskA;
-                bMaskA = GUILayout.Toggle(bMaskA, VFXToolboxGUIUtility.Get("A"),styles.MaskAToggle);
-                if (bMaskA != prev)
-                    m_Canvas.maskA = bMaskA;
-
-
-                GUILayout.Space(20);
-                {
-                    Rect brightnessRect = GUILayoutUtility.GetRect(160, 24);
-                    GUI.Box(brightnessRect, GUIContent.none, EditorStyles.toolbarButton);
-                    GUI.Label(new RectOffset(4, 0, 0, 0).Remove(brightnessRect), VFXToolboxGUIUtility.GetTextAndIcon("Background|Sets the Background Brightness", "CheckerFloor"), EditorStyles.miniLabel);
-
-                    float newBrightness = GUI.HorizontalSlider(new RectOffset(82, 4, 0, 0).Remove(brightnessRect), m_Canvas.BackgroundBrightness, 0.0f, 1.0f);
-                    if (m_Canvas.BackgroundBrightness != newBrightness)
-                        m_Canvas.BackgroundBrightness = newBrightness;
-                }
-
-                GUILayout.FlexibleSpace();
+                m_Asset.tool.canvas.OnToolbarGUI();
             }
-            
         }
 
         private void OnDrawCanvas(Rect rect)
         {
-            m_Canvas.displayRect = rect;
-
+            // Get the canvas from the current asset
             if (m_Asset != null)
-                m_Canvas.OnGUI(m_Asset.tool);
-            else
-                m_Canvas.OnGUI();
+            {
+                m_Asset.tool.canvas.OnGUI(rect, m_Asset.tool);
+            }
         }
 
         private void OnDrawInspector(Rect rect)
@@ -257,26 +199,6 @@ namespace UnityEditor.VFXToolbox.Workbench
             m_Dirty = true;
         }
 
-        private bool HandleDropData()
-        {
-            if(DragAndDrop.paths.Length > 0)
-            {
-                DragAndDrop.visualMode = DragAndDropVisualMode.Link;
-                if( Event.current.type == EventType.DragExited)
-                {
-                    foreach(string path in DragAndDrop.paths)
-                    {
-                      Texture2D t = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-                        if(t != null)
-                        {
-                            m_Canvas.texture = t;
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
 
         #region styles
         public static Styles styles
@@ -298,47 +220,9 @@ namespace UnityEditor.VFXToolbox.Workbench
             public GUIStyle inspector { get { return m_Inspector; } }
             private GUIStyle m_Inspector;
 
-            public readonly GUIContent iconRGB = EditorGUIUtility.IconContent("PreTextureRGB", "Toggle RGB/Alpha only");
-            public readonly GUIContent iconMipMapUp = EditorGUIUtility.IconContent("PreTextureMipMapLow", "Go one MipMap up (smaller size)");
-            public readonly GUIContent iconMipMapDown = EditorGUIUtility.IconContent("PreTextureMipMapHigh", "Go one MipMap down (higher size)");
-
-            public GUIStyle MaskRToggle { get { if (EditorGUIUtility.isProSkin) return m_MaskRTogglePro; else return m_MaskRToggle; } }
-            public GUIStyle MaskGToggle { get { if (EditorGUIUtility.isProSkin) return m_MaskGTogglePro; else return m_MaskGToggle; } }
-            public GUIStyle MaskBToggle { get { if (EditorGUIUtility.isProSkin) return m_MaskBTogglePro; else return m_MaskBToggle; } }
-            public GUIStyle MaskAToggle { get { if (EditorGUIUtility.isProSkin) return m_MaskATogglePro; else return m_MaskAToggle; } }
-
-            private GUIStyle m_MaskRToggle;
-            private GUIStyle m_MaskRTogglePro;
-            private GUIStyle m_MaskGToggle;
-            private GUIStyle m_MaskGTogglePro;
-            private GUIStyle m_MaskBToggle;
-            private GUIStyle m_MaskBTogglePro;
-            private GUIStyle m_MaskAToggle;
-            private GUIStyle m_MaskATogglePro;
-
             public Styles()
             {
                 m_Inspector = new GUIStyle(EditorStyles.inspectorDefaultMargins);
-
-                m_MaskRToggle = new GUIStyle(EditorStyles.toolbarButton);
-                m_MaskGToggle = new GUIStyle(EditorStyles.toolbarButton);
-                m_MaskBToggle= new GUIStyle(EditorStyles.toolbarButton);
-                m_MaskAToggle= new GUIStyle(EditorStyles.toolbarButton);
-
-                m_MaskRToggle.onNormal.textColor = new Color(1.0f, 0.0f, 0.0f);
-                m_MaskGToggle.onNormal.textColor = new Color(0.0f, 0.6f, 0.2f);
-                m_MaskBToggle.onNormal.textColor = new Color(0.0f, 0.2f, 1.0f);
-                m_MaskAToggle.onNormal.textColor = new Color(0.5f, 0.5f, 0.5f);
-
-                m_MaskRTogglePro = new GUIStyle(EditorStyles.toolbarButton);
-                m_MaskGTogglePro= new GUIStyle(EditorStyles.toolbarButton);
-                m_MaskBTogglePro= new GUIStyle(EditorStyles.toolbarButton);
-                m_MaskATogglePro= new GUIStyle(EditorStyles.toolbarButton);
-
-                m_MaskRTogglePro.onNormal.textColor = new Color(2.0f, 0.3f, 0.3f);
-                m_MaskGTogglePro.onNormal.textColor = new Color(0.5f, 2.0f, 0.1f);
-                m_MaskBTogglePro.onNormal.textColor = new Color(0.2f, 0.6f, 2.0f);
-                m_MaskATogglePro.onNormal.textColor = new Color(2.0f, 2.0f, 2.0f);
             }
         }
 

@@ -44,7 +44,7 @@ namespace UnityEditor.VFXToolbox.Workbench
             RenderTexture.ReleaseTemporary(m_RenderTexture);
         }
 
-        public override void Default(WorkbenchBehaviour asset)
+        public override void Default(WorkbenchBehaviour asset) 
         {
             base.Default(asset);
             Width = 256;
@@ -72,10 +72,15 @@ namespace UnityEditor.VFXToolbox.Workbench
             RenderTexture.active = backup;
         }
 
-        public override void Initialize()
+        public override void InitializeRuntime()
         {
             m_RenderTexture = RenderTexture.GetTemporary(Width, Height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
             m_Material = new Material(Shader.Find("Hidden/VFXToolbox/ImageScripter/NoiseGen"));
+        }
+
+        protected override WorkbenchCanvasBase GetCanvas(Workbench window)
+        {
+            return new WorkbenchImageCanvas(window);
         }
 
         public override bool OnCanvasGUI(WorkbenchImageCanvas canvas)

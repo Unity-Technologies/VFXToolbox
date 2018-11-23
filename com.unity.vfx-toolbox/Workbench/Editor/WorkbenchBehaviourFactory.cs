@@ -47,7 +47,7 @@ namespace UnityEditor.VFXToolbox.Workbench
                 tool.name = tool.GetType().Name;
                 tool.hideFlags = HideFlags.HideInHierarchy;
                 EditorUtility.SetDirty(asset);
-                tool.Initialize();
+                tool.InitializeRuntime();
                 AssetDatabase.SaveAssets();
             }
 

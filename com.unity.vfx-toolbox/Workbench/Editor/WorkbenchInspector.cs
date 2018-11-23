@@ -88,7 +88,7 @@ namespace UnityEditor.VFXToolbox.Workbench
                 tool.objectReferenceValue = newTool;
                 EditorUtility.SetDirty(serializedObject.targetObject);
                 serializedObject.ApplyModifiedProperties();
-                (newTool as WorkbenchToolBase).Initialize();
+                (newTool as WorkbenchToolBase).InitializeRuntime();
             }
         }
 

@@ -151,6 +151,11 @@ namespace UnityEditor.VFXToolbox.Workbench
             }
         }
 
+        protected override WorkbenchCanvasBase GetCanvas(Workbench window)
+        {
+            return new WorkbenchImageCanvas(window);
+        }
+
         public void UpdateRenderTarget()
         {
             if (m_RenderTexture.width != PaintDataWidth || m_RenderTexture.height != PaintDataHeight)
@@ -162,7 +167,7 @@ namespace UnityEditor.VFXToolbox.Workbench
             }
         }
 
-        public override void Initialize()
+        public override void InitializeRuntime()
         {
             m_RenderTexture = RenderTexture.GetTemporary(PaintDataWidth, PaintDataHeight, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
             m_Material = new Material(Shader.Find("Hidden/VFXToolbox/ImageScripter/FlowMapPaint"));

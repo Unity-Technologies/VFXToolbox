@@ -7,7 +7,10 @@ namespace UnityEditor.VFXToolbox.Workbench
 {
     public abstract class WorkbenchToolBase : ScriptableObject
     {
+        public WorkbenchCanvasBase canvas { get { return m_Canvas; } }
+
         protected WorkbenchBehaviour m_Asset;
+        protected WorkbenchCanvasBase m_Canvas;
 
         public abstract bool OnInspectorGUI();
 
@@ -17,9 +20,16 @@ namespace UnityEditor.VFXToolbox.Workbench
             asset.tool = this;
         }
 
-        public abstract void Initialize();
+        public abstract void InitializeRuntime();
+        public void InitializeEditor(Workbench window)
+        {
+            m_Canvas = GetCanvas(window);
+        }
+        protected abstract WorkbenchCanvasBase GetCanvas(Workbench window);
+
         public abstract void Dispose();
         public abstract bool OnCanvasGUI(WorkbenchImageCanvas canvas);
+        
         public abstract void Update();
 
         public static string GetCategory(Type t)
