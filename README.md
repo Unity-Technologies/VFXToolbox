@@ -8,7 +8,7 @@ Additional tools for Visual Effect Artists.
 * Install Unity 2018.3 and run it for your project
 * Open Package Manager Window (Window/Package Manager)
 * Use the + Button at the bottom of the window and select "Add Package from Disk"
-* Navigate to the com.unity.vfx-toolbox directory then open the `manifest.json` file.
+* Navigate to the com.unity.vfx-toolbox directory then open the `package.json` file.
 
 You should be good to go!
 
