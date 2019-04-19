@@ -44,9 +44,9 @@ namespace UnityEditor.VFXToolbox.Workbench
             RenderTexture.ReleaseTemporary(m_RenderTexture);
         }
 
-        public override void Default(WorkbenchBehaviour asset) 
+        public override void AttachToBehaviour(WorkbenchBehaviour asset) 
         {
-            base.Default(asset);
+            base.AttachToBehaviour(asset);
             Width = 256;
             Height = 256;
             Depth = 5;

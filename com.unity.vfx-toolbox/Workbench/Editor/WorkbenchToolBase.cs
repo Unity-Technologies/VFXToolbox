@@ -12,25 +12,27 @@ namespace UnityEditor.VFXToolbox.Workbench
         protected WorkbenchBehaviour m_Asset;
         protected WorkbenchCanvasBase m_Canvas;
 
-        public abstract bool OnInspectorGUI();
 
-        public virtual void Default(WorkbenchBehaviour asset)
+        public abstract void Dispose();
+        public abstract void Update();
+
+        // Attachs the tool to the behaviour
+        public virtual void AttachToBehaviour(WorkbenchBehaviour asset)
         {
             m_Asset = asset;
             asset.tool = this;
         }
 
         public abstract void InitializeRuntime();
+
+        public abstract bool OnInspectorGUI();
+        public abstract bool OnCanvasGUI(WorkbenchImageCanvas canvas);
+
         public void InitializeEditor(Workbench window)
         {
             m_Canvas = GetCanvas(window);
         }
         protected abstract WorkbenchCanvasBase GetCanvas(Workbench window);
-
-        public abstract void Dispose();
-        public abstract bool OnCanvasGUI(WorkbenchImageCanvas canvas);
-        
-        public abstract void Update();
 
         public static string GetCategory(Type t)
         {

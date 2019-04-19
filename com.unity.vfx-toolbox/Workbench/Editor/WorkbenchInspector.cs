@@ -82,7 +82,7 @@ namespace UnityEditor.VFXToolbox.Workbench
                 DestroyImmediate(tool.objectReferenceValue,true);
                 var newTool = CreateInstance((Type)type);
                 AssetDatabase.AddObjectToAsset(newTool, serializedObject.targetObject);
-                (newTool as WorkbenchToolBase).Default((WorkbenchBehaviour)serializedObject.targetObject);
+                (newTool as WorkbenchToolBase).AttachToBehaviour((WorkbenchBehaviour)serializedObject.targetObject);
                 newTool.name = ((Type)type).Name;
                 newTool.hideFlags = HideFlags.HideInHierarchy;
                 tool.objectReferenceValue = newTool;

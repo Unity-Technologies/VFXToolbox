@@ -43,7 +43,7 @@ namespace UnityEditor.VFXToolbox.Workbench
             if(tool != null)
             {
                 AssetDatabase.AddObjectToAsset(tool, asset);
-                tool.Default(asset);
+                tool.AttachToBehaviour(asset);
                 tool.name = tool.GetType().Name;
                 tool.hideFlags = HideFlags.HideInHierarchy;
                 EditorUtility.SetDirty(asset);

@@ -120,9 +120,9 @@ namespace UnityEditor.VFXToolbox.Workbench
             return bchanged;
         }
 
-        public override void Default(WorkbenchBehaviour asset)
+        public override void AttachToBehaviour(WorkbenchBehaviour asset)
         {
-            base.Default(asset);
+            base.AttachToBehaviour(asset);
             PaintDataWidth = 256;
             PaintDataHeight = 256;
             ViewMode = FlowMapPainterViewMode.Texture;
