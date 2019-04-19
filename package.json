@@ -1,13 +1,16 @@
 {
-    "name":"com.unity.vfx-toolbox",
-    "displayName": "VFX Toolbox",
-    "version":"0.1.0",
-    "description":"Additional Tools for VFX Artists",
-    "keywords":[
-        "vfx",
-        "tools",
-        "flipbooks",
-        "visual",
-        "effects"
-    ]
+  "name": "com.unity.vfx-toolbox",
+  "displayName": "VFX Toolbox",
+  "version": "1.0.0-preview",
+  "description": "Additional Tools for VFX Artists.\n\n* Image Sequencer\n* Houdini Exporters for Visual Effect Graph",
+  "keywords": [
+    "vfx",
+    "tools",
+    "flipbooks",
+    "visual",
+    "effects"
+  ],
+  "type": "tool",
+  "hideInEditor": false,
+  "unity": "2018.3"
 }

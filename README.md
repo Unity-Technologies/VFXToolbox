@@ -15,7 +15,7 @@ Additional tools for Visual Effect Artists.
 
 * Install Unity 2018.3 or newer
 * Open your project's `Packages/manifest.json` file with a text editor
-* Add the following line to `dependencies` list :  `"com.unity.vfx-toolbox": "https://github.com/Unity-Technologies/VFXToolbox.git",`
+* Add the following line to `dependencies` list :  `"com.unity.vfx-toolbox": "https://github.com/Unity-Technologies/VFXToolbox.git#1.0.0-preview",`
 
 You should be good to go!
 
