@@ -18,6 +18,7 @@ namespace UnityEditor.VFXToolbox
         public const string m_RootFolder = "Assets/VFXResources";
         public const string m_NormalNomenclaturePostFix = "_nrm";
         public const string m_LinearNomenclatureSuffix = "_lin";
+        public const string m_OpticalFlowNomenclatureSuffix = "_of";
         public readonly string[] m_Labels = new string[] { "Weapon", "Audio" };
         
         void OnPreprocessTexture()
@@ -36,6 +37,10 @@ namespace UnityEditor.VFXToolbox
 
                 // if containing linear suffix, switch to linear
                 if (filename.ToLower().Contains(m_LinearNomenclatureSuffix.ToLower()))
+                    usage = Usage.LinearData;
+
+                // if containing opticalflow suffix, switch to linear
+                if (filename.ToLower().Contains(m_OpticalFlowNomenclatureSuffix.ToLower()))
                     usage = Usage.LinearData;
 
                 // if HDR, switch to linear
