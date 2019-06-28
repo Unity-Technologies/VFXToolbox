@@ -1,7 +1,7 @@
 {
     "name":"com.unity.vfx-toolbox",
     "displayName": "VFX Toolbox",
-    "version":"0.1.0",
+    "version":"0.1.1-preview",
     "description":"Additional Tools for VFX Artists",
     "keywords":[
         "vfx",
