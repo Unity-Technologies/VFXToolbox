@@ -6,14 +6,15 @@ Additional tools for Visual Effect Artists.
 #### Local Package Install : 
 
 * Git Clone this repository (or download zip and unzip locally)
-* Install Unity 2018.3 or newer and run it for your project
+* Install Unity 2019.1 or newer and run it for your project
 * Open Package Manager Window (Window/Package Manager)
 * Use the + Button at the bottom of the window and select "Add Package from Disk"
 * Navigate to the root of the repository directory then open the `package.json` file.
 
 #### Git Reference Install (Package will be available as read-only):
 
-* Install Unity 2018.3 or newer
+* *(Make sure you have Git CLI installed on your system and path correctly configured)*
+* Install Unity 2019.1 or newer
 * Open your project's `Packages/manifest.json` file with a text editor
 * Add the following line to `dependencies` list :  `"com.unity.vfx-toolbox": "https://github.com/Unity-Technologies/VFXToolbox.git#1.0.0-preview",`
 
