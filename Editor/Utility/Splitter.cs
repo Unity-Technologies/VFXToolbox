@@ -97,12 +97,10 @@ namespace UnityEditor.VFXToolbox
             }
 
             RectOffset o = new RectOffset(7, 8, 0, 0);
-            EditorGUI.DrawRect(o.Remove(resizeActiveArea), new Color(0,0,0,1.0f));
+            EditorGUI.DrawRect(o.Remove(resizeActiveArea), new Color(0,0,0,0.5f));
             if (Event.current.type == EventType.MouseUp)
                 m_Resize = false;
         }
-
-
 
     }
 }

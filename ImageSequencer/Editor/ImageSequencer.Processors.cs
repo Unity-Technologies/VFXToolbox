@@ -151,8 +151,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             Rect toggle_rect = new Rect(rect.x + 4, rect.y, 16, rect.height);
             Rect label_rect = new Rect(rect.x + 24, rect.y, rect.width - 24, rect.height);
-            Rect view_rect = new Rect(rect.x + rect.width - 37, rect.y, 19, 18);
-            Rect lock_rect = new Rect(rect.x + rect.width - 16, rect.y+1, 16, 14);
+            Rect view_rect = new Rect(rect.x + rect.width - 37, rect.y+2, 16, 16);
+            Rect lock_rect = new Rect(rect.x + rect.width - 16, rect.y+2, 16, 14);
 
             bool enabled = GUI.Toggle(toggle_rect, m_processorStack.processors[index].Enabled,"");
             if(enabled != m_processorStack.processors[index].Enabled)

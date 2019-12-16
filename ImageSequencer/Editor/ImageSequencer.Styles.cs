@@ -9,6 +9,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public class Styles
         {
+            public const int ToolbarHeight = 21;
+
             public GUIStyle scrollView;
 
             public GUIStyle playbackControlWindow;

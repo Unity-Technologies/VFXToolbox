@@ -26,7 +26,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if(m_PreviewCanvas == null)
             {
-                m_PreviewCanvas = new ImageSequencerCanvas(new Rect(0, 16, position.width - m_Splitter.value, position.height - 16),this);
+                m_PreviewCanvas = new ImageSequencerCanvas(new Rect(0, Styles.ToolbarHeight, position.width - m_Splitter.value, position.height - Styles.ToolbarHeight),this);
             }
 
             CheckGraphicsSettings();
@@ -39,6 +39,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             InitializeGUI();
 
+            if(m_CurrentAsset == null)
             if(m_CurrentAsset == null)
             {
                 OnNoAssetGUI();
@@ -156,7 +157,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         private void DrawToolbar()
         {
-            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar, GUILayout.Height(Styles.ToolbarHeight)))
             {
                 EditorGUI.BeginChangeCheck();
                 bool prev;
@@ -168,7 +169,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 bool bMaskRGB = bMaskR && bMaskG && bMaskB;
 
                 //GUILayout.Space(m_Splitter.value);
-                using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar, GUILayout.Width(m_Splitter.value)))
+                using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar, GUILayout.Width(m_Splitter.value-1)))
                 {
                     if (GUILayout.Button(VFXToolboxGUIUtility.Get("Current Sequence: "+m_CurrentAsset.name), EditorStyles.toolbarButton))
                     {
@@ -198,23 +199,23 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 }
 
                 prev = bMaskR;
-                bMaskR = GUILayout.Toggle(bMaskR, VFXToolboxGUIUtility.Get("R"),styles.MaskRToggle);
+                bMaskR = GUILayout.Toggle(bMaskR, VFXToolboxGUIUtility.Get("R"),styles.MaskRToggle, GUILayout.Width(20));
 
                 if (bMaskR != prev)
                     m_PreviewCanvas.maskR = bMaskR;
 
                 prev = bMaskG;
-                bMaskG = GUILayout.Toggle(bMaskG, VFXToolboxGUIUtility.Get("G"),styles.MaskGToggle);
+                bMaskG = GUILayout.Toggle(bMaskG, VFXToolboxGUIUtility.Get("G"),styles.MaskGToggle, GUILayout.Width(20));
                 if (bMaskG != prev)
                     m_PreviewCanvas.maskG = bMaskG;
 
                 prev = bMaskB;
-                bMaskB = GUILayout.Toggle(bMaskB, VFXToolboxGUIUtility.Get("B"),styles.MaskBToggle);
+                bMaskB = GUILayout.Toggle(bMaskB, VFXToolboxGUIUtility.Get("B"),styles.MaskBToggle, GUILayout.Width(20));
                 if (bMaskB != prev)
                     m_PreviewCanvas.maskB = bMaskB;
 
                 prev = bMaskA;
-                bMaskA = GUILayout.Toggle(bMaskA, VFXToolboxGUIUtility.Get("A"),styles.MaskAToggle);
+                bMaskA = GUILayout.Toggle(bMaskA, VFXToolboxGUIUtility.Get("A"),styles.MaskAToggle, GUILayout.Width(20));
                 if (bMaskA != prev)
                     m_PreviewCanvas.maskA = bMaskA;
 
@@ -231,14 +232,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             Rect mipRect = GUILayoutUtility.GetRect(164, 24);
                             GUI.Box(mipRect, GUIContent.none, VFXToolboxStyles.toolbarButton);
 
-                            GUI.Label(new RectOffset(0, 0, 0, 0).Remove(mipRect), styles.iconMipMapDown);
-                            newMip = (int)Mathf.Round(GUI.HorizontalSlider(new RectOffset(24,64,0,0).Remove(mipRect), (float)newMip, 0.0f, (float)m_PreviewCanvas.mipMapCount-1));
-                            GUI.Label(new RectOffset(100, 0, 0, 0).Remove(mipRect), styles.iconMipMapUp);
+                            GUI.Label(new RectOffset(0, 0, -6, 0).Remove(mipRect), styles.iconMipMapDown);
+                            newMip = (int)Mathf.Round(GUI.HorizontalSlider(new RectOffset(24,64,1,0).Remove(mipRect), (float)newMip, 0.0f, (float)m_PreviewCanvas.mipMapCount-1));
+                            GUI.Label(new RectOffset(100, 0, -6, 0).Remove(mipRect), styles.iconMipMapUp);
                             if (newMip != currentMip)
                             {
                                 m_PreviewCanvas.mipMap = newMip;
                             }
-                            GUI.Label(new RectOffset(124, 0, 0, 0).Remove(mipRect), (m_PreviewCanvas.mipMap+1)+"/"+m_PreviewCanvas.mipMapCount, VFXToolboxStyles.toolbarLabelLeft);
+                            GUI.Label(new RectOffset(124, 0, 3, 0).Remove(mipRect), (m_PreviewCanvas.mipMap+1)+"/"+m_PreviewCanvas.mipMapCount, VFXToolboxStyles.toolbarLabelLeft);
                         }
                     }
                 }
@@ -253,9 +254,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 {
                     Rect brightnessRect = GUILayoutUtility.GetRect(160, 24);
                     GUI.Box(brightnessRect, GUIContent.none, VFXToolboxStyles.toolbarButton);
-                    GUI.Label(new RectOffset(4, 0, 0, 0).Remove(brightnessRect), VFXToolboxGUIUtility.GetTextAndIcon("Background|Sets the Background Brightness", "CheckerFloor"), VFXToolboxStyles.toolbarLabelLeft);
+                    GUI.Label(new RectOffset(4, 0, 2, 0).Remove(brightnessRect), VFXToolboxGUIUtility.GetTextAndIcon("Background|Sets the Background Brightness", "CheckerFloor"), VFXToolboxStyles.toolbarLabelLeft);
 
-                    float newBrightness = GUI.HorizontalSlider(new RectOffset(82, 4, 0, 0).Remove(brightnessRect), previewCanvas.BackgroundBrightness, 0.0f, 1.0f);
+                    float newBrightness = GUI.HorizontalSlider(new RectOffset(82, 6, 1, 0).Remove(brightnessRect), previewCanvas.BackgroundBrightness, 0.0f, 1.0f);
                     if (previewCanvas.BackgroundBrightness != newBrightness)
                         previewCanvas.BackgroundBrightness = newBrightness;
                 }
@@ -269,16 +270,16 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
 
             if (previewCanvas.sequence.length > 1)
-                previewCanvas.displayRect = new Rect(m_Splitter.value, 16, position.width - m_Splitter.value, position.height - 116);
+                previewCanvas.displayRect = new Rect(m_Splitter.value, Styles.ToolbarHeight, position.width - m_Splitter.value, position.height - 100 - Styles.ToolbarHeight);
             else
-                previewCanvas.displayRect = new Rect(m_Splitter.value, 16, position.width - m_Splitter.value, position.height - 16);
+                previewCanvas.displayRect = new Rect(m_Splitter.value, Styles.ToolbarHeight, position.width - m_Splitter.value, position.height - Styles.ToolbarHeight);
 
             previewCanvas.OnGUI(this);
 
             // Draw Update Button
             if(m_CurrentAsset.exportSettings.fileName != "")
             {
-                Rect exportButtonRect = new Rect(position.width - 100, 24, 74, 24);
+                Rect exportButtonRect = new Rect(position.width - 100, Styles.ToolbarHeight + 12, 74, 24);
                 if (GUI.Button(exportButtonRect, VFXToolboxGUIUtility.GetTextAndIcon("Update", "SaveActive"), VFXToolboxStyles.TabButtonSingle))
                 {
                     UpdateExportedAssets();
@@ -638,7 +639,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         private void UpdateCanvasRect()
         {
-            previewCanvas.displayRect = new Rect(m_Splitter.value, 16, position.width - m_Splitter.value, position.height - 16 );
+            previewCanvas.displayRect = new Rect(m_Splitter.value, Styles.ToolbarHeight , position.width - m_Splitter.value, position.height - Styles.ToolbarHeight);
         }
 
         public void Invalidate()
@@ -663,7 +664,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             public override Vector2 GetWindowSize()
             {
-                return new Vector2(200, 292);
+                return new Vector2(200, 300);
             }
 
             public override void OnGUI(Rect rect)
@@ -730,18 +731,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             }
                         }
 
-                        /*
                         DoHeaderLayout("Help and Feedback");
-                        if(GUILayout.Button(VFXToolboxGUIUtility.Get("Documentation"),s_Styles.menuItem))
+                        if(GUILayout.Button(VFXToolboxGUIUtility.Get("GitHub Repository"),s_Styles.menuItem))
                         {
-                            Application.OpenURL("https://drive.google.com/open?id=1YUwzA1mGvzWRpajDV-XF0iUd4RhW--bhMpqo-gmj9B8");
+                            Application.OpenURL("https://github.com/Unity-Technologies/VFXToolbox");
                         }
-
-                        if(GUILayout.Button(VFXToolboxGUIUtility.Get("Forums (for Feedback)"),s_Styles.menuItem))
-                        {
-                            Application.OpenURL("https://forum.unity3d.com/forums/vfx-toolbox.119/");
-                        }
-                        */
 
                         if(EditorGUI.EndChangeCheck())
                         {
@@ -770,8 +764,15 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             private class Styles
             {
-                public readonly GUIStyle menuItem = (GUIStyle)"MenuItem";
-                public readonly GUIStyle separator = (GUIStyle)"sv_iconselector_sep";
+                public readonly GUIStyle menuItem;
+                public readonly GUIStyle separator;
+
+                public Styles()
+                {
+                    menuItem = new GUIStyle((GUIStyle)"MenuItem");
+                    menuItem.fixedHeight += 2;
+                    separator = new GUIStyle((GUIStyle)"sv_iconselector_sep");
+                }
             }
         }
 
