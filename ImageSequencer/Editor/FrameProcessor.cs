@@ -30,7 +30,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get {
                 if (Enabled)
-                    return m_Processor.GetNumU(this);
+                    return m_Processor.numU;
                 else
                     return InputSequence.numU;
             }
@@ -39,7 +39,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get {
                 if (Enabled)
-                    return m_Processor.GetNumV(this);
+                    return m_Processor.numV;
                 else
                     return InputSequence.numV;
             }
@@ -94,6 +94,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             Linear = true;
             GenerateMipMaps = true;
+
+            settings.AttachTo(this);
         }
 
         public void SetEnabled(bool value)
@@ -116,17 +118,17 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if(Enabled != m_ProcessorInfo.Enabled)
                 Enabled = m_ProcessorInfo.Enabled;
             UpdateSequenceLength();
-            m_Processor.UpdateOutputSize(this);
+            m_Processor.UpdateOutputSize();
         }
 
         protected virtual int GetOutputWidth()
         {
-            m_Processor.UpdateOutputSize(this);
+            m_Processor.UpdateOutputSize();
             return m_OutputWidth;
         }
         protected virtual int GetOutputHeight()
         {
-            m_Processor.UpdateOutputSize(this);
+            m_Processor.UpdateOutputSize();
             return m_OutputHeight;
         }
         public void SetOutputSize(int width, int height)
@@ -172,7 +174,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             using (new EditorGUI.DisabledScope(!Enabled))
             {
                 m_SerializedObject.Update();
-                bHasChanged = m_Processor.OnInspectorGUI(bHasChanged, m_SerializedObject, this);
+                bHasChanged = m_Processor.OnInspectorGUI(bHasChanged, m_SerializedObject);
                 m_SerializedObject.ApplyModifiedProperties();
             }
 
@@ -203,9 +205,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         }
         public bool Process(int frame)
         {
-            return m_Processor.Process(this, frame);
+            return m_Processor.Process(frame);
         }
-
         public void ExecuteShaderAndDump(int outputframe, Texture mainTex)
         {
             ExecuteShaderAndDump(outputframe, mainTex, material);
@@ -218,14 +219,12 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         }
         public int GetProcessorSequenceLength()
         {
-            return m_Processor.GetProcessorSequenceLength(this);
+            return m_Processor.sequenceLength;
         }
-
         public bool Process(ProcessingFrame frame)
         {
             return Process(OutputSequence.frames.IndexOf(frame));
         }
-
         public void UpdateSequenceLength()
         {
             int currentCount = m_OutputSequence.frames.Count;
@@ -251,7 +250,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 }
             }
         }
-
         public void Invalidate()
         {
             UpdateSequenceLength();
@@ -262,22 +260,18 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if(next != null)
                 next.Invalidate();
         }
-
         public string GetName()
         {
             return m_Processor.processorName;
         }
-
         public string GetLabel()
         {
             return m_Processor.label;
         }
-
         public override string ToString()
         {
             return GetLabel() + (Enabled ? "" : " (Disabled)");
         }
-
         public ProcessorBase GetSettingsAbstract()
         {
             return settings;

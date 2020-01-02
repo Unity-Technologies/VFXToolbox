@@ -22,24 +22,21 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             FlipbookNumV = 5;
         }
 
-        public override void UpdateOutputSize(FrameProcessor processor)
+        public override void UpdateOutputSize()
         {
             int width = (int)Mathf.Ceil((float)processor.InputSequence.RequestFrame(0).texture.width / FlipbookNumU);
             int height = (int)Mathf.Ceil((float)processor.InputSequence.RequestFrame(0).texture.height / FlipbookNumV);
             processor.SetOutputSize(width, height);
         }
 
-        public override int GetProcessorSequenceLength(FrameProcessor processor)
-        {
-            return Mathf.Min(FlipbookNumU, processor.InputSequence.width) * Mathf.Min(FlipbookNumV, processor.InputSequence.height);
-        }
+        public override int sequenceLength => Mathf.Min(FlipbookNumU, processor.InputSequence.width) * Mathf.Min(FlipbookNumV, processor.InputSequence.height);
 
         public override bool OnCanvasGUI(ImageSequencerCanvas canvas)
         {
             return false;
         }
 
-        public override bool Process(FrameProcessor processor, int frame)
+        public override bool Process(int frame)
         {
             Texture texture = processor.InputSequence.RequestFrame(0).texture;
             processor.material.SetTexture("_MainTex", texture);
@@ -60,7 +57,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             return true;
         }
 
-        public override bool OnInspectorGUI(bool hasChanged, SerializedObject serializedObject, FrameProcessor processor)
+        public override bool OnInspectorGUI(bool hasChanged, SerializedObject serializedObject)
         {
             var flipbookNumU = serializedObject.FindProperty("FlipbookNumU");
             var flipbookNumV = serializedObject.FindProperty("FlipbookNumV");

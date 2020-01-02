@@ -38,7 +38,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             Mode = AssembleMode.FullSpriteSheet;
         }
 
-        public override void UpdateOutputSize(FrameProcessor processor)
+        public override void UpdateOutputSize()
         {
             switch (Mode)
             {
@@ -52,21 +52,24 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     processor.SetOutputSize(processor.InputSequence.width, processor.InputSequence.height * FlipbookNumV);
                     break;
             }
-
         }
 
-        public override int GetProcessorSequenceLength(FrameProcessor processor)
+        public override int sequenceLength
         {
-            switch (Mode)
+            get 
             {
-                default:
-                case AssembleMode.FullSpriteSheet:
-                    return 1;
+                switch (Mode)
+                {
+                    default:
+                    case AssembleMode.FullSpriteSheet:
+                        return 1;
 
-                case AssembleMode.VerticalSequence:
-                    return processor.InputSequence.length / FlipbookNumV;
+                    case AssembleMode.VerticalSequence:
+                        return processor.InputSequence.length / FlipbookNumV;
+                }
             }
         }
+
 
         public override bool OnCanvasGUI(ImageSequencerCanvas canvas)
         {
@@ -97,24 +100,24 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             return false;
         }
 
-        public override int GetNumU(FrameProcessor processor)
+        public override int numU
         {
-            switch (Mode)
+            get
             {
-                default:
-                case AssembleMode.FullSpriteSheet:
-                    return FlipbookNumU * processor.InputSequence.numU;
-                case AssembleMode.VerticalSequence:
-                    return processor.InputSequence.numU;
+                switch (Mode)
+                {
+                    default:
+                    case AssembleMode.FullSpriteSheet:
+                        return FlipbookNumU * processor.InputSequence.numU;
+                    case AssembleMode.VerticalSequence:
+                        return processor.InputSequence.numU;
+                }
             }
         }
 
-        public override int GetNumV(FrameProcessor processor)
-        {
-            return FlipbookNumV * processor.InputSequence.numV;
-        }
+        public override int numV => FlipbookNumV * processor.InputSequence.numV;
 
-        public override bool Process(FrameProcessor processor, int frame)
+        public override bool Process(int frame)
         {
             int length = processor.InputSequence.length;
 
@@ -179,7 +182,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         bool hasChanged = false;
 
-        public override bool OnInspectorGUI(bool changed, SerializedObject serializedObject, FrameProcessor processor)
+        public override bool OnInspectorGUI(bool changed, SerializedObject serializedObject)
         {
             var flipbookNumU = serializedObject.FindProperty("FlipbookNumU");
             var flipbookNumV = serializedObject.FindProperty("FlipbookNumV");
@@ -261,7 +264,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                                                 seq_flipbookNumV.intValue = seq_numV;
 
                                                 serializedObject.ApplyModifiedProperties();
-                                                UpdateOutputSize(processor);
+                                                UpdateOutputSize();
                                                 processor.Invalidate();
                                             } 
                                     , value);
@@ -303,7 +306,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (EditorGUI.EndChangeCheck())
             {
-                UpdateOutputSize(processor);
+                UpdateOutputSize();
                 processor.Invalidate();
                 hasChanged = true;
             }
