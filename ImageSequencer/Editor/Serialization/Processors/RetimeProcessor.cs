@@ -74,7 +74,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 m_CurveDrawer.OnPostGUI = OnCurveFieldGUI;
             }
 
-
             var useCurve = serializedObject.FindProperty("useCurve");
             var outputSequenceLength = serializedObject.FindProperty("outputSequenceLength");
 
