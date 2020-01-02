@@ -64,15 +64,15 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             get { return m_ProcessorInfo; }
         }
 
-        protected FrameProcessorStack m_ProcessorStack;
-        protected ProcessingFrameSequence m_OutputSequence;
+        private FrameProcessorStack m_ProcessorStack;
+        private ProcessingFrameSequence m_OutputSequence;
 
-        protected bool m_bEnabled;
+        private bool m_bEnabled;
 
-        protected int m_OutputWidth;
-        protected int m_OutputHeight;
+        private int m_OutputWidth;
+        private int m_OutputHeight;
 
-        public ProcessorBase settings { get { return m_Processor; } private set { m_Processor = value; m_SerializedObject = new SerializedObject(m_Processor); } }
+        public ProcessorBase processor { get { return m_Processor; } private set { m_Processor = value; m_SerializedObject = new SerializedObject(m_Processor); } }
 
         private SerializedObject m_SerializedObject;
         private ProcessorBase m_Processor;
@@ -80,22 +80,26 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public Shader shader { get; private set; }
         public Material material { get; private set; }
 
+        public bool isCurrentlyPreviewed => m_ProcessorStack.imageSequencer.previewCanvas.sequence.processor == this;
+        public int currentPreviewFrame => m_ProcessorStack.imageSequencer.previewCanvas.currentFrameIndex;
+        public int currentPreviewSequenceLength => m_ProcessorStack.imageSequencer.previewCanvas.numFrames;
+
         public FrameProcessor(FrameProcessorStack processorStack, ProcessorInfo info)
         {
             m_ProcessorInfo = info;
             m_bEnabled = m_ProcessorInfo.Enabled;
             m_ProcessorStack = processorStack;
-            settings = m_ProcessorInfo.Settings;
+            processor = m_ProcessorInfo.Settings;
             m_OutputSequence = new ProcessingFrameSequence(this);
 
-            shader = AssetDatabase.LoadAssetAtPath<Shader>(settings.shaderPath);
+            shader = AssetDatabase.LoadAssetAtPath<Shader>(processor.shaderPath);
             material = new Material(shader) { hideFlags = HideFlags.DontSave };
             material.hideFlags = HideFlags.DontSave;
 
             Linear = true;
             GenerateMipMaps = true;
 
-            settings.AttachTo(this);
+            processor.AttachTo(this);
         }
 
         public void SetEnabled(bool value)
@@ -274,7 +278,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         }
         public ProcessorBase GetSettingsAbstract()
         {
-            return settings;
+            return processor;
         }
 
     }

@@ -12,7 +12,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override string processorName => "Break Flipbook";
 
-        public override string label => $"{name} ({FlipbookNumU}x{FlipbookNumV}): {FlipbookNumU * FlipbookNumV} frame(s).";
+        public override string label => $"{processorName} ({FlipbookNumU}x{FlipbookNumV}): {FlipbookNumU * FlipbookNumV} frame(s).";
 
         private bool m_BypassSecurityCheck = false;
 
