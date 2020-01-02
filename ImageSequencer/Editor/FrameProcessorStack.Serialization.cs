@@ -83,7 +83,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             AddProcessorInfoObjectToAsset(asset, processor.ProcessorInfo);
             asset.processorInfos.Add(processor.ProcessorInfo);
 
-            ProcessorSettingsBase settings = processor.GetSettingsAbstract();
+            ProcessorBase settings = processor.GetSettingsAbstract();
             if (settings != null)
             {
                 AddSettingsObjectToAsset(asset, settings);
@@ -147,8 +147,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             // Creating Runtime
             foreach(ProcessorInfo procInfo in infos)
             {
-                Type processorType = settingsDefinitions[procInfo.Settings.GetType()].processorType;
-                var processor = (FrameProcessor)Activator.CreateInstance(processorType, this, procInfo);
+                var processor = (FrameProcessor)Activator.CreateInstance(typeof(FrameProcessor), this, procInfo);
                 m_Processors.Add(processor);
             }
         }

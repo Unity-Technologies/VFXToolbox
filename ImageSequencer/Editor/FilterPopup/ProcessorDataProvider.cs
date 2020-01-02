@@ -94,11 +94,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             // Reflection Stuff here
             ProcessorAttribute attribute = m_processorStack.settingsDefinitions[settingType];
-            Type processorType = attribute.processorType;
 
             var info = ProcessorInfo.CreateDefault(attribute.name, true, settingType);
 
-            processor = (FrameProcessor)Activator.CreateInstance(processorType, m_processorStack, info);
+            processor = (FrameProcessor)Activator.CreateInstance(typeof(FrameProcessor), m_processorStack, info);
 
             if(processor != null)
             {

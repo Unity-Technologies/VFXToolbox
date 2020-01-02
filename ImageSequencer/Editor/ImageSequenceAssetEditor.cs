@@ -81,7 +81,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     for(int i = 0; i < processorsCount; i++)
                     {
                         var item = processors.GetArrayElementAtIndex(i).objectReferenceValue as ProcessorInfo;
-                        EditorGUILayout.LabelField("#"+i+" - " + item.ProcessorName + (item.Enabled?"":" (Disabled)"));
+                        EditorGUILayout.LabelField("#"+i+" - " + item.Settings.label + (item.Enabled?"":" (Disabled)"));
                     }
                     EditorGUI.indentLevel--;
                 }

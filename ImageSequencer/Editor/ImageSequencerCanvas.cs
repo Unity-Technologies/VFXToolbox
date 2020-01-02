@@ -6,7 +6,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     internal class ImageSequencerCanvas : VFXToolboxCanvas
     {
-
         public bool showExtraInfo
         {
             get

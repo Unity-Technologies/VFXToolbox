@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    internal abstract class FrameProcessor
+    internal class FrameProcessor
     {
         public int OutputWidth
         {
@@ -30,7 +30,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get {
                 if (Enabled)
-                    return GetNumU();
+                    return m_Processor.GetNumU(this);
                 else
                     return InputSequence.numU;
             }
@@ -39,7 +39,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get {
                 if (Enabled)
-                    return GetNumV();
+                    return m_Processor.GetNumV(this);
                 else
                     return InputSequence.numV;
             }
@@ -72,15 +72,26 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         protected int m_OutputWidth;
         protected int m_OutputHeight;
 
-        protected ProcessorInfo m_ProcessorInfo;
+        public ProcessorBase settings { get { return m_Processor; } private set { m_Processor = value; m_SerializedObject = new SerializedObject(m_Processor); } }
+
+        private SerializedObject m_SerializedObject;
+        private ProcessorBase m_Processor;
+        private ProcessorInfo m_ProcessorInfo;
+        public Shader shader { get; private set; }
+        public Material material { get; private set; }
 
         public FrameProcessor(FrameProcessorStack processorStack, ProcessorInfo info)
         {
             m_ProcessorInfo = info;
-            m_ProcessorInfo.ProcessorName = GetName();
             m_bEnabled = m_ProcessorInfo.Enabled;
             m_ProcessorStack = processorStack;
+            settings = m_ProcessorInfo.Settings;
             m_OutputSequence = new ProcessingFrameSequence(this);
+
+            shader = AssetDatabase.LoadAssetAtPath<Shader>(settings.shaderPath);
+            material = new Material(shader) { hideFlags = HideFlags.DontSave };
+            material.hideFlags = HideFlags.DontSave;
+
             Linear = true;
             GenerateMipMaps = true;
         }
@@ -94,8 +105,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             info.ApplyModifiedProperties();
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
+            Material.DestroyImmediate(material);
             m_OutputSequence.Dispose();
         }
 
@@ -104,25 +116,19 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if(Enabled != m_ProcessorInfo.Enabled)
                 Enabled = m_ProcessorInfo.Enabled;
             UpdateSequenceLength();
-            UpdateOutputSize();
-        }
-
-        protected virtual void UpdateOutputSize()
-        {
-            SetOutputSize(InputSequence.width, InputSequence.height);
+            m_Processor.UpdateOutputSize(this);
         }
 
         protected virtual int GetOutputWidth()
         {
-            UpdateOutputSize();
+            m_Processor.UpdateOutputSize(this);
             return m_OutputWidth;
         }
         protected virtual int GetOutputHeight()
         {
-            UpdateOutputSize();
+            m_Processor.UpdateOutputSize(this);
             return m_OutputHeight;
         }
-
         public void SetOutputSize(int width, int height)
         {
             if(m_OutputWidth != width || m_OutputHeight != height)
@@ -131,10 +137,18 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 m_OutputHeight = Mathf.Clamp(height,1,8192);
             }
         }
-
-        protected abstract int GetNumU();
-        protected abstract int GetNumV();
-
+        protected int GetNumU()
+        {
+            if (InputSequence.processor == null)
+                return 1;
+            return InputSequence.numU;
+        }
+        protected int GetNumV()
+        {
+            if (InputSequence.processor == null)
+                return 1;
+            return InputSequence.numV;
+        }
         protected bool DrawSidePanelHeader()
         {
             bool bHasChanged = false;
@@ -151,14 +165,24 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
             return bHasChanged;
         }
+        public bool OnSidePanelGUI(ImageSequence asset, int ProcessorIndex)
+        {
+            bool bHasChanged = DrawSidePanelHeader();
 
-        protected abstract bool DrawSidePanelContent(bool hasChanged);
+            using (new EditorGUI.DisabledScope(!Enabled))
+            {
+                m_SerializedObject.Update();
+                bHasChanged = m_Processor.OnInspectorGUI(bHasChanged, m_SerializedObject, this);
+                m_SerializedObject.ApplyModifiedProperties();
+            }
 
-        public abstract bool OnSidePanelGUI(ImageSequence asset, int ProcessorIndex);
-
-        public abstract bool OnCanvasGUI(ImageSequencerCanvas canvas);
-
-        public virtual void RequestProcessOneFrame(int currentFrame)
+            return bHasChanged;
+        }
+        public bool OnCanvasGUI(ImageSequencerCanvas canvas)
+        {
+           return m_Processor.OnCanvasGUI(canvas);
+        }
+        public void RequestProcessOneFrame(int currentFrame)
         {
             int length = OutputSequence.length;
 
@@ -177,12 +201,24 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 i %= length;
             }
         }
-
-        public abstract bool Process(int frame);
-
-        public virtual int GetProcessorSequenceLength()
+        public bool Process(int frame)
         {
-            return InputSequence.length;
+            return m_Processor.Process(this, frame);
+        }
+
+        public void ExecuteShaderAndDump(int outputframe, Texture mainTex)
+        {
+            ExecuteShaderAndDump(outputframe, mainTex, material);
+        }
+        public void ExecuteShaderAndDump(int outputframe, Texture mainTex, Material material)
+        {
+            RenderTexture backup = RenderTexture.active;
+            Graphics.Blit(mainTex, (RenderTexture)m_OutputSequence.frames[outputframe].texture, material);
+            RenderTexture.active = backup;
+        }
+        public int GetProcessorSequenceLength()
+        {
+            return m_Processor.GetProcessorSequenceLength(this);
         }
 
         public bool Process(ProcessingFrame frame)
@@ -216,7 +252,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public virtual void Invalidate()
+        public void Invalidate()
         {
             UpdateSequenceLength();
             SetOutputSize(GetOutputWidth(), GetOutputHeight());
@@ -227,11 +263,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 next.Invalidate();
         }
 
-        public abstract string GetName();
-
-        public virtual string GetLabel()
+        public string GetName()
         {
-            return GetName();
+            return m_Processor.processorName;
+        }
+
+        public string GetLabel()
+        {
+            return m_Processor.label;
         }
 
         public override string ToString()
@@ -239,40 +278,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             return GetLabel() + (Enabled ? "" : " (Disabled)");
         }
 
-        public abstract ProcessorSettingsBase GetSettingsAbstract();
-
-    }
-
-    internal abstract class FrameProcessor<T> : FrameProcessor where T : ProcessorSettingsBase
-    {
-        public T settings { get { return m_Settings; } private set { m_Settings = value;  m_SerializedObject = new SerializedObject(m_Settings); } }
-
-        private T m_Settings;
-        protected SerializedObject m_SerializedObject;
-
-        public FrameProcessor(FrameProcessorStack stack, ProcessorInfo info) : base(stack, info)
-        {
-            m_ProcessorInfo = info;
-            settings = (T)m_ProcessorInfo.Settings;
-        }
-
-        public override bool OnSidePanelGUI(ImageSequence asset, int ProcessorIndex)
-        {
-            bool bHasChanged = DrawSidePanelHeader();
-
-            using (new EditorGUI.DisabledScope(!Enabled))
-            {
-                m_SerializedObject.Update();
-                bHasChanged = DrawSidePanelContent(bHasChanged);
-                m_SerializedObject.ApplyModifiedProperties();
-            }
-
-            return bHasChanged;
-        }
-
-        public sealed override ProcessorSettingsBase GetSettingsAbstract()
+        public ProcessorBase GetSettingsAbstract()
         {
             return settings;
         }
+
     }
 }

@@ -114,26 +114,22 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             settingsDefinitions = new Dictionary<Type, ProcessorAttribute>();
 
-            var assembly = Assembly.GetAssembly(typeof(ProcessorSettingsBase));
+            var assembly = Assembly.GetAssembly(typeof(ProcessorBase));
             var types = assembly.GetTypes();
-            var processorSettingsType = typeof(ProcessorSettingsBase);
+            var processorType = typeof(ProcessorBase);
             var attrType = typeof(ProcessorAttribute);
 
-            var processorSettingTypes = types
+            var allProcessorTypes = types
                 .Where(t => t.IsClass
                     && !t.IsAbstract
-                    && t.IsSubclassOf(processorSettingsType)
+                    && t.IsSubclassOf(processorType)
                     && t.IsDefined(attrType, false));
 
-            foreach (var processorSettingType in processorSettingTypes)
+            foreach (var type in allProcessorTypes)
             {
-                var attr = (ProcessorAttribute)processorSettingType.GetCustomAttributes(attrType, false)[0];
-                Type processorType = attr.processorType;
+                var attr = (ProcessorAttribute)type.GetCustomAttributes(attrType, false)[0];
 
-                if (!processorType.IsClass || !processorType.IsSubclassOf(typeof(FrameProcessor)) || processorType.IsAbstract)
-                    throw new InvalidOperationException("Invalid RendererAttribute parameter, type must be a non-abstract class that extends GPUFrameProcessor<>");
-
-                settingsDefinitions.Add(processorSettingType, attr);
+                settingsDefinitions.Add(type, attr);
             }
         }
 

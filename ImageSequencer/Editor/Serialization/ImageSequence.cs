@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [HelpURL("https://drive.google.com/open?id=1YUwzA1mGvzWRpajDV-XF0iUd4RhW--bhMpqo-gmj9B8")]
-    public class ImageSequence : ScriptableObject
+    internal class ImageSequence : ScriptableObject
     {
         public List<string> inputFrameGUIDs = new List<string>();
         public List<ProcessorInfo> processorInfos = new List<ProcessorInfo>();

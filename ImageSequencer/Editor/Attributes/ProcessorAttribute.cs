@@ -8,13 +8,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
     {
         public readonly string category;
         public readonly string name;
-        public readonly Type processorType;
 
-        public ProcessorAttribute(string category, string name, Type processorType)
+        public ProcessorAttribute(string category, string name)
         {
             this.category = category;
             this.name = name;
-            this.processorType = processorType;
         }
     }
 }
