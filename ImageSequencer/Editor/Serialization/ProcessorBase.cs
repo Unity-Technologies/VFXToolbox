@@ -15,8 +15,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             this.processor = processor;
         }
 
-        public virtual int numU => 1;
-        public virtual int numV => 1;
+        public virtual int numU => processor.InputSequence.numU;
+        public virtual int numV => processor.InputSequence.numV;
         public virtual int sequenceLength => processor.InputSequence.length;
         public abstract bool Process(int frame);
         public virtual void UpdateOutputSize()
