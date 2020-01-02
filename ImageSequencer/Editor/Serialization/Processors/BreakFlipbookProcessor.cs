@@ -31,11 +31,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override int sequenceLength => Mathf.Min(FlipbookNumU, processor.InputSequence.width) * Mathf.Min(FlipbookNumV, processor.InputSequence.height);
 
-        public override bool OnCanvasGUI(ImageSequencerCanvas canvas)
-        {
-            return false;
-        }
-
         public override bool Process(int frame)
         {
             Texture texture = processor.InputSequence.RequestFrame(0).texture;

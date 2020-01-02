@@ -24,7 +24,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             processor.SetOutputSize(processor.InputSequence.width, processor.InputSequence.height);
         }
         public abstract bool OnInspectorGUI(bool changed, SerializedObject serializedObject);
-        public abstract bool OnCanvasGUI(ImageSequencerCanvas canvas);
+        public virtual bool OnCanvasGUI(ImageSequencerCanvas canvas)
+        {
+            return false;
+        }
         public abstract void Default();
     }
 }

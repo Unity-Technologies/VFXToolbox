@@ -17,6 +17,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public int FlipbookNumV;
         public AssembleMode Mode;
 
+        bool hasChanged = false;
+
         public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/AssembleBlit.shader";
 
         public override string processorName => "Assemble Flipbook";
@@ -28,6 +30,39 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 string numU = (Mode == AssembleMode.VerticalSequence) ? "*" : FlipbookNumU.ToString();
                 string numV = FlipbookNumV.ToString();
                 return $"{processorName} ({numU}x{numV})";
+            }
+        }
+
+        public override int numU
+        {
+            get
+            {
+                switch (Mode)
+                {
+                    default:
+                    case AssembleMode.FullSpriteSheet:
+                        return FlipbookNumU * processor.InputSequence.numU;
+                    case AssembleMode.VerticalSequence:
+                        return processor.InputSequence.numU;
+                }
+            }
+        }
+
+        public override int numV => FlipbookNumV * processor.InputSequence.numV;
+
+        public override int sequenceLength
+        {
+            get
+            {
+                switch (Mode)
+                {
+                    default:
+                    case AssembleMode.FullSpriteSheet:
+                        return 1;
+
+                    case AssembleMode.VerticalSequence:
+                        return processor.InputSequence.length / FlipbookNumV;
+                }
             }
         }
 
@@ -53,23 +88,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     break;
             }
         }
-
-        public override int sequenceLength
-        {
-            get 
-            {
-                switch (Mode)
-                {
-                    default:
-                    case AssembleMode.FullSpriteSheet:
-                        return 1;
-
-                    case AssembleMode.VerticalSequence:
-                        return processor.InputSequence.length / FlipbookNumV;
-                }
-            }
-        }
-
 
         public override bool OnCanvasGUI(ImageSequencerCanvas canvas)
         {
@@ -99,23 +117,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             GUI.color = Color.white;
             return false;
         }
-
-        public override int numU
-        {
-            get
-            {
-                switch (Mode)
-                {
-                    default:
-                    case AssembleMode.FullSpriteSheet:
-                        return FlipbookNumU * processor.InputSequence.numU;
-                    case AssembleMode.VerticalSequence:
-                        return processor.InputSequence.numU;
-                }
-            }
-        }
-
-        public override int numV => FlipbookNumV * processor.InputSequence.numV;
 
         public override bool Process(int frame)
         {
@@ -179,8 +180,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             return true;
         }
-
-        bool hasChanged = false;
 
         public override bool OnInspectorGUI(bool changed, SerializedObject serializedObject)
         {
