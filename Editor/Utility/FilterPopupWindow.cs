@@ -674,7 +674,7 @@ namespace UnityEditor.VFXToolbox
 
     }
 
-    public struct DisabledScope : IDisposable
+    internal struct DisabledScope : IDisposable
     {
         private static Stack<bool> s_EnabledStack = new Stack<bool>();
         bool m_Disposed;

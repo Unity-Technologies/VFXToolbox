@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.IO;
+using VFXToolbox.MiniTGA;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
@@ -138,7 +139,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             break;
                         case ImageSequence.ExportMode.Targa:
                             {
-                                bytes = MiniTGA.MiniTGA.MiniTGAWrite((ushort)frame.texture.width, (ushort)frame.texture.height, settings.exportAlpha, inputs);
+                                bytes = MiniTGA.MiniTGAWrite((ushort)frame.texture.width, (ushort)frame.texture.height, settings.exportAlpha, inputs);
                             }
                             break;
                         case ImageSequence.ExportMode.PNG:
@@ -218,7 +219,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             float a = inputs[k].a;
                             inputs[k] = new Color(a, a, a, a);
                         }
-                        MiniTGA.MiniTGA.MiniTGAWrite(alphaFilename,(ushort)frame.texture.width, (ushort)frame.texture.height, false, inputs);
+                        MiniTGA.MiniTGAWrite(alphaFilename,(ushort)frame.texture.width, (ushort)frame.texture.height, false, inputs);
 
                         AssetDatabase.Refresh();
 

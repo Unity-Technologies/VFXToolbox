@@ -6,7 +6,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     public class ImageSequencerCanvas : VFXToolboxCanvas
     {
-        public bool showExtraInfo
+        internal bool showExtraInfo
         {
             get
             {
@@ -18,14 +18,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public int numFrames
+        internal int numFrames
         {
             get
             {
                 return m_PreviewSequence.length;
             }
         }
-       
+
         internal ProcessingFrameSequence sequence
         {
             get
@@ -50,7 +50,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public int currentFrameIndex
+        internal int currentFrameIndex
         {
             get
             {
@@ -66,7 +66,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             } 
         }
 
-        public bool isPlaying
+        internal bool isPlaying
         {
             get
             {
@@ -99,19 +99,19 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             m_PlayControlsRect = new Rect(16, 16, 420, 26);
         }
 
-        public override void Invalidate(bool needRedraw)
+        internal override void Invalidate(bool needRedraw)
         {
             base.Invalidate(needRedraw);
             m_ImageSequencerWindow.Invalidate();
         }
 
-        protected override void SetTexture(Texture tex)
+        protected override sealed void SetTexture(Texture tex)
         {
             // Never should Happen
             throw new NotImplementedException();
         }
 
-        protected override Texture GetTexture()
+        protected override sealed Texture GetTexture()
         {
             if (currentFrame != null)
             {
@@ -121,7 +121,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 return null;
         }
 
-        protected override int GetMipMapCount()
+        protected override sealed int GetMipMapCount()
         {
             if (currentFrame != null)
                 return currentFrame.mipmapCount;
@@ -129,7 +129,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 return 0;
         }
 
-        protected override void HandleKeyboardEvents()
+        protected override sealed void HandleKeyboardEvents()
         {
             base.HandleKeyboardEvents();
 
@@ -165,7 +165,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        protected override void DrawGrid()
+        protected override sealed void DrawGrid()
         {
             int GridNumU = m_PreviewSequence.numU;
             int GridNumV =  m_PreviewSequence.numV;
@@ -357,7 +357,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public void UpdateCanvasSequence()
+        internal void UpdateCanvasSequence()
         {
             int length;
             if (sequence.processingNode != null)

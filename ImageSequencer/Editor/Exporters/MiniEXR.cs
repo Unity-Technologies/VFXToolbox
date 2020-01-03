@@ -9,7 +9,7 @@ using UnityEditor.VFXToolbox;
 // Writes OpenEXR RGB files out of half-precision RGBA or RGB data.
 //
  
-namespace MiniEXR {
+namespace VFXToolbox.MiniEXR {
       //Based on source-forge project: http://sourceforge.net/projects/csharp-half/
     internal static class HalfHelper
     {
@@ -174,8 +174,8 @@ namespace MiniEXR {
             return result;
         }
     }
- 
-    public static class MiniEXR {
+
+    internal static class MiniEXR {
  
         // Writes EXR into a memory buffer.
         // Input:

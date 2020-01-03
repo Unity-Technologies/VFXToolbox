@@ -436,7 +436,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    GUILayout.Label(VFXToolboxGUIUtility.Get("Frame Processor Stack"),EditorStyles.boldLabel,GUILayout.Width(180));
+                    GUILayout.Label(VFXToolboxGUIUtility.Get("Frame Processors"),EditorStyles.boldLabel,GUILayout.Width(180));
                     GUILayout.FlexibleSpace();
                     if(GUILayout.Button(VFXToolboxGUIUtility.Get("Clear"), GUILayout.Width(80)))
                     {

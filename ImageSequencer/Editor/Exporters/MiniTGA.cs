@@ -2,9 +2,9 @@ using System;
 using UnityEngine;
 using UnityEditor.VFXToolbox;
 
-namespace MiniTGA
+namespace VFXToolbox.MiniTGA
 {
-    public static class MiniTGA
+    internal static class MiniTGA
     {
         // Writes TGA into a memory buffer.
         // Input:

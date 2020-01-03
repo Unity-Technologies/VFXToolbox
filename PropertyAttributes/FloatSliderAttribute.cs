@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEngine.VFXToolbox
 {
-    public class FloatSliderAttribute : PropertyAttribute
+    internal class FloatSliderAttribute : PropertyAttribute
     {
         public float m_ValueMin;
         public float m_ValueMax;

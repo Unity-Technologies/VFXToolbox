@@ -6,13 +6,13 @@ namespace UnityEditor.VFXToolbox
 {
     public abstract class VFXToolboxCanvas
     {
-        public Rect displayRect
+        internal Rect displayRect
         {
             get { return m_Rect; }
             set { m_Rect = value; }
         }
 
-        public bool maskR
+        internal bool maskR
         {
             get { return m_Material.GetColor("_RGBAMask").r == 1.0f; }
             set
@@ -24,7 +24,7 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
-        public bool maskG
+        internal bool maskG
         {
             get { return m_Material.GetColor("_RGBAMask").g == 1.0f; }
             set
@@ -36,7 +36,7 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
-        public bool maskB
+        internal bool maskB
         {
             get { return m_Material.GetColor("_RGBAMask").b == 1.0f; }
             set
@@ -49,7 +49,7 @@ namespace UnityEditor.VFXToolbox
 
         }
 
-        public bool maskA
+        internal bool maskA
         {
             get { return m_Material.GetColor("_RGBAMask").a == 1.0f; }
             set
@@ -61,7 +61,7 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
-        public bool filter
+        internal bool filter
         {
             get {   return m_bFilter; }
             set {
@@ -73,8 +73,8 @@ namespace UnityEditor.VFXToolbox
                     
                 }
         }
-    
-        public int mipMap
+
+        internal int mipMap
         {
             get {
                     return m_MipMap;
@@ -93,12 +93,12 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
-        public int mipMapCount
+        internal int mipMapCount
         {
             get { return GetMipMapCount(); }
         }
 
-        public bool showGrid
+        internal bool showGrid
         {
             get
             {
@@ -110,7 +110,7 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
-        public float BackgroundBrightness
+        internal float BackgroundBrightness
         {
             get
             {
@@ -122,7 +122,7 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
-        public Styles styles
+        internal Styles styles
         {
             get
             {
@@ -132,6 +132,9 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
+        /// <summary>
+        /// The current Zoom Level
+        /// </summary>
         public float zoom
         {
             get
@@ -169,6 +172,9 @@ namespace UnityEditor.VFXToolbox
         private bool m_bNeedRedraw;
         private float m_bgBrightness = -1.0f;
 
+        /// <summary>
+        /// The currently previewed Texture
+        /// </summary>
         public Texture texture
         {
             get { return GetTexture(); }
@@ -176,10 +182,10 @@ namespace UnityEditor.VFXToolbox
         }
         private Texture m_Texture;
 
-        public CanvasGUIDelegate onCanvasGUI;
-        public delegate void CanvasGUIDelegate();
+        internal CanvasGUIDelegate onCanvasGUI;
+        internal delegate void CanvasGUIDelegate();
 
-        public VFXToolboxCanvas(Rect displayRect, string shaderName = "Packages/com.unity.vfx-toolbox/Editor/Canvas/Shaders/VFXToolboxCanvas.shader") 
+        internal VFXToolboxCanvas(Rect displayRect, string shaderName = "Packages/com.unity.vfx-toolbox/Editor/Canvas/Shaders/VFXToolboxCanvas.shader") 
         {
             m_Rect = displayRect;
 
@@ -190,7 +196,7 @@ namespace UnityEditor.VFXToolbox
             m_RenderTexture = RenderTexture.GetTemporary(1,1,0);
         }
 
-        public virtual void Invalidate(bool needRedraw)
+        internal virtual void Invalidate(bool needRedraw)
         {
             m_bNeedRedraw = m_bNeedRedraw | needRedraw;
         }
@@ -213,12 +219,12 @@ namespace UnityEditor.VFXToolbox
                 return 0;
         }
 
-        public void InvalidateRenderTarget()
+        internal void InvalidateRenderTarget()
         {
             m_IsDirtyRenderTarget = true;
         }
 
-        private void UpdateRenderTarget()
+        internal void UpdateRenderTarget()
         {
             int width = Mathf.Max(1, texture.width / (int)Mathf.Pow(2, (mipMap)));
             int height = Mathf.Max(1, texture.height / (int)Mathf.Pow(2, (mipMap)));
@@ -238,7 +244,7 @@ namespace UnityEditor.VFXToolbox
             Invalidate(true);
         }
 
-        public void Recenter(bool Refit)
+        internal void Recenter(bool Refit)
         {
             m_CameraPosition = Vector2.zero;
             if(Refit)
@@ -380,9 +386,13 @@ namespace UnityEditor.VFXToolbox
                     ScaleMode.ScaleToFit
                     );
             }
-
         }
 
+        /// <summary>
+        /// Helper Function that converts a Canvas Position to a Screen Position based on the current Canvas Position and Zoom
+        /// </summary>
+        /// <param name="Position">Position in Canvas Space</param>
+        /// <returns>Position in Screen Space</returns>
         public Vector2 CanvasToScreen(Vector2 Position)
         {
             return new Vector2(
@@ -420,8 +430,8 @@ namespace UnityEditor.VFXToolbox
             // Restore GUI RenderTarget
             RenderTexture.active = oldrendertarget;
         }
-       
-        public virtual void OnGUI()
+
+        internal virtual void OnGUI()
         {
             
             if(m_bgBrightness < 0.0f)
@@ -486,16 +496,16 @@ namespace UnityEditor.VFXToolbox
 
 #region BRIGHTNESS CONTROLS
 
-        public Texture2D BackgroundTexture { get { return m_BackgroundTexture; } }
+        internal Texture2D BackgroundTexture { get { return m_BackgroundTexture; } }
         private Texture2D m_BackgroundTexture;
 
-        public void SetBGBrightness(float value)
+        internal void SetBGBrightness(float value)
         {
             m_bgBrightness = value;
             m_BackgroundTexture = Styles.GetBGTexture(value);
         }
 
-        public void ResetBrightness()
+        internal void ResetBrightness()
         {
             if (EditorGUIUtility.isProSkin)
                 BackgroundBrightness = 0.2f;
@@ -503,12 +513,12 @@ namespace UnityEditor.VFXToolbox
                 BackgroundBrightness = 0.4f;
         }
 
-        public void BrightnessUp(float value)
+        internal void BrightnessUp(float value)
         {
             BackgroundBrightness = Mathf.Min(BackgroundBrightness + value,1.0f);
         }
 
-        public void BrightnessDown(float value)
+        internal void BrightnessDown(float value)
         {
             BackgroundBrightness = Mathf.Max(0.0f, BackgroundBrightness - value);
         }
@@ -516,10 +526,7 @@ namespace UnityEditor.VFXToolbox
 #endregion
 
 #region STYLES
-
-
-
-        public class Styles
+        internal class Styles
         {
             public GUIStyle miniLabel
             {
