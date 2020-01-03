@@ -9,8 +9,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     internal class ProcessorDataProvider : IProvider
     {
-        private Dictionary<Type, ProcessorAttribute> m_dataSource;
-        private FrameProcessorStack m_processorStack;
+        private Dictionary<Type, ProcessorAttribute> m_DataSource;
+        private ProcessingNodeStack m_ProcessingNodeStack;
         private ImageSequence m_CurrentAsset;
 
         public class ProcessorElement : FilterPopupWindow.Element
@@ -32,10 +32,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        internal ProcessorDataProvider(FrameProcessorStack stack, ImageSequence asset)
+        internal ProcessorDataProvider(ProcessingNodeStack stack, ImageSequence asset)
         {
-            m_dataSource = stack.settingsDefinitions;
-            m_processorStack = stack;
+            m_DataSource = stack.settingsDefinitions;
+            m_ProcessingNodeStack = stack;
             m_CurrentAsset = asset;
         }
 
@@ -43,7 +43,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             tree.Add(new FilterPopupWindow.GroupElement(0, "Add new Processor..."));
 
-            var processors = m_dataSource.ToList();
+            var processors = m_DataSource.ToList();
             processors.Sort((processorA, processorB) => {
                 int res = processorA.Value.category.CompareTo(processorB.Value.category);
                 return res != 0 ? res : processorA.Value.name.CompareTo(processorB.Value.name);
@@ -90,19 +90,19 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             // Add Element
             Undo.RecordObject(m_CurrentAsset, "Add Processor");
 
-            FrameProcessor processor = null;
+            ProcessingNode processor = null;
 
             // Reflection Stuff here
-            ProcessorAttribute attribute = m_processorStack.settingsDefinitions[settingType];
+            ProcessorAttribute attribute = m_ProcessingNodeStack.settingsDefinitions[settingType];
 
             var info = ProcessorInfo.CreateDefault(attribute.name, true, settingType);
 
-            processor = (FrameProcessor)Activator.CreateInstance(typeof(FrameProcessor), m_processorStack, info);
+            processor = (ProcessingNode)Activator.CreateInstance(typeof(ProcessingNode), m_ProcessingNodeStack, info);
 
             if(processor != null)
             {
-                m_processorStack.AddProcessor(processor, m_CurrentAsset);
-                m_processorStack.InvalidateAll();
+                m_ProcessingNodeStack.AddProcessor(processor, m_CurrentAsset);
+                m_ProcessingNodeStack.InvalidateAll();
             } 
         }
 

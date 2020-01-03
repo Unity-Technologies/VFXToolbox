@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    internal partial class FrameProcessorStack
+    internal partial class ProcessingNodeStack
     {
         public ProcessingFrameSequence inputSequence
         {
@@ -19,8 +19,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get
             {
-                if (m_Processors.Count > 0)
-                    return m_Processors[m_Processors.Count - 1].OutputSequence;
+                if (m_ProcessingNodes.Count > 0)
+                    return m_ProcessingNodes[m_ProcessingNodes.Count - 1].OutputSequence;
                 else
                     return m_InputSequence;
             }
@@ -31,40 +31,40 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             get { return m_ImageSequencer; }
         }
 
-        public List<FrameProcessor> processors
+        public List<ProcessingNode> nodes
         {
             get
             {
-                return m_Processors;
+                return m_ProcessingNodes;
             }
         }
 
-        private List<FrameProcessor> m_Processors;
+        private List<ProcessingNode> m_ProcessingNodes;
         private ProcessingFrameSequence m_InputSequence;
         private ImageSequencer m_ImageSequencer;
 
-        public FrameProcessorStack(ProcessingFrameSequence inputSequence, ImageSequencer imageSequencer)
+        public ProcessingNodeStack(ProcessingFrameSequence inputSequence, ImageSequencer imageSequencer)
         {
             m_InputSequence = inputSequence;
-            m_Processors = new List<FrameProcessor>();
+            m_ProcessingNodes = new List<ProcessingNode>();
             m_ImageSequencer = imageSequencer;
             
         }
 
         public void Dispose()
         {
-            foreach(FrameProcessor p in m_Processors)
+            foreach(ProcessingNode p in m_ProcessingNodes)
             {
                 p.Dispose();
             }
-            m_Processors.Clear();
+            m_ProcessingNodes.Clear();
         }
 
         public ProcessingFrameSequence GetOutputSequence()
         {
-            if(m_Processors.Count > 0)
+            if(m_ProcessingNodes.Count > 0)
             {
-                return m_Processors[m_Processors.Count - 1].OutputSequence;
+                return m_ProcessingNodes[m_ProcessingNodes.Count - 1].OutputSequence;
             }
             else
             {
@@ -72,39 +72,39 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public ProcessingFrameSequence GetInputSequence(FrameProcessor processor)
+        public ProcessingFrameSequence GetInputSequence(ProcessingNode processor)
         {
-            int index = m_Processors.IndexOf(processor);
+            int index = m_ProcessingNodes.IndexOf(processor);
 
             if (index > 0)
             {
-                return m_Processors[index - 1].OutputSequence;
+                return m_ProcessingNodes[index - 1].OutputSequence;
             }
             else
                 return m_InputSequence;
         }
 
-        public FrameProcessor GetNextProcessor(FrameProcessor processor)
+        public ProcessingNode GetNextProcessor(ProcessingNode node)
         {
-            int index = m_Processors.IndexOf(processor);
-            if(index < m_Processors.Count-1)
+            int index = m_ProcessingNodes.IndexOf(node);
+            if(index < m_ProcessingNodes.Count-1)
             {
-                return m_Processors[index + 1];
+                return m_ProcessingNodes[index + 1];
             }
             return null;
         }
 
-        public void Invalidate(FrameProcessor processor)
+        public void Invalidate(ProcessingNode node)
         {
-            int index = m_Processors.IndexOf(processor);
+            int index = m_ProcessingNodes.IndexOf(node);
             if(index != -1)
-                m_Processors[index].Invalidate();
+                m_ProcessingNodes[index].Invalidate();
         }
 
         public void InvalidateAll()
         {
-            if (m_Processors.Count > 0)
-                m_Processors[0].Invalidate();
+            if (m_ProcessingNodes.Count > 0)
+                m_ProcessingNodes[0].Invalidate();
         }
 
 

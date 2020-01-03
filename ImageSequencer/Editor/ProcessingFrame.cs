@@ -9,7 +9,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             get {
                 if (m_Texture == null)
                 {
-                    if(m_Processor == null) // For input frames, either our input asset has been deleted, or something went wrong with the meta's, let's replace by a dummy
+                    if(m_ProcessingNode == null) // For input frames, either our input asset has been deleted, or something went wrong with the meta's, let's replace by a dummy
                     {
                         m_Texture = Missing.texture;
                         m_Texture.name = @"/!\ MISSING /!\";
@@ -23,7 +23,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public bool isInputFrame
         {
-            get { return m_Processor == null; }
+            get { return m_ProcessingNode == null; }
         }
 
         public int mipmapCount
@@ -42,25 +42,25 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public bool dirty;
 
         private Texture m_Texture;
-        private FrameProcessor m_Processor;
+        private ProcessingNode m_ProcessingNode;
 
         public ProcessingFrame(Texture texture)
         {
             m_Texture = texture;
             dirty = false;
-            m_Processor = null;
+            m_ProcessingNode = null;
         }
 
-        public ProcessingFrame(FrameProcessor processor)
+        public ProcessingFrame(ProcessingNode node)
         {
             dirty = true;
-            m_Processor = processor;
+            m_ProcessingNode = node;
             ResetTexture();
         }
 
         public void SyncSize()
         {
-            if(texture.width != m_Processor.OutputWidth || texture.height != m_Processor.OutputHeight )
+            if(texture.width != m_ProcessingNode.OutputWidth || texture.height != m_ProcessingNode.OutputHeight )
             {
                 ResetTexture();
             }
@@ -68,20 +68,20 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         private void ResetTexture()
         {
-            if(m_Texture == null || (m_Processor != null && (m_Texture.width != m_Processor.OutputWidth || m_Texture.height != m_Processor.OutputHeight)))
+            if(m_Texture == null || (m_ProcessingNode != null && (m_Texture.width != m_ProcessingNode.OutputWidth || m_Texture.height != m_ProcessingNode.OutputHeight)))
             {
                 RenderTexture.DestroyImmediate(m_Texture);
-                m_Texture = new RenderTexture(m_Processor.OutputWidth, m_Processor.OutputHeight, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+                m_Texture = new RenderTexture(m_ProcessingNode.OutputWidth, m_ProcessingNode.OutputHeight, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
                 ((RenderTexture)m_Texture).autoGenerateMips = true;
             }
         }
 
         public bool Process()
         {
-            if(dirty && m_Processor != null)
+            if(dirty && m_ProcessingNode != null)
             {
                 SyncSize();
-                if(m_Processor.Process(this))
+                if(m_ProcessingNode.Process(this))
                 {
                     dirty = false;
                     return true;

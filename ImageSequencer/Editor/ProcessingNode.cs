@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    internal class FrameProcessor
+    internal class ProcessingNode
     {
         public int OutputWidth
         {
@@ -52,7 +52,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public ProcessingFrameSequence InputSequence
         {
-            get { return m_ProcessorStack.GetInputSequence(this); }
+            get { return m_ProcessingNodeStack.GetInputSequence(this); }
         }
         public ProcessingFrameSequence OutputSequence
         {
@@ -64,7 +64,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             get { return m_ProcessorInfo; }
         }
 
-        private FrameProcessorStack m_ProcessorStack;
+        private ProcessingNodeStack m_ProcessingNodeStack;
         private ProcessingFrameSequence m_OutputSequence;
 
         private bool m_bEnabled;
@@ -80,15 +80,15 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public Shader shader { get; private set; }
         public Material material { get; private set; }
 
-        public bool isCurrentlyPreviewed => m_ProcessorStack.imageSequencer.previewCanvas.sequence.processor == this;
-        public int currentPreviewFrame => m_ProcessorStack.imageSequencer.previewCanvas.currentFrameIndex;
-        public int currentPreviewSequenceLength => m_ProcessorStack.imageSequencer.previewCanvas.numFrames;
+        public bool isCurrentlyPreviewed => m_ProcessingNodeStack.imageSequencer.previewCanvas.sequence.processingNode == this;
+        public int currentPreviewFrame => m_ProcessingNodeStack.imageSequencer.previewCanvas.currentFrameIndex;
+        public int currentPreviewSequenceLength => m_ProcessingNodeStack.imageSequencer.previewCanvas.numFrames;
 
-        public FrameProcessor(FrameProcessorStack processorStack, ProcessorInfo info)
+        public ProcessingNode(ProcessingNodeStack processorStack, ProcessorInfo info)
         {
             m_ProcessorInfo = info;
             m_bEnabled = m_ProcessorInfo.Enabled;
-            m_ProcessorStack = processorStack;
+            m_ProcessingNodeStack = processorStack;
             processor = m_ProcessorInfo.Settings;
             m_OutputSequence = new ProcessingFrameSequence(this);
 
@@ -145,13 +145,13 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         }
         protected int GetNumU()
         {
-            if (InputSequence.processor == null)
+            if (InputSequence.processingNode == null)
                 return 1;
             return InputSequence.numU;
         }
         protected int GetNumV()
         {
-            if (InputSequence.processor == null)
+            if (InputSequence.processingNode == null)
                 return 1;
             return InputSequence.numV;
         }
@@ -166,7 +166,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 SerializedObject o = new SerializedObject(m_ProcessorInfo);
                 o.FindProperty("Enabled").boolValue = Enabled;
                 o.ApplyModifiedProperties();
-                m_ProcessorStack.Invalidate(this);
+                m_ProcessingNodeStack.Invalidate(this);
                 bHasChanged = true;
             }
             return bHasChanged;
@@ -260,7 +260,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             SetOutputSize(GetOutputWidth(), GetOutputHeight());
             m_OutputSequence.InvalidateAll();
 
-            FrameProcessor next = m_ProcessorStack.GetNextProcessor(this);
+            ProcessingNode next = m_ProcessingNodeStack.GetNextProcessor(this);
             if(next != null)
                 next.Invalidate();
         }

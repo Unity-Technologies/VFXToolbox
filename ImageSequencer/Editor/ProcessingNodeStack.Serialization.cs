@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    internal partial class FrameProcessorStack
+    internal partial class ProcessingNodeStack
     {
         public void AddSettingsObjectToAsset(ImageSequence asset, ScriptableObject settings)
         {
@@ -78,18 +78,18 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             EditorUtility.SetDirty(asset);
         }
 
-        public void AddProcessor(FrameProcessor processor, ImageSequence asset)
+        public void AddProcessor(ProcessingNode node, ImageSequence asset)
         {
-            AddProcessorInfoObjectToAsset(asset, processor.ProcessorInfo);
-            asset.processorInfos.Add(processor.ProcessorInfo);
+            AddProcessorInfoObjectToAsset(asset, node.ProcessorInfo);
+            asset.processorInfos.Add(node.ProcessorInfo);
 
-            ProcessorBase settings = processor.GetSettingsAbstract();
+            ProcessorBase settings = node.GetSettingsAbstract();
             if (settings != null)
             {
                 AddSettingsObjectToAsset(asset, settings);
-                processor.ProcessorInfo.Settings = settings;
+                node.ProcessorInfo.Settings = settings;
             }
-            m_Processors.Add(processor);
+            m_ProcessingNodes.Add(node);
 
             EditorUtility.SetDirty(asset);
         }
@@ -97,7 +97,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public void RemoveAllProcessors(ImageSequence asset)
         {
             asset.processorInfos.Clear();
-            m_Processors.Clear();
+            m_ProcessingNodes.Clear();
 
             EditorUtility.SetDirty(asset);
         }
@@ -105,29 +105,29 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public void RemoveProcessor(int index, ImageSequence asset)
         {
             asset.processorInfos.RemoveAt(index);
-            m_Processors.RemoveAt(index);
+            m_ProcessingNodes.RemoveAt(index);
 
             EditorUtility.SetDirty(asset);
         }
 
         public void ReorderProcessors(ImageSequence asset)
         {
-            if(m_Processors.Count > 0)
+            if(m_ProcessingNodes.Count > 0)
             {
-                List<FrameProcessor> old = new List<FrameProcessor>();
-                foreach(FrameProcessor p in m_Processors)
+                List<ProcessingNode> old = new List<ProcessingNode>();
+                foreach(ProcessingNode n in m_ProcessingNodes)
                 {
-                    old.Add(p);
+                    old.Add(n);
                 }
 
-                m_Processors.Clear();
+                m_ProcessingNodes.Clear();
                 foreach(ProcessorInfo info in asset.processorInfos)
                 {
-                    foreach(FrameProcessor p in old)
+                    foreach(ProcessingNode p in old)
                     {
                         if(p.ProcessorInfo.Equals(info))
                         {
-                            m_Processors.Add(p);
+                            m_ProcessingNodes.Add(p);
                             break;
                         }
                     }
@@ -138,7 +138,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public void LoadProcessorsFromAsset(ImageSequence asset)
         {
-            m_Processors.Clear();
+            m_ProcessingNodes.Clear();
 
             var infos = asset.processorInfos;
 
@@ -147,8 +147,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             // Creating Runtime
             foreach(ProcessorInfo procInfo in infos)
             {
-                var processor = (FrameProcessor)Activator.CreateInstance(typeof(FrameProcessor), this, procInfo);
-                m_Processors.Add(processor);
+                var processor = (ProcessingNode)Activator.CreateInstance(typeof(ProcessingNode), this, procInfo);
+                m_ProcessingNodes.Add(processor);
             }
         }
 

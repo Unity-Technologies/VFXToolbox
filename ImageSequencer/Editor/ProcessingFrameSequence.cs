@@ -9,8 +9,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get
             {
-                if (m_Processor != null)
-                    return m_Processor.NumU;
+                if (m_ProcessingNode != null)
+                    return m_ProcessingNode.NumU;
                 else
                     return 1;
             }
@@ -20,8 +20,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get
             {
-                if (m_Processor != null)
-                    return m_Processor.NumV;
+                if (m_ProcessingNode != null)
+                    return m_ProcessingNode.NumV;
                 else
                     return 1;
             }
@@ -35,11 +35,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public FrameProcessor processor
+        public ProcessingNode processingNode
         {
             get
             {
-                return m_Processor;
+                return m_ProcessingNode;
             }
         }
 
@@ -47,7 +47,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get
             {
-                if (m_Processor == null)
+                if (m_ProcessingNode == null)
                 {
                     if(m_Frames.Count > 0)
                         return m_Frames[0].texture.width;
@@ -56,7 +56,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 }
                 else
                 {
-                    return m_Processor.OutputWidth;
+                    return m_ProcessingNode.OutputWidth;
                 }
                     
             }
@@ -66,7 +66,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get
             {
-                if (m_Processor == null)
+                if (m_ProcessingNode == null)
                 {
                     if(m_Frames.Count > 0)
                         return m_Frames[0].texture.height;
@@ -75,7 +75,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 }
                 else
                 {
-                    return m_Processor.OutputHeight;
+                    return m_ProcessingNode.OutputHeight;
                 }
                     
             }
@@ -84,12 +84,12 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public int length { get { return m_Frames.Count; } }
 
         private List<ProcessingFrame> m_Frames;
-        private FrameProcessor m_Processor;
+        private ProcessingNode m_ProcessingNode;
 
-        public ProcessingFrameSequence(FrameProcessor processor)
+        public ProcessingFrameSequence(ProcessingNode node)
         {
             m_Frames = new List<ProcessingFrame>();
-            m_Processor = processor;
+            m_ProcessingNode = node;
         }
 
         public void InvalidateAll()
@@ -111,14 +111,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public ProcessingFrame RequestFrame(int index)
         {
-            if (m_Processor == null)
+            if (m_ProcessingNode == null)
             {
                 return m_Frames[index];
             }
 
-            if(m_Processor.Enabled)
+            if(m_ProcessingNode.Enabled)
             {
-                m_Processor.UpdateSequenceLength();
+                m_ProcessingNode.UpdateSequenceLength();
 
                 if (m_Frames[index].dirty)
                 {
@@ -128,7 +128,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
             else
             {
-                return m_Processor.InputSequence.RequestFrame(index);
+                return m_ProcessingNode.InputSequence.RequestFrame(index);
             }
         }
 

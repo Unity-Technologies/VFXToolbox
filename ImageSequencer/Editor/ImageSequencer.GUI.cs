@@ -73,9 +73,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                         Invalidate();
                         m_NeedRedraw = false;
                     }
-                    else if((m_AutoCook && m_CurrentProcessor != null))
+                    else if((m_AutoCook && m_CurrentProcessingNode != null))
                     {
-                        m_CurrentProcessor.RequestProcessOneFrame(previewCanvas.currentFrameIndex);
+                        m_CurrentProcessingNode.RequestProcessOneFrame(previewCanvas.currentFrameIndex);
                         Invalidate();
                     }
                 }
@@ -332,7 +332,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         private void DrawTabbedPanelSelector()
         {
             SidePanelMode prevMode = m_SidePanelViewMode;
-            bool hasInputFrames = m_processorStack.inputSequence.frames.Count > 0;
+            bool hasInputFrames = m_ProcessingNodeStack.inputSequence.frames.Count > 0;
             SidePanelMode newMode = (SidePanelMode)VFXToolboxGUIUtility.TabbedButtonsGUILayout(
                     (int)prevMode,
                     new string[] { "Input Frames", "Processors", "Export"},
@@ -347,7 +347,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 {
                     case SidePanelMode.InputFrames:
 
-                        m_PreviewCanvas.sequence = m_processorStack.inputSequence;
+                        m_PreviewCanvas.sequence = m_ProcessingNodeStack.inputSequence;
 
                         break;
 
@@ -357,14 +357,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             m_PreviewCanvas.sequence = m_LockedPreviewProcessor.OutputSequence;
                         else
                         {
-                            if(m_CurrentProcessor != null)
-                                m_PreviewCanvas.sequence = m_CurrentProcessor.OutputSequence;
+                            if(m_CurrentProcessingNode != null)
+                                m_PreviewCanvas.sequence = m_CurrentProcessingNode.OutputSequence;
                             else
                             {
-                                if (m_processorStack.processors.Count > 0)
-                                    m_PreviewCanvas.sequence = m_processorStack.processors[m_processorStack.processors.Count - 1].OutputSequence;
+                                if (m_ProcessingNodeStack.nodes.Count > 0)
+                                    m_PreviewCanvas.sequence = m_ProcessingNodeStack.nodes[m_ProcessingNodeStack.nodes.Count - 1].OutputSequence;
                                 else
-                                    m_PreviewCanvas.sequence = m_processorStack.inputSequence;
+                                    m_PreviewCanvas.sequence = m_ProcessingNodeStack.inputSequence;
                             }
                         }
 
@@ -372,7 +372,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                     case SidePanelMode.Export:
 
-                        m_PreviewCanvas.sequence = m_processorStack.outputSequence;
+                        m_PreviewCanvas.sequence = m_ProcessingNodeStack.outputSequence;
 
                         break;
                 }
@@ -404,7 +404,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             GUILayout.Space(8);
             m_InputFramesReorderableList.DoLayoutList();
 
-            if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Delete && m_processorStack.inputSequence.length > 0)
+            if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Delete && m_ProcessingNodeStack.inputSequence.length > 0)
             {
                 RemoveInputFrame(m_InputFramesReorderableList);
                 Event.current.Use();
@@ -442,14 +442,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     {
                         // Delete everything
                         Undo.RecordObject(m_CurrentAsset, "Clear All Processors");
-                        m_processorStack.RemoveAllProcessors(m_CurrentAsset);
+                        m_ProcessingNodeStack.RemoveAllProcessors(m_CurrentAsset);
                         // Update UI
                         m_ProcessorsReorderableList.index = -1;
-                        m_CurrentProcessor = null;
+                        m_CurrentProcessingNode = null;
                         m_LockedPreviewProcessor = null;
                         m_CurrentAsset.editSettings.lockedProcessor = -1;
                         m_CurrentAsset.editSettings.selectedProcessor = -1;
-                        m_PreviewCanvas.sequence = m_processorStack.inputSequence;
+                        m_PreviewCanvas.sequence = m_ProcessingNodeStack.inputSequence;
                         EditorUtility.SetDirty(m_CurrentAsset);
                         // Request Repaint
                         Invalidate();
@@ -467,14 +467,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 GUILayout.Space(10);
 
                 // Draw inspector and Invalidates whatever needs to.
-                for(int i = 0; i < m_processorStack.processors.Count; i++)
+                for(int i = 0; i < m_ProcessingNodeStack.nodes.Count; i++)
                 {
                     if(m_ProcessorsReorderableList.index == i)
                     {
-                        bool changed = m_processorStack.processors[i].OnSidePanelGUI(m_CurrentAsset,i);
+                        bool changed = m_ProcessingNodeStack.nodes[i].OnSidePanelGUI(m_CurrentAsset,i);
                         if (changed)
                         {
-                            m_processorStack.processors[i].Invalidate();
+                            m_ProcessingNodeStack.nodes[i].Invalidate();
                             UpdateViewport();
                         }
                         m_Dirty = m_Dirty || changed;
@@ -488,7 +488,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
 
             // Handle final keyboard events (delete)
-            if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Delete && m_processorStack.processors.Count > 0)
+            if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Delete && m_ProcessingNodeStack.nodes.Count > 0)
             {
                 MenuRemoveProcessor(m_ProcessorsReorderableList);
                 Event.current.Use();
@@ -497,7 +497,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         private void DrawExportPanelContent()
         {
-            int length = m_processorStack.outputSequence.length;
+            int length = m_ProcessingNodeStack.outputSequence.length;
 
             if(length > 0)
             {
@@ -560,9 +560,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     m_CurrentAsset.exportSettings.dataContents = (ImageSequence.DataContents)EditorGUILayout.EnumPopup(VFXToolboxGUIUtility.Get("Import as|Sets the importer mode"), m_CurrentAsset.exportSettings.dataContents);
                     if(m_CurrentAsset.exportSettings.dataContents == ImageSequence.DataContents.Sprite)
                     {
-                        FrameProcessor p = m_processorStack.processors[m_processorStack.processors.Count - 1];
-                        if (((float)p.OutputWidth % p.NumU) != 0 || ((float)p.OutputHeight % p.NumV) != 0)
-                            EditorGUILayout.HelpBox("Warning : texture size is not a multiplier of rows ("+p.NumU+") and columns ("+p.NumV+") count, this will lead to incorrect rendering of the sprite animation", MessageType.Warning);
+                        ProcessingNode n = m_ProcessingNodeStack.nodes[m_ProcessingNodeStack.nodes.Count - 1];
+                        if (((float)n.OutputWidth % n.NumU) != 0 || ((float)n.OutputHeight % n.NumV) != 0)
+                            EditorGUILayout.HelpBox("Warning : texture size is not a multiplier of rows ("+n.NumU+") and columns ("+n.NumV+") count, this will lead to incorrect rendering of the sprite animation", MessageType.Warning);
                     }
 
                     switch(m_CurrentAsset.exportSettings.dataContents)
@@ -599,7 +599,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     if (fileName != "")
                     {
                         m_CurrentAsset.exportSettings.fileName = fileName;
-                        m_CurrentAsset.exportSettings.frameCount = (ushort)m_processorStack.outputSequence.frames.Count;
+                        m_CurrentAsset.exportSettings.frameCount = (ushort)m_ProcessingNodeStack.outputSequence.frames.Count;
                     }
                 }
                 // Export Again

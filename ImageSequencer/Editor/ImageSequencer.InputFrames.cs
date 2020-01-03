@@ -18,13 +18,13 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 foreach (string s in names)
                 {
                     Texture2D t = AssetDatabase.LoadAssetAtPath<Texture2D>(s);
-                    if(t != null)  m_processorStack.inputSequence.frames.Add(new ProcessingFrame(t));
+                    if(t != null)  m_ProcessingNodeStack.inputSequence.frames.Add(new ProcessingFrame(t));
                 }
 
                 previewCanvas.currentFrameIndex = 0;
-                m_processorStack.InvalidateAll();
+                m_ProcessingNodeStack.InvalidateAll();
                 UpdateViewport();
-                m_processorStack.SyncFramesToAsset(m_CurrentAsset);
+                m_ProcessingNodeStack.SyncFramesToAsset(m_CurrentAsset);
                 UpdateInputTexturesHash();
             }
         }
@@ -72,7 +72,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             Undo.RecordObject(m_CurrentAsset, "Reorder Input Frames");
             UpdateViewport();
-            m_processorStack.SyncFramesToAsset(m_CurrentAsset);
+            m_ProcessingNodeStack.SyncFramesToAsset(m_CurrentAsset);
             UpdateInputTexturesHash();
         }
 
@@ -92,12 +92,12 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 }
             }
             Undo.RecordObject(m_CurrentAsset, "Remove Input Frames");
-            m_processorStack.SyncFramesToAsset(m_CurrentAsset);
+            m_ProcessingNodeStack.SyncFramesToAsset(m_CurrentAsset);
             UpdateViewport();
             UpdateInputTexturesHash();
 
-            if(m_processorStack.inputSequence.length > 0)
-                m_processorStack.InvalidateAll();
+            if(m_ProcessingNodeStack.inputSequence.length > 0)
+                m_ProcessingNodeStack.InvalidateAll();
         }
 
         public void DrawInputFrameRListElement(Rect rect, int index, bool isActive, bool isFocused)
@@ -141,16 +141,16 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             Undo.RecordObject(m_CurrentAsset, "Clear All Input Frames");
             // Remove frames and update hash
-            m_processorStack.RemoveAllInputFrames(m_CurrentAsset);
-            m_processorStack.SyncFramesToAsset(m_CurrentAsset);
+            m_ProcessingNodeStack.RemoveAllInputFrames(m_CurrentAsset);
+            m_ProcessingNodeStack.SyncFramesToAsset(m_CurrentAsset);
             m_InputFramesHashCode = GetInputTexturesHashCode();
             // Update view
             sidePanelViewMode = SidePanelMode.InputFrames;
-            m_CurrentProcessor = null;
+            m_CurrentProcessingNode = null;
             m_LockedPreviewProcessor = null;
             m_CurrentAsset.editSettings.lockedProcessor = -1;
             m_CurrentAsset.editSettings.selectedProcessor = -1;
-            m_PreviewCanvas.sequence = m_processorStack.inputSequence;
+            m_PreviewCanvas.sequence = m_ProcessingNodeStack.inputSequence;
             // Request an update
             Invalidate();
             RefreshCanvas();
@@ -161,7 +161,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             Undo.RecordObject(m_CurrentAsset, "Sort All Input Frames");
             // Sort frames and update hash
-            m_processorStack.SortAllInputFrames(m_CurrentAsset);
+            m_ProcessingNodeStack.SortAllInputFrames(m_CurrentAsset);
             m_InputFramesHashCode = GetInputTexturesHashCode();
 
             LoadAsset(m_CurrentAsset);
@@ -176,7 +176,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             Undo.RecordObject(m_CurrentAsset, "Reverse Input Frames Order");
             // Inverse frame order and update hash
-            m_processorStack.ReverseAllInputFrames(m_CurrentAsset);
+            m_ProcessingNodeStack.ReverseAllInputFrames(m_CurrentAsset);
             m_InputFramesHashCode = GetInputTexturesHashCode();
 
             LoadAsset(m_CurrentAsset);

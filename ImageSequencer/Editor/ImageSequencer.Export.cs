@@ -24,9 +24,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 string title = "Save Texture, use # for frame numbering.";
                 string defaultFileName, extension;
 
-                int count = m_processorStack.outputSequence.frames.Count;
-                int numU = m_processorStack.outputSequence.numU;
-                int numV = m_processorStack.outputSequence.numV;
+                int count = m_ProcessingNodeStack.outputSequence.frames.Count;
+                int numU = m_ProcessingNodeStack.outputSequence.numU;
+                int numV = m_ProcessingNodeStack.outputSequence.numV;
 
                 string defaultDir = Path.GetDirectoryName(AssetDatabase.GetAssetPath(m_CurrentAsset));
 
@@ -73,7 +73,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 Debug.LogWarning("VFX Toolbox Warning : Saving a texture outside the project's scope. Import Settings will not be applied");
             }
 
-            int frameCount = m_processorStack.outputSequence.length;
+            int frameCount = m_ProcessingNodeStack.outputSequence.length;
 
             if(frameCount > 1 && !Path.GetFileNameWithoutExtension(path).Contains("#"))
             {
@@ -90,7 +90,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             try
             {
                 int i = 1;
-                foreach (ProcessingFrame frame in m_processorStack.outputSequence.frames)
+                foreach (ProcessingFrame frame in m_ProcessingNodeStack.outputSequence.frames)
                 {
                     if(VFXToolboxGUIUtility.DisplayProgressBar("Image Sequencer", "Exporting Frame #" + i + "/" + frameCount, (float)i / frameCount, 0, true))
                     {
@@ -181,7 +181,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             case ImageSequence.DataContents.Sprite:
                                 importer.textureType = TextureImporterType.Sprite;
                                 importer.spriteImportMode = SpriteImportMode.Multiple;
-                                importer.spritesheet = GetSpriteMetaData(frame, m_processorStack.outputSequence.numU, m_processorStack.outputSequence.numV );
+                                importer.spritesheet = GetSpriteMetaData(frame, m_ProcessingNodeStack.outputSequence.numU, m_ProcessingNodeStack.outputSequence.numV );
                                 break;
                         }
                         importer.mipmapEnabled = m_CurrentAsset.exportSettings.generateMipMaps;
@@ -231,7 +231,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             {
                                 alphaImporter.textureType = TextureImporterType.Sprite;
                                 alphaImporter.spriteImportMode = SpriteImportMode.Multiple;
-                                alphaImporter.spritesheet = GetSpriteMetaData(frame, m_processorStack.outputSequence.numU, m_processorStack.outputSequence.numV);
+                                alphaImporter.spritesheet = GetSpriteMetaData(frame, m_ProcessingNodeStack.outputSequence.numU, m_ProcessingNodeStack.outputSequence.numV);
                                 alphaImporter.alphaSource = TextureImporterAlphaSource.None;
                             }
                             else
@@ -309,7 +309,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         private void UpdateExportedAssets()
         {
             if (ExportToFile(true) != "")
-                m_CurrentAsset.exportSettings.frameCount = (ushort)m_processorStack.outputSequence.frames.Count;
+                m_CurrentAsset.exportSettings.frameCount = (ushort)m_ProcessingNodeStack.outputSequence.frames.Count;
             else
                 m_CurrentAsset.exportSettings.frameCount = 0;
         }

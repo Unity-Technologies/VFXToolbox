@@ -40,11 +40,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public FrameProcessor currentProcessor
+        public ProcessingNode currentProcessingNode
         {
             get
             {
-                return m_CurrentProcessor;
+                return m_CurrentProcessingNode;
             }
         }
 
@@ -54,10 +54,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         private bool m_IgnoreInheritSettings;
 
         private ImageSequencerCanvas m_PreviewCanvas;
-        private FrameProcessorStack m_processorStack;
+        private ProcessingNodeStack m_ProcessingNodeStack;
         private bool m_AutoCook = false;
-        private FrameProcessor m_CurrentProcessor;
-        private FrameProcessor m_LockedPreviewProcessor;
+        private ProcessingNode m_CurrentProcessingNode;
+        private ProcessingNode m_LockedPreviewProcessor;
 
         private GraphicsDeviceType m_CurrentGraphicsAPI;
         private ColorSpace m_CurrentColorSpace;
@@ -117,7 +117,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if (m_InputFramesHashCode != hash || m_CurrentAsset.inheritSettingsReference != null)
                 LoadAsset(m_CurrentAsset);
 
-            m_processorStack.LoadProcessorsFromAsset(m_CurrentAsset);
+            m_ProcessingNodeStack.LoadProcessorsFromAsset(m_CurrentAsset);
             RestoreProcessorView();
 
             if (m_CurrentAsset.inputFrameGUIDs.Count > 0)
@@ -125,10 +125,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             else
                 m_SidePanelViewMode = SidePanelMode.InputFrames;
 
-            foreach (FrameProcessor p in m_processorStack.processors)
+            foreach (ProcessingNode n in m_ProcessingNodeStack.nodes)
             {
-                p.Refresh();
-                p.Invalidate();
+                n.Refresh();
+                n.Invalidate();
             }
 
             Repaint();
@@ -155,17 +155,17 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             m_InputFramesReorderableList = null;
             m_ProcessorsReorderableList = null;
             m_LockedPreviewProcessor = null;
-            m_CurrentProcessor = null;
+            m_CurrentProcessingNode = null;
 
             // Free resources if any
-            if(m_processorStack != null)
-                m_processorStack.Dispose();
+            if(m_ProcessingNodeStack != null)
+                m_ProcessingNodeStack.Dispose();
 
             InitializeGUI();
 
             if(m_CurrentAsset != null)
             {
-                m_processorStack = new FrameProcessorStack(new ProcessingFrameSequence(null), this);
+                m_ProcessingNodeStack = new ProcessingNodeStack(new ProcessingFrameSequence(null), this);
 
                 m_CurrentAssetSerializedObject = new SerializedObject(m_CurrentAsset);
 
@@ -175,10 +175,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                 VFXToolboxGUIUtility.DisplayProgressBar("Image Sequencer", "Loading Frames", 0.333333f);
 
-                m_processorStack.LoadFramesFromAsset(m_CurrentAsset);
+                m_ProcessingNodeStack.LoadFramesFromAsset(m_CurrentAsset);
                 UpdateInputTexturesHash();
 
-                m_InputFramesReorderableList = new ReorderableList(m_processorStack.inputSequence.frames, typeof(Texture2D),true,false,true,true);
+                m_InputFramesReorderableList = new ReorderableList(m_ProcessingNodeStack.inputSequence.frames, typeof(Texture2D),true,false,true,true);
                 m_InputFramesReorderableList.onAddCallback = AddInputFrame;
                 m_InputFramesReorderableList.onRemoveCallback = RemoveInputFrame;
                 m_InputFramesReorderableList.onReorderCallback = ReorderInputFrame;
@@ -206,8 +206,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     }
                 }
 
-                m_processorStack.LoadProcessorsFromAsset(inheritedSettingReference);
-                m_ProcessorDataProvider = new ProcessorDataProvider(m_processorStack, m_CurrentAsset);
+                m_ProcessingNodeStack.LoadProcessorsFromAsset(inheritedSettingReference);
+                m_ProcessorDataProvider = new ProcessorDataProvider(m_ProcessingNodeStack, m_CurrentAsset);
 
                 // Construct the RList
                 if (m_CurrentAsset.inheritSettingsReference == null)
@@ -228,7 +228,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     m_ProcessorsReorderableList.onSelectCallback = MenuSelectProcessor;
                 }
 
-                m_PreviewCanvas.sequence = m_processorStack.inputSequence;
+                m_PreviewCanvas.sequence = m_ProcessingNodeStack.inputSequence;
                 if(m_PreviewCanvas.sequence.length > 0)
                     m_PreviewCanvas.currentFrameIndex = 0;
                 else
@@ -236,7 +236,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                 VFXToolboxGUIUtility.DisplayProgressBar("Image Sequencer", "Finalizing...", 1.0f);
 
-                m_processorStack.InvalidateAll();
+                m_ProcessingNodeStack.InvalidateAll();
                 RestoreProcessorView();
 
                 EditorUtility.ClearProgressBar();
@@ -248,7 +248,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         /// </summary>
         public void DefaultView()
         {
-            if (m_processorStack.processors.Count == 0 || m_processorStack.inputSequence.frames.Count == 0)
+            if (m_ProcessingNodeStack.nodes.Count == 0 || m_ProcessingNodeStack.inputSequence.frames.Count == 0)
             {
                 m_SidePanelViewMode = SidePanelMode.InputFrames;
                 m_ProcessorsReorderableList.index = -1;
@@ -273,11 +273,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             if(m_CurrentAsset.inheritSettingsReference != null && !m_IgnoreInheritSettings)
             {
-                if(m_processorStack.processors.Count > 0)
+                if(m_ProcessingNodeStack.nodes.Count > 0)
                 {
                     if(m_CurrentAsset.editSettings.selectedProcessor > 0)
                     {
-                        m_CurrentProcessor = m_processorStack.processors[m_CurrentAsset.editSettings.selectedProcessor];
+                        m_CurrentProcessingNode = m_ProcessingNodeStack.nodes[m_CurrentAsset.editSettings.selectedProcessor];
                         m_ProcessorsReorderableList.index = m_CurrentAsset.editSettings.selectedProcessor;
                     }
                 }
@@ -285,15 +285,15 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             else
             {
                 // index Checks
-                m_CurrentAsset.editSettings.lockedProcessor = Mathf.Clamp(m_CurrentAsset.editSettings.lockedProcessor, -1, m_processorStack.processors.Count - 1);
-                m_CurrentAsset.editSettings.selectedProcessor = Mathf.Clamp(m_CurrentAsset.editSettings.selectedProcessor, -1, m_processorStack.processors.Count - 1);
+                m_CurrentAsset.editSettings.lockedProcessor = Mathf.Clamp(m_CurrentAsset.editSettings.lockedProcessor, -1, m_ProcessingNodeStack.nodes.Count - 1);
+                m_CurrentAsset.editSettings.selectedProcessor = Mathf.Clamp(m_CurrentAsset.editSettings.selectedProcessor, -1, m_ProcessingNodeStack.nodes.Count - 1);
 
                 // Locked processor
                 if (m_CurrentAsset.editSettings.lockedProcessor != -1)
                 {
                     m_ProcessorsReorderableList.index = m_CurrentAsset.editSettings.lockedProcessor;
-                    m_LockedPreviewProcessor = m_processorStack.processors[m_CurrentAsset.editSettings.lockedProcessor];
-                    m_CurrentProcessor = m_processorStack.processors[m_CurrentAsset.editSettings.lockedProcessor];
+                    m_LockedPreviewProcessor = m_ProcessingNodeStack.nodes[m_CurrentAsset.editSettings.lockedProcessor];
+                    m_CurrentProcessingNode = m_ProcessingNodeStack.nodes[m_CurrentAsset.editSettings.lockedProcessor];
                 }
                 else
                     m_LockedPreviewProcessor = null; 
@@ -304,13 +304,13 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     m_ProcessorsReorderableList.index = m_CurrentAsset.editSettings.selectedProcessor;
 
                     if (m_CurrentAsset.editSettings.lockedProcessor != -1)
-                        m_CurrentProcessor = m_processorStack.processors[m_CurrentAsset.editSettings.lockedProcessor];
+                        m_CurrentProcessingNode = m_ProcessingNodeStack.nodes[m_CurrentAsset.editSettings.lockedProcessor];
                     else
-                        m_CurrentProcessor = m_processorStack.processors[m_CurrentAsset.editSettings.selectedProcessor];
+                        m_CurrentProcessingNode = m_ProcessingNodeStack.nodes[m_CurrentAsset.editSettings.selectedProcessor];
                 }
             }
 
-            m_processorStack.InvalidateAll();
+            m_ProcessingNodeStack.InvalidateAll();
             RefreshCanvas();
         }
 
@@ -320,16 +320,16 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if(m_CurrentGraphicsAPI != device)
             {
                 m_CurrentGraphicsAPI = device;
-                if(m_processorStack != null)
-                    m_processorStack.InvalidateAll();
+                if(m_ProcessingNodeStack != null)
+                    m_ProcessingNodeStack.InvalidateAll();
                 Repaint();
             }
             ColorSpace colorSpace = QualitySettings.activeColorSpace;
             if(m_CurrentColorSpace != colorSpace)
             {
                 m_CurrentColorSpace = colorSpace;
-                if(m_processorStack != null)
-                    m_processorStack.InvalidateAll();
+                if(m_ProcessingNodeStack != null)
+                    m_ProcessingNodeStack.InvalidateAll();
             }
         }
     }

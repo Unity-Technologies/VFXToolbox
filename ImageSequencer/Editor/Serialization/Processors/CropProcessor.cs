@@ -149,7 +149,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 ProcessingFrame f = processor.InputSequence.frames[i];
 
                 VFXToolboxGUIUtility.DisplayProgressBar("Crop processor", "Evaluating closest bound (Frame #" + i + " on " + processor.InputSequence.frames.Count + "...)", (float)i / processor.InputSequence.frames.Count);
-                if (processor.InputSequence.processor != null)
+                if (processor.InputSequence.processingNode != null)
                 {
                     f.Process();
                     colors = VFXToolboxUtility.ReadBack(f.texture as RenderTexture);

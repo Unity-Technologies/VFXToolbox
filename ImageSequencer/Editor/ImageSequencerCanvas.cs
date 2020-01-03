@@ -202,12 +202,12 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             // Processor extra info
             GUI.BeginGroup(m_Rect);
-            if (editor.currentProcessor != null && editor.currentProcessor.Enabled && m_bShowExtraInfo && editor.sidePanelViewMode == ImageSequencer.SidePanelMode.Processors)
-                editor.currentProcessor.OnCanvasGUI(this);
+            if (editor.currentProcessingNode != null && editor.currentProcessingNode.Enabled && m_bShowExtraInfo && editor.sidePanelViewMode == ImageSequencer.SidePanelMode.Processors)
+                editor.currentProcessingNode.OnCanvasGUI(this);
             GUI.EndGroup();
 
             // Everytime text
-            string procName = (editor.sidePanelViewMode == ImageSequencer.SidePanelMode.Export) ? "Export" : (sequence.processor == null ? "Input Frames" : sequence.processor.ToString());
+            string procName = (editor.sidePanelViewMode == ImageSequencer.SidePanelMode.Export) ? "Export" : (sequence.processingNode == null ? "Input Frames" : sequence.processingNode.ToString());
             GUI.Label(new RectOffset(24,24,24,24).Remove(m_Rect), procName , styles.largeLabel);
             GUI.Label(new RectOffset(24,24,64,24).Remove(m_Rect), GetDebugInfoString() , styles.label);
             //EditorGUI.DrawRect(m_Rect, Color.red);
@@ -360,8 +360,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public void UpdateCanvasSequence()
         {
             int length;
-            if (sequence.processor != null)
-                length = sequence.processor.GetProcessorSequenceLength();
+            if (sequence.processingNode != null)
+                length = sequence.processingNode.GetProcessorSequenceLength();
             else
                 length = sequence.length;
 

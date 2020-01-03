@@ -8,9 +8,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public abstract string processorName { get; }
         public virtual string label => processorName;
 
-        protected FrameProcessor processor;
+        protected ProcessingNode processor;
 
-        public void AttachTo(FrameProcessor processor)
+        public void AttachTo(ProcessingNode processor)
         {
             this.processor = processor;
         }
