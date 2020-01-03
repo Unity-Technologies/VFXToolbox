@@ -41,14 +41,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 {
                     default:
                     case AssembleMode.FullSpriteSheet:
-                        return FlipbookNumU * processor.InputSequence.numU;
+                        return FlipbookNumU * inputSequenceNumU;
                     case AssembleMode.VerticalSequence:
-                        return processor.InputSequence.numU;
+                        return inputSequenceNumU;
                 }
             }
         }
 
-        public override int numV => FlipbookNumV * processor.InputSequence.numV;
+        public override int numV => FlipbookNumV * inputSequenceNumV;
 
         public override int sequenceLength
         {
@@ -61,7 +61,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                         return 1;
 
                     case AssembleMode.VerticalSequence:
-                        return processor.InputSequence.length / FlipbookNumV;
+                        return inputSequenceLength / FlipbookNumV;
                 }
             }
         }
@@ -79,12 +79,12 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             {
                 case AssembleMode.FullSpriteSheet:
 
-                    processor.SetOutputSize(processor.InputSequence.width * FlipbookNumU, processor.InputSequence.height * FlipbookNumV);
+                    SetOutputSize(inputSequenceWidth * FlipbookNumU, inputSequenceHeight * FlipbookNumV);
                     break;
 
                 case AssembleMode.VerticalSequence:
 
-                    processor.SetOutputSize(processor.InputSequence.width, processor.InputSequence.height * FlipbookNumV);
+                    SetOutputSize(inputSequenceWidth, inputSequenceHeight * FlipbookNumV);
                     break;
             }
         }
@@ -120,7 +120,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool Process(int frame)
         {
-            int length = processor.InputSequence.length;
+            int length = inputSequenceLength;
 
             RenderTexture backup = RenderTexture.active;
 
@@ -137,14 +137,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                         Vector2 size = new Vector2(1.0f / FlipbookNumU, 1.0f / FlipbookNumV);
                         int idx = Mathf.Clamp(i, 0, length - 1);
 
-                        Texture currentTexture = processor.InputSequence.RequestFrame(idx).texture;
+                        Texture currentTexture = RequestInputTexture(idx);
 
                         Vector4 ClipCoordinates = new Vector4(u * size.x, v * size.y, size.x, size.y);
 
-                        processor.material.SetTexture("_MainTex", currentTexture);
-                        processor.material.SetVector("_CC", ClipCoordinates);
+                        material.SetTexture("_MainTex", currentTexture);
+                        material.SetVector("_CC", ClipCoordinates);
 
-                        Graphics.Blit(currentTexture, (RenderTexture)processor.OutputSequence.frames[0].texture, processor.material);
+                        Graphics.Blit(currentTexture, (RenderTexture)RequestOutputTexture(0), material);
                     }
 
                     RenderTexture.active = backup;
@@ -154,7 +154,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 case AssembleMode.VerticalSequence:
 
                     // Blit Every N'th Image inside output
-                    int cycleLength = processor.InputSequence.length / FlipbookNumV;
+                    int cycleLength = inputSequenceLength / FlipbookNumV;
 
                     for (int i = 0; i < FlipbookNumV; i++)
                     {
@@ -164,14 +164,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                         Vector2 size = new Vector2(1.0f, 1.0f / FlipbookNumV);
                         int idx = Mathf.Clamp((i * cycleLength) + frame, 0, length - 1);
 
-                        Texture currentTexture = processor.InputSequence.RequestFrame(idx).texture;
+                        Texture currentTexture = RequestInputTexture(idx);
 
                         Vector4 ClipCoordinates = new Vector4(u * size.x, v * size.y, size.x, size.y);
 
-                        processor.material.SetTexture("_MainTex", currentTexture);
-                        processor.material.SetVector("_CC", ClipCoordinates);
+                        material.SetTexture("_MainTex", currentTexture);
+                        material.SetVector("_CC", ClipCoordinates);
 
-                        Graphics.Blit(currentTexture, (RenderTexture)processor.OutputSequence.frames[frame].texture, processor.material);
+                        Graphics.Blit(currentTexture, (RenderTexture)RequestOutputTexture(frame), material);
                     }
 
                     RenderTexture.active = backup;
@@ -205,15 +205,15 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     int newU = EditorGUILayout.IntField(VFXToolboxGUIUtility.Get("Columns (U) : "), flipbookNumU.intValue);
                     int newV = EditorGUILayout.IntField(VFXToolboxGUIUtility.Get("Rows (V) : "), flipbookNumV.intValue);
 
-                    if (processor.InputSequence.length > 0)
+                    if (inputSequenceLength > 0)
                     {
                         using (new GUILayout.HorizontalScope())
                         {
                             GUILayout.Label(VFXToolboxGUIUtility.Get("Find Best Ratios"), GUILayout.Width(EditorGUIUtility.labelWidth));
                             if (GUILayout.Button(VFXToolboxGUIUtility.Get("Get")))
                             {
-                                float frameRatio = (float)processor.InputSequence.frames[0].texture.width / (float)processor.InputSequence.frames[0].texture.height;
-                                int length = processor.InputSequence.frames.Count;
+                                float frameRatio = (float)inputSequenceWidth / (float)inputSequenceHeight;
+                                int length = inputSequenceLength;
                                 List<int> ratios = new List<int>();
                                 SortedDictionary<int, float> coeffs = new SortedDictionary<int, float>();
                                 float rad = Mathf.Sqrt(length);
@@ -252,7 +252,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                                     menu.AddItem(new GUIContent(value + " x " + (length / value) + ((kvp.Value == 0.0f) ? " (PERFECT)" : "")), false, 
                                         (o) => {
-                                                var seq_length = processor.InputSequence.length;
+                                                var seq_length = inputSequenceLength;
                                                 var seq_numU = (int)o;
                                                 var seq_numV = seq_length / seq_numU;
                                                 serializedObject.Update();
@@ -264,7 +264,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                                                 serializedObject.ApplyModifiedProperties();
                                                 UpdateOutputSize();
-                                                processor.Invalidate();
+                                                Invalidate();
                                             } 
                                     , value);
                                 }
@@ -278,13 +278,13 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                     if (newU != flipbookNumU.intValue)
                     {
-                        newU = Mathf.Clamp(newU, 1, processor.InputSequence.length / newV);
+                        newU = Mathf.Clamp(newU, 1, inputSequenceLength / newV);
                         flipbookNumU.intValue = newU;
                     }
 
                     if (newV != flipbookNumV.intValue)
                     {
-                        newV = Mathf.Clamp(newV, 1, processor.InputSequence.length / newU);
+                        newV = Mathf.Clamp(newV, 1, inputSequenceLength / newU);
                         flipbookNumV.intValue = newV;
                     }
                     break;
@@ -295,7 +295,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
                     if (numRows != flipbookNumV.intValue)
                     {
-                        numRows = Mathf.Clamp(numRows, 1, processor.InputSequence.length);
+                        numRows = Mathf.Clamp(numRows, 1, inputSequenceLength);
                         flipbookNumV.intValue = numRows;
                     }
 
@@ -306,7 +306,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if (EditorGUI.EndChangeCheck())
             {
                 UpdateOutputSize();
-                processor.Invalidate();
+                Invalidate();
                 hasChanged = true;
             }
 

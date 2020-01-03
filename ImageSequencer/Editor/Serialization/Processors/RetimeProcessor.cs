@@ -19,7 +19,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get
             {
-                if (processor.InputSequence.length > 0)
+                if (inputSequenceLength > 0)
                     return outputSequenceLength;
                 else
                     return 0;
@@ -37,7 +37,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool Process(int frame)
         {
-            int inputlength = processor.InputSequence.length;
+            int inputlength = inputSequenceLength;
             int outputlength = sequenceLength;
             float t = (float)frame / outputlength;
 
@@ -52,14 +52,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             int Prev = Mathf.Clamp((int)Mathf.Floor(Frame), 0, inputlength - 1);
             int Next = Mathf.Clamp((int)Mathf.Ceil(Frame), 0, inputlength - 1);
 
-            Texture prevtex = processor.InputSequence.RequestFrame(Prev).texture;
-            Texture nexttex = processor.InputSequence.RequestFrame(Next).texture;
+            Texture prevtex = RequestInputTexture(Prev);
+            Texture nexttex = RequestInputTexture(Next);
 
-            processor.material.SetTexture("_MainTex", prevtex);
-            processor.material.SetTexture("_AltTex", nexttex);
-            processor.material.SetFloat("_BlendFactor", blendFactor);
+            material.SetTexture("_MainTex", prevtex);
+            material.SetTexture("_AltTex", nexttex);
+            material.SetFloat("_BlendFactor", blendFactor);
 
-            processor.ExecuteShaderAndDump(frame, prevtex);
+            ProcessFrame(frame, prevtex);
             return true;
         }
 
@@ -69,7 +69,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             if (m_CurveDrawer == null)
             {
-                m_CurveDrawer = new CurveDrawer("Retime Curve", 0.0f, 1.0f, 0.0f, processor.InputSequence.length, 140, false);
+                m_CurveDrawer = new CurveDrawer("Retime Curve", 0.0f, 1.0f, 0.0f, inputSequenceLength, 140, false);
                 m_CurveDrawer.AddCurve(serializedObject.FindProperty("curve"), new Color(0.5f, 0.75f, 1.0f), "Retime Curve");
                 m_CurveDrawer.OnPostGUI = OnCurveFieldGUI;
             }
@@ -80,7 +80,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             EditorGUI.BeginChangeCheck();
 
             int length = outputSequenceLength.intValue;
-            int newlength = EditorGUILayout.IntSlider(VFXToolboxGUIUtility.Get("Sequence Length"), length, 1, processor.InputSequence.length);
+            int newlength = EditorGUILayout.IntSlider(VFXToolboxGUIUtility.Get("Sequence Length"), length, 1, inputSequenceLength);
             if (newlength != length)
             {
                 outputSequenceLength.intValue = newlength;
@@ -90,7 +90,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (useCurve.boolValue)
             {
-                m_CurveDrawer.SetBounds(new Rect(0, 0, 1, processor.InputSequence.length - 1));
+                m_CurveDrawer.SetBounds(new Rect(0, 0, 1, inputSequenceLength - 1));
 
                 if (m_CurveDrawer.OnGUILayout())
                 {
@@ -109,9 +109,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         void OnCurveFieldGUI(Rect renderArea, Rect curveArea)
         {
             float seqRatio = -1.0f;
-            if (processor.isCurrentlyPreviewed)
+            if (isCurrentlyPreviewed)
             {
-                seqRatio = (processor.currentPreviewSequenceLength > 1) ? (float)processor.currentPreviewFrame / (processor.currentPreviewSequenceLength - 1) : 0.0f;
+                seqRatio = (previewSequenceLength > 1) ? (float)previewCurrentFrame / (previewSequenceLength - 1) : 0.0f;
             }
 
             // If previewing current sequence : draw trackbar

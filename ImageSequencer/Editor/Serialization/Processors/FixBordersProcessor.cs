@@ -26,13 +26,13 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool Process(int frame)
         {
-            Texture inputFrame = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", inputFrame);
-            processor.material.SetVector("_FixFactors", FixFactors);
-            processor.material.SetColor("_FadeToColor", FadeToColor);
-            processor.material.SetFloat("_FadeToAlpha", FadeToAlpha);
-            processor.material.SetFloat("_Exponent", Exponent);
-            processor.ExecuteShaderAndDump(frame, inputFrame);
+            Texture inputFrame = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", inputFrame);
+            material.SetVector("_FixFactors", FixFactors);
+            material.SetColor("_FadeToColor", FadeToColor);
+            material.SetFloat("_FadeToAlpha", FadeToAlpha);
+            material.SetFloat("_Exponent", Exponent);
+            ProcessFrame(frame, inputFrame);
             return true;
         }
 
@@ -78,7 +78,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (EditorGUI.EndChangeCheck())
             {
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 

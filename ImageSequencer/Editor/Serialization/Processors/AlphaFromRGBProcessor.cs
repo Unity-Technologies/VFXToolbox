@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Color","Alpha From RGB")]
-    class AlphaFromRGBProcessor : ProcessorBase
+    internal class AlphaFromRGBProcessor : ProcessorBase
     {
         public Color BWFilterTint;
 
@@ -18,11 +18,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool Process(int frame)
         {
-            Texture inputFrame = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", inputFrame);
-            processor.material.SetVector("_RGBTint", BWFilterTint);
+            Texture inputFrame = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", inputFrame);
+            material.SetVector("_RGBTint", BWFilterTint);
 
-            processor.ExecuteShaderAndDump(frame, inputFrame);
+            ProcessFrame(frame, inputFrame);
             return true;
         }
 
@@ -36,7 +36,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (EditorGUI.EndChangeCheck())
             {
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 

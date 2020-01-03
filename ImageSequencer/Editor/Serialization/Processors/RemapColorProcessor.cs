@@ -45,14 +45,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
 
             CurveToTextureUtility.GradientToTexture(Gradient, ref m_GradientTexture);
-            Texture inputFrame = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", inputFrame);
+            Texture inputFrame = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", inputFrame);
 
-            processor.material.SetFloat("_Mode", (int)ColorSource);
+            material.SetFloat("_Mode", (int)ColorSource);
 
-            processor.material.SetTexture("_Gradient", m_GradientTexture);
+            material.SetTexture("_Gradient", m_GradientTexture);
 
-            processor.ExecuteShaderAndDump(frame, inputFrame);
+            ProcessFrame(frame, inputFrame);
             return true;
         }
 
@@ -67,7 +67,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (EditorGUI.EndChangeCheck())
             {
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 
@@ -81,7 +81,5 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             m_GradientTexture.filterMode = FilterMode.Bilinear;
             CurveToTextureUtility.GradientToTexture(Gradient, ref m_GradientTexture);
         }
-
-
     }
 }

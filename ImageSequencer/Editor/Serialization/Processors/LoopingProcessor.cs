@@ -19,7 +19,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             get
             {
-                if (processor.InputSequence.length > 0)
+                if (inputSequenceLength > 0)
                     return outputSequenceLength;
                 else
                     return 0;
@@ -37,7 +37,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool Process(int frame)
         {
-            int inputlength = processor.InputSequence.length;
+            int inputlength = inputSequenceLength;
             int outputlength = sequenceLength;
 
             float t = (float)frame / outputlength;
@@ -47,14 +47,14 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             int Prev = Mathf.Clamp((int)Mathf.Ceil(syncFrame + frame), 0, inputlength - 1);
             int Next = Mathf.Clamp((int)Mathf.Floor(syncFrame - (outputlength - frame)), 0, inputlength - 1);
 
-            Texture prevtex = processor.InputSequence.RequestFrame(Prev).texture;
-            Texture nexttex = processor.InputSequence.RequestFrame(Next).texture;
+            Texture prevtex = RequestInputTexture(Prev);
+            Texture nexttex = RequestInputTexture(Next); 
 
-            processor.material.SetTexture("_MainTex", prevtex);
-            processor.material.SetTexture("_AltTex", nexttex);
-            processor.material.SetFloat("_BlendFactor", blendFactor);
+            material.SetTexture("_MainTex", prevtex);
+            material.SetTexture("_AltTex", nexttex);
+            material.SetFloat("_BlendFactor", blendFactor);
 
-            processor.ExecuteShaderAndDump(frame, prevtex);
+            ProcessFrame(frame, prevtex);
             return true;
         }
 
@@ -68,28 +68,28 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             EditorGUI.BeginChangeCheck();
 
             int sync = syncFrame.intValue;
-            int newSync = EditorGUILayout.IntSlider(VFXToolboxGUIUtility.Get("Input Sync Frame|The frame from input sequence that will be used at start and end of the output sequence."), sync, 0 + outputSequenceLength.intValue, processor.InputSequence.length - outputSequenceLength.intValue);
+            int newSync = EditorGUILayout.IntSlider(VFXToolboxGUIUtility.Get("Input Sync Frame|The frame from input sequence that will be used at start and end of the output sequence."), sync, 0 + outputSequenceLength.intValue, inputSequenceLength - outputSequenceLength.intValue);
 
             if (newSync != sync)
             {
-                newSync = Mathf.Clamp(newSync, 0 + outputSequenceLength.intValue, processor.InputSequence.length - outputSequenceLength.intValue);
+                newSync = Mathf.Clamp(newSync, 0 + outputSequenceLength.intValue, inputSequenceLength - outputSequenceLength.intValue);
                 syncFrame.intValue = newSync;
             }
 
             int length = outputSequenceLength.intValue;
-            int newlength = EditorGUILayout.IntSlider(VFXToolboxGUIUtility.Get("Output Sequence Length|How many frames will be in the output sequence?"), length, 2, (processor.InputSequence.length / 2) + 1);
+            int newlength = EditorGUILayout.IntSlider(VFXToolboxGUIUtility.Get("Output Sequence Length|How many frames will be in the output sequence?"), length, 2, (inputSequenceLength / 2) + 1);
 
             if (newlength != length)
             {
-                newlength = Mathf.Min(newlength, Mathf.Max(1, (processor.InputSequence.length / 2)));
+                newlength = Mathf.Min(newlength, Mathf.Max(1, (inputSequenceLength / 2)));
                 outputSequenceLength.intValue = newlength;
-                syncFrame.intValue = Mathf.Clamp(syncFrame.intValue, 0 + outputSequenceLength.intValue, processor.InputSequence.length - outputSequenceLength.intValue);
+                syncFrame.intValue = Mathf.Clamp(syncFrame.intValue, 0 + outputSequenceLength.intValue, inputSequenceLength - outputSequenceLength.intValue);
             }
 
             float seqRatio = -1.0f;
-            if (processor.isCurrentlyPreviewed)
+            if (isCurrentlyPreviewed)
             {
-                seqRatio = (processor.currentPreviewSequenceLength > 1) ? (float)processor.currentPreviewFrame / (processor.currentPreviewSequenceLength - 1) : 0.0f;
+                seqRatio = (previewSequenceLength > 1) ? (float)previewCurrentFrame / (previewSequenceLength - 1) : 0.0f;
             }
 
             // Draw Preview
@@ -129,7 +129,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             AnimationCurve curve = serializedObject.FindProperty("curve").animationCurveValue;
             using (new GUI.ClipScope(gradient_rect))
             {
-                int seqLen = processor.OutputSequence.length;
+                int seqLen = this.outputSequenceLength;
                 int syncF = syncFrame.intValue;
 
                 float w = Mathf.Ceil((float)width / seqLen);
@@ -201,9 +201,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         void OnCurveFieldGUI(Rect renderArea, Rect curveArea)
         {
             float seqRatio = -1.0f;
-            if (processor.isCurrentlyPreviewed)
+            if (isCurrentlyPreviewed)
             {
-                seqRatio = (processor.currentPreviewSequenceLength > 1) ? (float)processor.currentPreviewFrame / (processor.currentPreviewSequenceLength - 1) : 0.0f;
+                seqRatio = (previewSequenceLength > 1) ? (float)previewCurrentFrame / (previewSequenceLength - 1) : 0.0f;
             }
 
             // If previewing current sequence : draw trackbar
@@ -216,7 +216,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool OnCanvasGUI(ImageSequencerCanvas canvas)
         {
-            int inLength = processor.InputSequence.length;
+            int inLength = inputSequenceLength;
             int outLength = sequenceLength;
             int syncFrame = this.syncFrame;
 
@@ -248,7 +248,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 #if !UNITY_2018_2_OR_NEWER
                 GL.sRGBWrite = (QualitySettings.activeColorSpace == ColorSpace.Linear);
 #endif
-                GUI.DrawTexture(imgARect, processor.InputSequence.RequestFrame(inSeqAIDX).texture);
+                GUI.DrawTexture(imgARect, RequestInputTexture(inSeqAIDX));
 #if !UNITY_2018_2_OR_NEWER
                 GL.sRGBWrite = false;
 #endif
@@ -277,7 +277,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 #if !UNITY_2018_2_OR_NEWER
                 GL.sRGBWrite = (QualitySettings.activeColorSpace == ColorSpace.Linear);
 #endif
-                GUI.DrawTexture(imgBRect, processor.InputSequence.RequestFrame(inSeqBIDX).texture);
+                GUI.DrawTexture(imgBRect, RequestInputTexture(inSeqBIDX));
 #if !UNITY_2018_2_OR_NEWER
                 GL.sRGBWrite = false;
 #endif

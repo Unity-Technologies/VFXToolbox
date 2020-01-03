@@ -1,38 +1,40 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("","Custom Material")]
     class CustomMaterialProcessor : ProcessorBase
     {
-        public Material material;
+        [FormerlySerializedAs("material")]
+        public Material customMaterial;
 
         public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Null.shader";
 
         public override string processorName => "Custom Material";
 
-        public override string label => $"{processorName} ({((material == null) ? "Not Set" : material.name)})";
+        public override string label => $"{processorName} ({((customMaterial == null) ? "Not Set" : customMaterial.name)})";
 
         public override void Default()
         {
-            material = null;
+            customMaterial = null;
         }
 
         public override bool Process(int frame)
         {
-            Texture inputFrame = processor.InputSequence.RequestFrame(frame).texture;
+            Texture inputFrame = RequestInputTexture(frame);
 
-            if (material != null)
+            if (customMaterial != null)
             {
-                material.SetTexture("_InputFrame", inputFrame);
-                material.SetVector("_FrameData", new Vector4(processor.OutputWidth, processor.OutputHeight, frame, sequenceLength));
-                material.SetVector("_FlipbookData", new Vector4(processor.NumU, processor.NumV, 0, 0));
-                processor.ExecuteShaderAndDump(frame, inputFrame, material);
+                customMaterial.SetTexture("_InputFrame", inputFrame);
+                customMaterial.SetVector("_FrameData", new Vector4(inputSequenceWidth, inputSequenceHeight, frame, sequenceLength));
+                customMaterial.SetVector("_FlipbookData", new Vector4(inputSequenceNumU, inputSequenceNumV, 0, 0));
+                ProcessFrame(frame, inputFrame, customMaterial);
             }
             else
             {
-                processor.material.SetTexture("_MainTex", inputFrame);
-                processor.ExecuteShaderAndDump(frame, inputFrame);
+                material.SetTexture("_MainTex", inputFrame);
+                ProcessFrame(frame, inputFrame);
             }
             return true;
         }
@@ -43,34 +45,34 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public override bool OnInspectorGUI(bool changed, SerializedObject serializedObject)
         {
             EditorGUI.BeginChangeCheck();
-            Material mat = (Material)EditorGUILayout.ObjectField(VFXToolboxGUIUtility.Get("Material"), material, typeof(Material), false);
+            Material mat = (Material)EditorGUILayout.ObjectField(VFXToolboxGUIUtility.Get("Material"), customMaterial, typeof(Material), false);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(this, "Custom Material Change");
-                material = mat;
+                customMaterial = mat;
                 EditorUtility.SetDirty(this);
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 
-            if (material != null)
+            if (customMaterial != null)
             {
-                Editor.CreateCachedEditor(material, typeof(MaterialEditor), ref m_MaterialEditor);
+                Editor.CreateCachedEditor(customMaterial, typeof(MaterialEditor), ref m_MaterialEditor);
                 EditorGUI.BeginChangeCheck();
                 m_MaterialEditor.DrawHeader();
                 EditorGUIUtility.labelWidth = 120;
                 m_MaterialEditor.OnInspectorGUI();
 
-                if (m_CachedShader != material.shader)
+                if (m_CachedShader != customMaterial.shader)
                 {
                     // Hack : we cache shader in order to track changes as DrawHeader does not consider shader change as a EditorGUI.changed
-                    m_CachedShader = material.shader;
+                    m_CachedShader = customMaterial.shader;
                     GUI.changed = true;
                 }
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    processor.Invalidate();
+                    Invalidate();
                     changed = true;
                 }
 

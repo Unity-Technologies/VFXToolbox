@@ -18,11 +18,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool Process(int frame)
         {
-            Texture tex = processor.InputSequence.RequestFrame(frame).texture;
-            processor.SetOutputSize(tex.width, tex.height);
-            processor.material.SetTexture("_MainTex", tex);
-            processor.material.SetColor("_BackgroundColor", BackgroundColor);
-            processor.ExecuteShaderAndDump(frame, tex);
+            Texture tex = RequestInputTexture(frame);
+            SetOutputSize(tex.width, tex.height);
+            material.SetTexture("_MainTex", tex);
+            material.SetColor("_BackgroundColor", BackgroundColor);
+            ProcessFrame(frame, tex);
             return true;
         }
 
@@ -37,19 +37,19 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 EditorGUILayout.PropertyField(bgColor, VFXToolboxGUIUtility.Get("Background Color"));
                 if (GUILayout.Button(VFXToolboxGUIUtility.Get("Grab"), GUILayout.Width(40)))
                 {
-                    if (processor.InputSequence.length > 0)
+                    if (inputSequenceLength > 0)
                     {
-                        processor.InputSequence.RequestFrame(0);
+                        var texture = RequestInputTexture(0);
 
                         Color background;
 
-                        if (processor.InputSequence.frames[0].texture is RenderTexture)
+                        if (texture is RenderTexture)
                         {
-                            background = VFXToolboxUtility.ReadBack((RenderTexture)processor.InputSequence.frames[0].texture)[0];
+                            background = VFXToolboxUtility.ReadBack((RenderTexture)texture)[0];
                         }
                         else
                         {
-                            Texture2D inputFrame = (Texture2D)processor.InputSequence.frames[0].texture;
+                            Texture2D inputFrame = (Texture2D)texture;
                             RenderTexture rt = RenderTexture.GetTemporary(inputFrame.width, inputFrame.height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
                             Graphics.Blit(inputFrame, rt);
                             background = VFXToolboxUtility.ReadBack(rt)[0];
@@ -67,7 +67,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if (EditorGUI.EndChangeCheck())
             {
                 UpdateOutputSize();
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
             GUILayout.Space(20);

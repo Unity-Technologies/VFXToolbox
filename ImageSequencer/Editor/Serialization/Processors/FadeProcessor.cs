@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Sequence","Fade")]
-    class FadeProcessor : ProcessorBase
+    internal class FadeProcessor : ProcessorBase
     {
         public AnimationCurve FadeCurve;
         public Color FadeToColor;
@@ -22,11 +22,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override bool Process(int frame)
         {
-            Texture inputFrame = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", inputFrame);
-            processor.material.SetColor("_FadeToColor", FadeToColor);
-            processor.material.SetFloat("_Ratio", FadeCurve.Evaluate(((float)frame) / sequenceLength));
-            processor.ExecuteShaderAndDump(frame, inputFrame);
+            Texture inputFrame = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", inputFrame);
+            material.SetColor("_FadeToColor", FadeToColor);
+            material.SetFloat("_Ratio", FadeCurve.Evaluate(((float)frame) / sequenceLength));
+            ProcessFrame(frame, inputFrame);
             return true;
         }
 
@@ -58,7 +58,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (EditorGUI.EndChangeCheck())
             {
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 
@@ -69,9 +69,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         void OnCurveFieldGUI(Rect renderArea, Rect curveArea)
         {
             float seqRatio = -1.0f;
-            if (processor.isCurrentlyPreviewed)
+            if (isCurrentlyPreviewed)
             {
-                seqRatio = (processor.currentPreviewSequenceLength > 1) ? (float)processor.currentPreviewFrame / (processor.currentPreviewSequenceLength - 1) : 0.0f;
+                seqRatio = (previewSequenceLength > 1) ? (float)previewCurrentFrame / (previewSequenceLength - 1) : 0.0f;
             }
 
             // If previewing current sequence : draw trackbar

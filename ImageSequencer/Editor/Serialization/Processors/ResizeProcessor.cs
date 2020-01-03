@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Common","Resize")]
-    class ResizeProcessor : ProcessorBase
+    internal class ResizeProcessor : ProcessorBase
     {
         public ushort Width;
         public ushort Height;
@@ -22,16 +22,16 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override void UpdateOutputSize()
         {
-            processor.SetOutputSize(Width, Height);
+            SetOutputSize(Width, Height);
         }
 
         public override bool Process(int frame)
         {
-            Texture texture = processor.InputSequence.RequestFrame(frame).texture;
+            Texture texture = RequestInputTexture(frame);
             Vector4 kernelAndSize = new Vector4((float)texture.width / (float)Width, (float)texture.height / (float)Height, (float)Width, (float)Height);
-            processor.material.SetTexture("_MainTex", texture);
-            processor.material.SetVector("_KernelAndSize", kernelAndSize);
-            processor.ExecuteShaderAndDump(frame, texture);
+            material.SetTexture("_MainTex", texture);
+            material.SetVector("_KernelAndSize", kernelAndSize);
+            ProcessFrame(frame, texture);
             return true;
         }
 
@@ -57,7 +57,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             var out_width = serializedObject.FindProperty("Width");
                             out_width.intValue = (int)o;
                             serializedObject.ApplyModifiedProperties();
-                            processor.Invalidate();
+                            Invalidate();
                             UpdateOutputSize();
                         }, s);
                     }
@@ -84,7 +84,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                             var out_height = serializedObject.FindProperty("Height");
                             out_height.intValue = (int)o;
                             serializedObject.ApplyModifiedProperties();
-                            processor.Invalidate();
+                            Invalidate();
                             UpdateOutputSize();
                         }, s);
                     }
@@ -104,7 +104,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if (EditorGUI.EndChangeCheck())
             {
                 UpdateOutputSize();
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 

@@ -4,7 +4,7 @@ using System;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
-    internal class ImageSequencerCanvas : VFXToolboxCanvas
+    public class ImageSequencerCanvas : VFXToolboxCanvas
     {
         public bool showExtraInfo
         {
@@ -26,7 +26,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
        
-        public ProcessingFrameSequence sequence
+        internal ProcessingFrameSequence sequence
         {
             get
             {
@@ -38,7 +38,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
-        public ProcessingFrame currentFrame
+        internal ProcessingFrame currentFrame
         {
             get {
                 return m_ProcessingFrame;
@@ -90,7 +90,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         private bool m_IsScrobbing;
 
-        public ImageSequencerCanvas(Rect displayRect, ImageSequencer editorWindow)
+        internal ImageSequencerCanvas(Rect displayRect, ImageSequencer editorWindow)
             :base(displayRect)
         {
             m_ImageSequencerWindow = editorWindow;
@@ -196,7 +196,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             Handles.color = Color.white;
         }
 
-        public void OnGUI(ImageSequencer editor)
+        internal void OnGUI(ImageSequencer editor)
         {
             OnGUI();
 
@@ -234,7 +234,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         }
 
-        public void DrawSequenceControls(Rect ViewportArea, ImageSequencer editor)
+        internal void DrawSequenceControls(Rect ViewportArea, ImageSequencer editor)
         {
             m_PlayControlsRect = new Rect(ViewportArea.x , (ViewportArea.y + ViewportArea.height), ViewportArea.width , 100);
 

@@ -4,7 +4,7 @@ using UnityEngine.VFXToolbox;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Color","Color Correction")]
-    class ColorCorrectionProcessor : ProcessorBase
+    internal class ColorCorrectionProcessor : ProcessorBase
     {
         [FloatSlider(0.0f,2.0f)]
         public float Brightness;
@@ -39,15 +39,15 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
 
             CurveToTextureUtility.CurveToTexture(AlphaCurve, ref m_CurveTexture);
-            Texture inputFrame = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", inputFrame);
-            processor.material.SetFloat("_Brightness", Brightness);
-            processor.material.SetFloat("_Contrast", Contrast);
-            processor.material.SetFloat("_Saturation", Saturation);
+            Texture inputFrame = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", inputFrame);
+            material.SetFloat("_Brightness", Brightness);
+            material.SetFloat("_Contrast", Contrast);
+            material.SetFloat("_Saturation", Saturation);
 
-            processor.material.SetTexture("_AlphaCurve", m_CurveTexture);
+            material.SetTexture("_AlphaCurve", m_CurveTexture);
 
-            processor.ExecuteShaderAndDump(frame, inputFrame);
+            ProcessFrame(frame, inputFrame);
             return true;
         }
 
@@ -100,7 +100,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (EditorGUI.EndChangeCheck() || curveChanged)
             {
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 

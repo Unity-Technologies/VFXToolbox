@@ -19,11 +19,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         }
         public override bool Process(int frame)
         {
-            Texture inputFrame = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", inputFrame);
-            processor.material.SetInt("_RemoveAlpha", RemoveAlpha ? 1 : 0);
-            processor.material.SetFloat("_AlphaValue", AlphaValue);
-            processor.ExecuteShaderAndDump(frame, inputFrame);
+            Texture inputFrame = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", inputFrame);
+            material.SetInt("_RemoveAlpha", RemoveAlpha ? 1 : 0);
+            material.SetFloat("_AlphaValue", AlphaValue);
+            ProcessFrame(frame, inputFrame);
             return true;
         }
         public override bool OnInspectorGUI(bool changed, SerializedObject serializedObject)
@@ -39,7 +39,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             if (EditorGUI.EndChangeCheck())
             {
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 

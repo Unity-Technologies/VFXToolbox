@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Common","Rotate")]
-    class RotateProcessor : ProcessorBase
+    internal class RotateProcessor : ProcessorBase
     {
         public enum RotateMode
         {
@@ -21,12 +21,16 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override string label => $"{processorName} ({FrameRotateMode})";
 
+        public override int numU => (FrameRotateMode == RotateMode.None || FrameRotateMode == RotateMode.Rotate180) ? base.numU : base.numV;
+
+        public override int numV => (FrameRotateMode == RotateMode.None || FrameRotateMode == RotateMode.Rotate180) ? base.numV : base.numU;
+
         public override void UpdateOutputSize()
         {
             if (FrameRotateMode == RotateMode.None || FrameRotateMode == RotateMode.Rotate180)
-                processor.SetOutputSize(processor.InputSequence.width, processor.InputSequence.height);
+                SetOutputSize(inputSequenceWidth, inputSequenceHeight);
             else
-                processor.SetOutputSize(processor.InputSequence.height, processor.InputSequence.width);
+                SetOutputSize(inputSequenceHeight, inputSequenceWidth);
         }
 
         public override void Default()
@@ -37,10 +41,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public override bool Process(int frame)
         {
             UpdateOutputSize();
-            Texture texture = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", texture);
-            processor.material.SetInt("_Mode", (int)FrameRotateMode);
-            processor.ExecuteShaderAndDump(frame, texture);
+            Texture texture = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", texture);
+            material.SetInt("_Mode", (int)FrameRotateMode);
+            ProcessFrame(frame, texture);
             return true;
         }
 
@@ -55,7 +59,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if (EditorGUI.EndChangeCheck())
             {
                 UpdateOutputSize();
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 

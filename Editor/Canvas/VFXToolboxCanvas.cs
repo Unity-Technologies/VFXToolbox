@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox
 {
-    internal abstract class VFXToolboxCanvas
+    public abstract class VFXToolboxCanvas
     {
         public Rect displayRect
         {

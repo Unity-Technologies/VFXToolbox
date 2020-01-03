@@ -81,8 +81,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public Material material { get; private set; }
 
         public bool isCurrentlyPreviewed => m_ProcessingNodeStack.imageSequencer.previewCanvas.sequence.processingNode == this;
-        public int currentPreviewFrame => m_ProcessingNodeStack.imageSequencer.previewCanvas.currentFrameIndex;
-        public int currentPreviewSequenceLength => m_ProcessingNodeStack.imageSequencer.previewCanvas.numFrames;
+        public int previewCurrentFrame => m_ProcessingNodeStack.imageSequencer.previewCanvas.currentFrameIndex;
+        public int previewSequenceLength => m_ProcessingNodeStack.imageSequencer.previewCanvas.numFrames;
 
         public ProcessingNode(ProcessingNodeStack processorStack, ProcessorInfo info)
         {

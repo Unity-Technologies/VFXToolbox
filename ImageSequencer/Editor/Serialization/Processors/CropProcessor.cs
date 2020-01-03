@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     [Processor("Common","Crop")]
-    class CropProcessor : ProcessorBase
+    internal class CropProcessor : ProcessorBase
     {
         public uint Crop_Top;
         public uint Crop_Bottom;
@@ -18,9 +18,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override void UpdateOutputSize()
         {
-            int width = (processor.InputSequence.width - (int)Crop_Left) - (int)Crop_Right;
-            int height = (processor.InputSequence.height - (int)Crop_Top) - (int)Crop_Bottom;
-            processor.SetOutputSize(width, height);
+            int width = (inputSequenceWidth - (int)Crop_Left) - (int)Crop_Right;
+            int height = (inputSequenceHeight - (int)Crop_Top) - (int)Crop_Bottom;
+            SetOutputSize(width, height);
         }
 
         public override void Default()
@@ -31,26 +31,27 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 Crop_Right = 0;
                 AutoCropThreshold = 0.003f;
         }
+
         public override bool Process(int frame)
         {
             UpdateOutputSize();
-            Texture texture = processor.InputSequence.RequestFrame(frame).texture;
-            processor.material.SetTexture("_MainTex", texture);
-            processor.material.SetVector("_CropFactors", new Vector4(
+            Texture texture = RequestInputTexture(frame);
+            material.SetTexture("_MainTex", texture);
+            material.SetVector("_CropFactors", new Vector4(
                 (float)Crop_Left / texture.width,
                 (float)Crop_Right / texture.width,
                 (float)Crop_Top / texture.height,
                 (float)Crop_Bottom / texture.height
                 ));
 
-            processor.ExecuteShaderAndDump(frame, texture);
+            ProcessFrame(frame, texture);
             return true;
         }
 
         public override bool OnInspectorGUI(bool changed, SerializedObject serializedObject)
         {
-            int sourceWidth = processor.InputSequence.width;
-            int sourceHeight = processor.InputSequence.height;
+            int sourceWidth = inputSequenceWidth;
+            int sourceHeight = inputSequenceHeight;
 
             var crop_top = serializedObject.FindProperty("Crop_Top");
             var crop_bottom = serializedObject.FindProperty("Crop_Bottom");
@@ -123,7 +124,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             if (EditorGUI.EndChangeCheck())
             {
                 UpdateOutputSize();
-                processor.Invalidate();
+                Invalidate();
                 changed = true;
             }
 
@@ -133,8 +134,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         private void FindProperValues(float threshold, ref SerializedProperty top, ref SerializedProperty bottom, ref SerializedProperty left, ref SerializedProperty right)
         {
-            int width = processor.InputSequence.width;
-            int height = processor.InputSequence.height;
+            int width = inputSequenceWidth;
+            int height = inputSequenceHeight;
 
             int minX = width;
             int maxX = 0;
@@ -144,19 +145,18 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             Color[] colors;
             RenderTexture tempRT = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
 
-            for (int i = 0; i < processor.InputSequence.frames.Count; i++)
+            for (int i = 0; i < inputSequenceLength; i++)
             {
-                ProcessingFrame f = processor.InputSequence.frames[i];
+                Texture t = RequestInputTexture(i);
 
-                VFXToolboxGUIUtility.DisplayProgressBar("Crop processor", "Evaluating closest bound (Frame #" + i + " on " + processor.InputSequence.frames.Count + "...)", (float)i / processor.InputSequence.frames.Count);
-                if (processor.InputSequence.processingNode != null)
+                VFXToolboxGUIUtility.DisplayProgressBar("Crop processor", "Evaluating closest bound (Frame #" + i + " on " + inputSequenceLength + "...)", (float)i / inputSequenceLength);
+                if (!isInputFrameSequence)
                 {
-                    f.Process();
-                    colors = VFXToolboxUtility.ReadBack(f.texture as RenderTexture);
+                    colors = VFXToolboxUtility.ReadBack(t as RenderTexture);
                 }
                 else
                 {
-                    Graphics.Blit(f.texture, tempRT);
+                    Graphics.Blit(t, tempRT);
                     colors = VFXToolboxUtility.ReadBack(tempRT);
                 }
 

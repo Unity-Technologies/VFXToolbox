@@ -24,17 +24,17 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public override void UpdateOutputSize()
         {
-            int width = (int)Mathf.Ceil((float)processor.InputSequence.RequestFrame(0).texture.width / FlipbookNumU);
-            int height = (int)Mathf.Ceil((float)processor.InputSequence.RequestFrame(0).texture.height / FlipbookNumV);
-            processor.SetOutputSize(width, height);
+            int width = (int)Mathf.Ceil((float)inputSequenceWidth / FlipbookNumU);
+            int height = (int)Mathf.Ceil((float)inputSequenceHeight / FlipbookNumV);
+            SetOutputSize(width, height);
         }
 
-        public override int sequenceLength => Mathf.Min(FlipbookNumU, processor.InputSequence.width) * Mathf.Min(FlipbookNumV, processor.InputSequence.height);
+        public override int sequenceLength => Mathf.Min(FlipbookNumU, inputSequenceWidth) * Mathf.Min(FlipbookNumV, inputSequenceHeight);
 
         public override bool Process(int frame)
         {
-            Texture texture = processor.InputSequence.RequestFrame(0).texture;
-            processor.material.SetTexture("_MainTex", texture);
+            Texture texture = RequestInputTexture(0);
+            material.SetTexture("_MainTex", texture);
             Vector4 rect = new Vector4();
 
             int u = Mathf.Min(FlipbookNumU, texture.width);
@@ -47,8 +47,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             rect.z = 1.0f / u;
             rect.w = 1.0f / v;
 
-            processor.material.SetVector("_Rect", rect);
-            processor.ExecuteShaderAndDump(frame, texture);
+            material.SetVector("_Rect", rect);
+            ProcessFrame(frame, texture);
             return true;
         }
 
@@ -59,8 +59,8 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             EditorGUI.BeginChangeCheck();
 
-            int newU = Mathf.Clamp(EditorGUILayout.IntField(VFXToolboxGUIUtility.Get("Columns (U) : "), flipbookNumU.intValue), 1, processor.InputSequence.width);
-            int newV = Mathf.Clamp(EditorGUILayout.IntField(VFXToolboxGUIUtility.Get("Rows (V) : "), flipbookNumV.intValue), 1, processor.InputSequence.height);
+            int newU = Mathf.Clamp(EditorGUILayout.IntField(VFXToolboxGUIUtility.Get("Columns (U) : "), flipbookNumU.intValue), 1, inputSequenceWidth);
+            int newV = Mathf.Clamp(EditorGUILayout.IntField(VFXToolboxGUIUtility.Get("Rows (V) : "), flipbookNumV.intValue), 1, inputSequenceHeight);
 
             if (newU != flipbookNumU.intValue || flipbookNumV.intValue != newV)
                 GUI.changed = true;
@@ -89,7 +89,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                     }
                 }
 
-                processor.Invalidate();
+                Invalidate();
                 hasChanged = true;
             }
 
