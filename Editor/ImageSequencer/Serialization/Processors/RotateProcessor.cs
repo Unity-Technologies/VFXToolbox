@@ -15,7 +15,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public RotateMode FrameRotateMode;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Rotate.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Shaders/Rotate.shader";
 
         public override string processorName => "Rotate";
 

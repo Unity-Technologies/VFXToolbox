@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditorInternal;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
@@ -330,6 +331,36 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 m_CurrentColorSpace = colorSpace;
                 if(m_ProcessingNodeStack != null)
                     m_ProcessingNodeStack.InvalidateAll();
+            }
+        }
+
+        public static void CleanupAsset(ImageSequence asset)
+        {
+            var subAssets = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GetAssetPath(asset));
+            List<Object> toDelete = new List<Object>();
+
+            var allSettings = asset.processorInfos.Select(i => i.Settings);
+
+            foreach(var subAsset in subAssets)
+            {
+                if(subAsset is ProcessorInfo && !asset.processorInfos.Contains(subAsset))
+                {
+                    toDelete.Add(subAsset); 
+                }
+                else if(subAsset is ProcessorBase && !allSettings.Contains(subAsset))
+                {
+                    toDelete.Add(subAsset);
+                }
+            }
+
+            foreach(var o in toDelete)
+            {
+                AssetDatabase.RemoveObjectFromAsset(o);
+            }
+
+            if(toDelete.Count > 0)
+            {
+                EditorUtility.SetDirty(asset);
             }
         }
     }

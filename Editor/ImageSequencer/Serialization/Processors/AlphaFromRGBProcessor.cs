@@ -7,7 +7,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
     {
         public Color BWFilterTint;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/AlphaFromRGB.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/AlphaFromRGB.shader";
 
         public override string processorName => "Alpha From RGB";
 

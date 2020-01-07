@@ -19,7 +19,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         bool hasChanged = false;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/AssembleBlit.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/AssembleBlit.shader";
 
         public override string processorName => "Assemble Flipbook";
 

@@ -88,6 +88,11 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             Sprite = 3
         }
 
+        private void OnEnable()
+        {
+            ImageSequencer.CleanupAsset(this);
+        }
+
     }
 }
 

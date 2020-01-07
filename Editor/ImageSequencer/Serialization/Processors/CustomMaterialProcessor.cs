@@ -9,7 +9,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         [FormerlySerializedAs("material")]
         public Material customMaterial;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Null.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/Null.shader";
 
         public override string processorName => "Custom Material";
 

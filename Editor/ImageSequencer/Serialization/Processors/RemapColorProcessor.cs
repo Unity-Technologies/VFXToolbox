@@ -19,7 +19,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public RemapColorSource ColorSource;
 
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/RemapColor.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/RemapColor.shader";
 
         public override string processorName => "Remap Color";
 

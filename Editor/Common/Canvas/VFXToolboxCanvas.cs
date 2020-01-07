@@ -185,7 +185,7 @@ namespace UnityEditor.VFXToolbox
         internal CanvasGUIDelegate onCanvasGUI;
         internal delegate void CanvasGUIDelegate();
 
-        internal VFXToolboxCanvas(Rect displayRect, string shaderName = "Packages/com.unity.vfx-toolbox/Editor/Canvas/Shaders/VFXToolboxCanvas.shader") 
+        internal VFXToolboxCanvas(Rect displayRect, string shaderName = "Packages/com.unity.vfx-toolbox/Editor/Common/Canvas/Shaders/VFXToolboxCanvas.shader") 
         {
             m_Rect = displayRect;
 

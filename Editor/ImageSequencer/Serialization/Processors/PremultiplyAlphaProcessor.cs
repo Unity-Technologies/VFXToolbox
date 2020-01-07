@@ -8,7 +8,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public bool RemoveAlpha;
         public float AlphaValue;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/PremultiplyAlpha.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/PremultiplyAlpha.shader";
 
         public override string processorName => "Premultiply Alpha";
 

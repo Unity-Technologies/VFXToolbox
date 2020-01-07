@@ -7,7 +7,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
     {
         public Color BackgroundColor;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Unblend.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/Unblend.shader";
 
         public override string processorName => "Remove Background";
 

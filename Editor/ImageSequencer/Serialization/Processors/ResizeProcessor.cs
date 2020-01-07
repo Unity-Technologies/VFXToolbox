@@ -8,7 +8,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public ushort Width;
         public ushort Height;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Resize.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/Resize.shader";
 
         public override string processorName => "Resize";
 

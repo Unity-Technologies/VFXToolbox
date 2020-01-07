@@ -107,7 +107,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             {
                 if(s_Missing == null)
                 {
-                    Texture2D t = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.unity.vfx-toolbox/Editor/Resources/MissingTexture.png");
+                    Texture2D t = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.unity.vfx-toolbox/Editor/Common/Textures/MissingTexture.png");
                     if(t == null)
                     {
                         Debug.LogError("Could not find VFXToolbox Missing Texture, using white texture instead. Make sure you imported all the VFXToolbox files.");

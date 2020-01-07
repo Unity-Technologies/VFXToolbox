@@ -8,7 +8,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public AnimationCurve FadeCurve;
         public Color FadeToColor;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Fade.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/Fade.shader";
 
         public override string processorName => "Fade";
 

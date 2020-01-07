@@ -12,7 +12,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public float AutoCropThreshold = 0.003f;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Crop.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/Crop.shader";
 
         public override string processorName => "Crop";
 

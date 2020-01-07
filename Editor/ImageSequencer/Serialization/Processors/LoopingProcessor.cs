@@ -9,7 +9,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public int syncFrame;
         public int outputSequenceLength;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Blend.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/Blend.shader";
 
         public override string processorName => "Looping";
 

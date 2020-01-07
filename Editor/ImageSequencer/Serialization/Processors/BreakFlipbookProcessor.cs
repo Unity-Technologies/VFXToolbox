@@ -8,7 +8,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         public int FlipbookNumU;
         public int FlipbookNumV;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/GetSubUV.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/GetSubUV.shader";
 
         public override string processorName => "Break Flipbook";
 

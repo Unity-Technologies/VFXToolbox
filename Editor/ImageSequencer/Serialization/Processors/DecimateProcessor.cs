@@ -7,7 +7,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
     {
         public ushort DecimateBy;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/Null.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/Null.shader";
 
         public override string label => $"{processorName} (1 of {DecimateBy})";
 

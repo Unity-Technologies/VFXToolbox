@@ -12,7 +12,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         [FloatSlider(0.5f,4.0f)]
         public float Exponent;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/FixBorders.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/FixBorders.shader";
 
         public override string processorName => "Fix Borders";
 

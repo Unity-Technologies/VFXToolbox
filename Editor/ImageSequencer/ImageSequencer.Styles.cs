@@ -56,7 +56,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             public Styles()
             {
-                title = new GUIContent("Image Sequencer");
+                title = new GUIContent("Image Sequencer", AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/EditorResources/ImageSequencer-Icon.png"));
 
                 scrollView = new GUIStyle();
                 scrollView.padding = new RectOffset(8, 8, 0, 0);

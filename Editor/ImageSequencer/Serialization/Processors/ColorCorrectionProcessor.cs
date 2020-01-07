@@ -15,7 +15,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public AnimationCurve AlphaCurve;
 
-        public override string shaderPath => "Packages/com.unity.vfx-toolbox/ImageSequencer/Editor/Shaders/ColorCorrection.shader";
+        public override string shaderPath => "Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/Shaders/ColorCorrection.shader";
 
         public override string processorName => "Color Correction";
 

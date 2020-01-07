@@ -20,7 +20,6 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
 
             FilterPopupWindow.Show(Event.current.mousePosition, m_ProcessorDataProvider);
-           
         }
 
         private void MenuSelectProcessor(ReorderableList list)
