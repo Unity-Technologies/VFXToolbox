@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace UnityEditor.VFXToolbox
 {
+    /// <summary>
+    /// An Editor UI Canvas that enables previsualizing an image. Derive from this class to implement your own.
+    /// </summary>
     public abstract class VFXToolboxCanvas
     {
         internal Rect displayRect
@@ -162,7 +165,7 @@ namespace UnityEditor.VFXToolbox
         private int m_MipMap = 0;
         private bool m_bShowGrid = true;
 
-        protected Rect m_Rect;
+        private Rect m_Rect;
 
         private Shader m_Shader;
         private Material m_Material;
@@ -201,9 +204,22 @@ namespace UnityEditor.VFXToolbox
             m_bNeedRedraw = m_bNeedRedraw | needRedraw;
         }
 
+        /// <summary>
+        /// Handle Setting the Texture to the canvas
+        /// </summary>
+        /// <param name="tex">The texture to display</param>
         protected abstract void SetTexture(Texture tex);
+
+        /// <summary>
+        /// Handle Getting the Texture displayed on the canvas
+        /// </summary>
+        /// <returns>The displayed texture</returns>
         protected abstract Texture GetTexture();
 
+        /// <summary>
+        /// Returns the count of the currently set texture
+        /// </summary>
+        /// <returns></returns>
         protected virtual int GetMipMapCount()
         {
             if (texture != null)
@@ -277,6 +293,9 @@ namespace UnityEditor.VFXToolbox
             }
         }
 
+        /// <summary>
+        /// Handles common Keyboard events to perform navigation
+        /// </summary>
         protected virtual void HandleKeyboardEvents()
         {
             if(Event.current.type == EventType.KeyDown)
@@ -401,6 +420,9 @@ namespace UnityEditor.VFXToolbox
                 );
         }
 
+        /// <summary>
+        /// Draws a line grid around the texture
+        /// </summary>
         protected virtual void DrawGrid()
         {
             Vector2 src, dst;

@@ -4,6 +4,9 @@ using System;
 
 namespace UnityEditor.VFXToolbox.ImageSequencer
 {
+    /// <summary>
+    /// A VFXToolboxCanvas component used in Image Sequencer
+    /// </summary>
     public class ImageSequencerCanvas : VFXToolboxCanvas
     {
         internal bool showExtraInfo
@@ -105,12 +108,20 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             m_ImageSequencerWindow.Invalidate();
         }
 
+        /// <summary>
+        /// As texture display is handled by the processing stack, this function is not used.
+        /// </summary>
+        /// <param name="tex">A texture</param>
         protected override sealed void SetTexture(Texture tex)
         {
-            // Never should Happen
+            // Should Never Happen
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Gets the current frame from the current processing node in the processing stack.
+        /// </summary>
+        /// <returns>Currently displayed texture</returns>
         protected override sealed Texture GetTexture()
         {
             if (currentFrame != null)
@@ -121,6 +132,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 return null;
         }
 
+        /// <summary>
+        /// Returns how many mip-maps are stored in the currently displayed texture object.
+        /// </summary>
+        /// <returns>mip map count</returns>
         protected override sealed int GetMipMapCount()
         {
             if (currentFrame != null)
@@ -129,6 +144,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
                 return 0;
         }
 
+        /// <summary>
+        /// Handles all the Common VFXToolboxCanvas Keyboard events plus all required ones from Image Sequencer
+        /// </summary>
         protected override sealed void HandleKeyboardEvents()
         {
             base.HandleKeyboardEvents();
@@ -165,6 +183,9 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             }
         }
 
+        /// <summary>
+        /// Draws the grid around the texture, and all Flipbook frame subdivisions
+        /// </summary>
         protected override sealed void DrawGrid()
         {
             int GridNumU = m_PreviewSequence.numU;
@@ -201,15 +222,15 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
             OnGUI();
 
             // Processor extra info
-            GUI.BeginGroup(m_Rect);
+            GUI.BeginGroup(displayRect);
             if (editor.currentProcessingNode != null && editor.currentProcessingNode.Enabled && m_bShowExtraInfo && editor.sidePanelViewMode == ImageSequencer.SidePanelMode.Processors)
                 editor.currentProcessingNode.OnCanvasGUI(this);
             GUI.EndGroup();
 
             // Everytime text
             string procName = (editor.sidePanelViewMode == ImageSequencer.SidePanelMode.Export) ? "Export" : (sequence.processingNode == null ? "Input Frames" : sequence.processingNode.ToString());
-            GUI.Label(new RectOffset(24,24,24,24).Remove(m_Rect), procName , styles.largeLabel);
-            GUI.Label(new RectOffset(24,24,64,24).Remove(m_Rect), GetDebugInfoString() , styles.label);
+            GUI.Label(new RectOffset(24,24,24,24).Remove(displayRect), procName , styles.largeLabel);
+            GUI.Label(new RectOffset(24,24,64,24).Remove(displayRect), GetDebugInfoString() , styles.label);
             //EditorGUI.DrawRect(m_Rect, Color.red);
 
             // Play Controls
@@ -467,7 +488,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         #region STYLES
 
-        public new class Styles
+        internal new class Styles
         {
             public GUIStyle miniLabel
             {

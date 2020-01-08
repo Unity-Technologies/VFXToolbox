@@ -114,21 +114,31 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
         {
             settingsDefinitions = new Dictionary<Type, ProcessorAttribute>();
 
-            var assembly = Assembly.GetAssembly(typeof(ProcessorBase));
-            var types = assembly.GetTypes();
             var processorType = typeof(ProcessorBase);
             var attrType = typeof(ProcessorAttribute);
 
-            var allProcessorTypes = types
-                .Where(t => t.IsClass
-                    && !t.IsAbstract
-                    && t.IsSubclassOf(processorType)
-                    && t.IsDefined(attrType, false));
+            Type[] allProcessorTypes = new Type[0];
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies() )
+            {
+                try
+                {
+                    allProcessorTypes = allProcessorTypes.Concat(assembly.GetTypes().Where(t =>
+                        t.IsClass
+                        && !t.IsAbstract
+                        && t.IsSubclassOf(processorType)
+                        && t.IsDefined(attrType, false)
+                        )).ToArray();
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
+            }
 
             foreach (var type in allProcessorTypes)
             {
                 var attr = (ProcessorAttribute)type.GetCustomAttributes(attrType, false)[0];
-
                 settingsDefinitions.Add(type, attr);
             }
         }
