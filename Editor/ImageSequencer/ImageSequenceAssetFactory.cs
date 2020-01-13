@@ -7,7 +7,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     internal class ImageSequenceAssetFactory
     {
-        [MenuItem("Assets/Create/Visual Effects/Image Sequence", priority = 301)]
+        [MenuItem("Assets/Create/Visual Effects/Image Sequence", priority = 321)]
         private static void MenuCreatePostProcessingProfile()
         {
             var icon = EditorGUIUtility.FindTexture("ImageSequence Icon");

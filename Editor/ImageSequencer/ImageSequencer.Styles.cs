@@ -15,6 +15,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             public GUIStyle playbackControlWindow;
 
+            public GUIContent proTitle;
             public GUIContent title;
 
             public readonly GUIContent iconPlay = EditorGUIUtility.IconContent("Animation.Play", "Play the sequence"); 
@@ -56,6 +57,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
             public Styles()
             {
+                proTitle = new GUIContent("Image Sequencer", AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/EditorResources/d_ImageSequencer-Icon.png"));
                 title = new GUIContent("Image Sequencer", AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.unity.vfx-toolbox/Editor/ImageSequencer/EditorResources/ImageSequencer-Icon.png"));
 
                 scrollView = new GUIStyle();

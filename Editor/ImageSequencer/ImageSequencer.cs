@@ -8,7 +8,7 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 {
     internal partial class ImageSequencer : EditorWindow
     {
-        [MenuItem("Window/Visual Effects/Image Sequencer")]
+        [MenuItem("Window/Visual Effects/Image Sequencer", priority = 3031)]
         public static void OpenEditor()
         {
             GetWindow(typeof(ImageSequencer));

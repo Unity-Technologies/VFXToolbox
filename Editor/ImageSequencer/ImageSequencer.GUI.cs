@@ -34,7 +34,10 @@ namespace UnityEditor.VFXToolbox.ImageSequencer
 
         public void OnGUI()
         {
-            titleContent = styles.title;
+            if(EditorGUIUtility.isProSkin)
+                titleContent = styles.proTitle;
+            else
+                titleContent = styles.title;
             m_MinimumSize = new Vector2(880, 320);
 
             InitializeGUI();
