@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     /// <summary>
     /// A VFXToolboxCanvas component used in Image Sequencer

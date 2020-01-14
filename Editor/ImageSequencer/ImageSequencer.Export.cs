@@ -2,7 +2,7 @@ using UnityEngine;
 using System.IO;
 using VFXToolbox.MiniTGA;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     internal partial class ImageSequencer : EditorWindow
     {

@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEditor.VFXToolbox;
+using UnityEditor.Experimental.VFX.Toolbox;
 
 namespace VFXToolbox.MiniTGA
 {

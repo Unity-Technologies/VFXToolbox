@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityEditor.VFXToolbox
+namespace UnityEditor.Experimental.VFX.Toolbox
 {
     internal class CurveToTextureUtility
     {

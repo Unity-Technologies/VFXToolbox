@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     /// <summary>
     /// Base Class for Custom Processors. Derive from this class to add a new Processor.

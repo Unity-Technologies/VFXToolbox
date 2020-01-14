@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEditor.VFXToolbox;
+using UnityEditor.Experimental.VFX.Toolbox;
 
 // MiniEXR 2013 by Aras Pranckevicius / Unity Technologies.
 //

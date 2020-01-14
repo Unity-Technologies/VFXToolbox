@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.VFXToolbox;
 
-namespace UnityEditor.VFXToolbox
+namespace UnityEditor.Experimental.VFX.Toolbox
 {
     [CustomPropertyDrawer(typeof(FloatSliderAttribute))]
     internal class FloatSliderPropertyDrawer : PropertyDrawer

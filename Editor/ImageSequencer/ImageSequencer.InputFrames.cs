@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditorInternal;
 using System.Collections.Generic;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     internal partial class ImageSequencer : EditorWindow
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace UnityEditor.VFXToolbox
+namespace UnityEditor.Experimental.VFX.Toolbox
 {
     internal static class VFXToolboxStyles
     {

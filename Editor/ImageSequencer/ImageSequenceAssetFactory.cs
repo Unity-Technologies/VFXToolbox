@@ -3,7 +3,7 @@ using UnityEditor.Callbacks;
 using UnityEditor.ProjectWindowCallback;
 using System.IO;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     internal class ImageSequenceAssetFactory
     {

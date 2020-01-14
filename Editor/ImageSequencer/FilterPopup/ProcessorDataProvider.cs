@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEditor;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     internal class ProcessorDataProvider : IProvider
     {

@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace UnityEditor.VFXToolbox
+namespace UnityEditor.Experimental.VFX.Toolbox
 {
     internal interface IProvider
     {

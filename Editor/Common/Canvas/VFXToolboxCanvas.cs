@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityEditor.VFXToolbox
+namespace UnityEditor.Experimental.VFX.Toolbox
 {
     /// <summary>
     /// An Editor UI Canvas that enables previsualizing an image. Derive from this class to implement your own.

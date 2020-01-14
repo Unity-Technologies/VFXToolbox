@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.VFXToolbox;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     [Processor("Common","Fix Borders")]
     class FixBordersProcessor : ProcessorBase

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     [Processor("Color","Remap Color")]
     class RemapColorProcessor: ProcessorBase

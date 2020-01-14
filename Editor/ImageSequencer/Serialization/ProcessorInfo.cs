@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     internal class ProcessorInfo : ScriptableObject
     {

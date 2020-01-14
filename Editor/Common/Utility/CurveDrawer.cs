@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.VFXToolbox;
 using System.Collections.Generic;
 
-namespace UnityEditor.VFXToolbox
+namespace UnityEditor.Experimental.VFX.Toolbox
 {
     internal class CurveDrawer
     {

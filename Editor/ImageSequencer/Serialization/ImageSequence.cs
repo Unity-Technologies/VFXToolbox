@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     [HelpURL("https://drive.google.com/open?id=1YUwzA1mGvzWRpajDV-XF0iUd4RhW--bhMpqo-gmj9B8")]
     internal class ImageSequence : ScriptableObject

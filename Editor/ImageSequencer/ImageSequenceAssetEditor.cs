@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityEditor.VFXToolbox.ImageSequencer
+namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 {
     [CustomEditor(typeof(ImageSequence))]
     internal class ImageSequenceAssetEditor : Editor
