@@ -416,7 +416,7 @@ This section details the built-in processors bundled with Image Sequencer and th
 
 Custom Material Processor enables using custom materials to process Frames. Custom Materials enable performing operations on a frame's pixels using a shader.
 
-When using a Custom Material processor, the following inspector is displayed:
+When selecting a Custom Material processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-CustomMaterial.png)
 
@@ -432,11 +432,13 @@ To write shaders compatible with Image Sequencer, see the [Custom Material Shade
 
 ### Color
 
+Color processors work on image color for common tasks.
+
 #### Alpha From RGB
 
 Alpha from RGB Processor generates an alpha channel value based on luminance values stored in the RGB channels of the input frames.
 
-When using an Alpha from RGB processor, the following inspector is displayed:
+When selecting  an Alpha from RGB processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-AlphaFromRGB.png)
 
@@ -446,7 +448,7 @@ When using an Alpha from RGB processor, the following inspector is displayed:
 
 The Color Correction processor applies Brightness, Contrast and Saturation control over the input Frames, as well as Alpha  Remapping.
 
-When using an Alpha from RGB processor, the following inspector is displayed:
+When selecting an Alpha from RGB processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-ColorCorrection.png)
 
@@ -459,7 +461,7 @@ When using an Alpha from RGB processor, the following inspector is displayed:
 
 The Pre-Multiply Alpha Processor applies a simple Alpha mask on RGB values to ensure RGB values are pre-multiplied by the alpha channel. This process is often required to use your textures in pre-multiplied alpha blend mode.
 
-When using an Pre-Multiply Alpha processor, the following inspector is displayed:
+When selecting an Pre-Multiply Alpha processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-PremultiplyAlpha.png)
 
@@ -470,60 +472,383 @@ When using an Pre-Multiply Alpha processor, the following inspector is displayed
 
 The Remap Color Processor remaps the output color based on a single grayscale value. This process is quite similar to Photoshop's Gradient Map filter.
 
+When selecting an Remap Color processor, the following inspector is displayed:
+
 ![](images/ImageSequencer-RemapColor.png)
+
+* **Color Source** (Enum) : Controls how the input grayscale gradient is handled
+  * SRGB Luminance : RGB luminance as sRGB values (for sRGB input images)
+  * Linear Luminance : Linear Luminance (for HDR input images)
+  * Linear Red : Linear Red input channel value 
+  * Linear Green : Linear Green input channel value 
+  * Linear Blue : Linear Blue input channel value 
+  * Alpha : Linear Alpha input channel value
+* **Remap Gradient** (Gradient) : Gradient sampled using the input grayscale value to output values.
 
 #### Remove Background
 
+The Remove Background Processor works by trying to remove the RGB values of the background color and restoring the original color of the alpha blended element.
+
+When selecting a Remove Background processor, the following inspector is displayed:
+
 ![](images/ImageSequencer-RemoveBackground.png)
+
+* **Background Color** (Color) : the assumed Color of the background, used for reverse lerp.
+* **Grab** (Button) : Tries to fetch the first pixel's color to use it as the background color.
 
 ### Common
 
+Common-category processors work on various tasks such as optimizing the size of every frame and performing adjustments.
+
 #### Crop
+
+The Crop Processor applies cropping to the four edges of a frame in order to reduce unused transparent space and maximize overdraw efficiency. It provides an automatic computation of the closest bounds.
+
+When selecting a Crop processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-Crop.png)
 
+* **Top** (Slider) : The amount of pixels to crop at the top edge of the image.
+* **Bottom** (Slider) : The amount of pixels to crop at the bottom edge of the image.
+* **Left** (Slider) : The amount of pixels to crop at the left edge of the image.
+* **Right** (Slider) : The amount of pixels to crop at the right edge of the image.
+* **Automatic Crop Values** : A tool that computes automatically the Top, Bottom, Left and Right values.
+  * **Alpha Threshold** (Slider) : The alpha threshold taken into account for the closest bound computation
+  * **Find** (Button) : Clicking this button will perform the check on all Crop processor's input frames.
+
 #### Fix Borders
+
+The Fix Border Processor applies gradient fading to all edges of the image, ensuring it fades towards transparent and/or a given color.
+
+When selecting a Fix Border processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-FixBorders.png)
 
+* **Left** (Slider) : The percentage in width that will fade in from the left edge.
+* **Right** (Slider) : The percentage in width that will fade in from the right edge.
+* **Top** (Slider) : The percentage in width that will fade in from the top edge.
+* **Bottom** (Slider) : The percentage in width that will fade in from the bottom edge.
+* **Fade to Color** : The blended target color that will apply to RGB channels (use alpha = 0 to not affect RGB at all)
+* **Fade to Alpha** : The target alpha that will be blended to at the edges of the image (default 0 to fade out)
+* **Exponent** : An exponent applied to the gradient to make it harder or softer
+
 #### Resize
+
+The Resize processor simply resizes images from the processor's input sequence.
+
+When selecting a Resize processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-Resize.png)
 
+* Width : the desired output width.
+* Height : the desired output height. 
+
+>  Use the buttons to access common power of two values.
+
 #### Rotate
+
+The Rotate processor provides 90 degree step rotation to apply on the processor's input images.
+
+When selecting a Rotate processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-Rotate.png)
 
+* **Rotation Mode** (enum) : Provides rotation options for 90, 180 or 270 degrees clockwise.
+
 ### Sequence
+
+Sequence processors applies processing that modifies the sequence timing's and frame count.
 
 #### Decimate
 
+The Decimate processor discards input images to keep only one image out of N.
+
+When selecting a Decimate processor, the following inspector is displayed:
+
 ![](images/ImageSequencer-Decimate.png)
+
+* **Decimate By** (int) :  The decimation factor (keeping one image out of N).
 
 #### Fade
 
+The Fade processor fades the image alpha and color to a given color matte, based on a time curve.
+
+When selecting a Fade processor, the following inspector is displayed:
+
 ![](images/ImageSequencer-Fade.png)
+
+* **Fade to Color** (Color) : The color to fade To
+* **Fade Curve** (Curve) : The fading curve based on the overall progress of the sequence (percentage as X axis), with Y values blending from the Fade color (0.0) to the Actual color (1.0)
 
 #### Loop Sequence
 
+The Loop Sequence Processor outputs a sequence that is ensured to loop, based on a longer input sequence, and a sync frame.
+
+Images from the input sequence are blended from a sequence prior to the sync frame and after the sync frame. Then blended using a curve in order to ensure the last and first frame (sync frame and sync frame+1) are contiguous.
+
+When selecting a Loop Sequence processor, the following inspector is displayed:
+
 ![](images/ImageSequencer-Looping.png)
+
+* **Input Sync Frame** : the desired frame index to use as sync point.
+* **Output Sequence Length** : the desired output sequence length, cannot be greater than half of the input sequence length.
+* **Mix Curve** : The blend curve to apply between the sequence prior to the sync point.
 
 #### Retime
 
+The retime processor applies temporal remapping to the input sequence in order to apply acceleration and/or deceleration to the motion of images.
+
+When selecting a Retime processor, the following inspector is displayed:
+
 ![](images/ImageSequencer-Retime.png)
+
+* **Sequence Length** : the desired output sequence length
+* **Use Retiming Curve** : whether to remap the time using a curve instead of a linear retiming.
+* **Retime Curve** : the time remap curve to apply to the input sequence. Based on the output sequence percentage (X axis), and given the input sequence frames (Y axis)
 
 ### Texture Sheet
 
+Texture Sheet processors applies processing to image sequences to turn them into flipbooks or to turn flipbooks into sequences of images.
+
 #### Assemble Flipbook
+
+The Assemble Flipbook assembles a sequence of images into a flipbook sprite sheet of given rows and columns.
+
+When selecting a Assemble Flipbook processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-AssembleFlipbook.png)
 
+* **Assemble Mode** (enum) : How the input sequence is processed
+  * Full Sprite Sheet : Assembles the sprite sheet as rows and columns
+  * Vertical 
+* **Columns** (U) : how many columns to pack into
+* **Rows** (V) : how many rows to pack into
+* **Find Best Ratios** : Clicking this button will show a drop down with all Row and Column possibilities, sorted by closeness to a power-of-two-compatible ratio (ability to resize to sizes that are power of while maintaining a correct Texel aspect ratio)
+
 #### Break Flipbook
+
+The Break Flipbook operator splits an input image into a sequence of length based on the given number of rows and columns.
+
+When selecting a Break Flipbook processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-BreakFlipbook.png)
 
-### Writing Shaders for Custom Material Processor
+* Columns : the desired amount of columns to split into
+* Rows : the desired amount of rows to split into.
 
-### Writing Custom Processors
+### Shaders for Custom Material Processor
 
+Shaders for Custom Material processor provide a simple way to write a filter for Image Sequencer without relying to writing a full Custom Processor. By using a custom material processor you will be able to run a shader for every input frame and output an output frame of same dimensions and same rows and columns.
+
+#### Writing a shader for Custom Materials
+
+In order to create shaders for Custom material processor you need to create a simple unlit shader from the Project Create Menu : **Shaders > Unlit Shader**. You can alter the default code to match the following code:
+
+ ```c
+Shader "ImageSequencer/SimpleCustomMaterial"
+{
+	Properties
+    {
+	}
+	SubShader
+	{
+		Tags { "RenderType"="Opaque" }
+		LOD 100
+
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#include "UnityCG.cginc"
+
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
+			};
+
+			struct v2f
+			{
+				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
+			};
+
+			sampler2D _InputFrame;
+			float4 _FrameData;
+			float4 _FlipbookData;
+
+			v2f vert (appdata v)
+			{
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.uv = v.uv;
+				return o;
+			}
+
+			fixed4 frag (v2f i) : SV_Target
+			{
+				// Process the Color
+				fixed4 col = tex2D(_InputFrame, i.uv);
+				return col;
+			}
+			ENDCG
+		}
+	}
+}
+ ```
+
+#### Specific Uniforms
+
+In order to access the input frame texture, you need to declare `sampler2D _InputFrame;` as uniform variable in the body of the shader. This uniform **must not be declared** into the `properties` section of the shader.
+
+If you want to access per-frame data, you can declare the following uniform variables in order to get values from Image Sequencer.
+
+ ```
+// ImageSequencer CustomMaterial uniforms
+// ======================================
+//
+// sampler2D _InputFrame;			// Input Frame (from previous sequence)
+//
+// float4 _FrameData;				// Frame Data
+//									//		x, y : width (x) and height (y) in pixels
+//									//		z, w : sequence index (z) and length (w)
+//
+// float4 _FlipbookData;			// Flipbook Data
+//									//		x, y : number of columns (x) and rows (y)
+//									//		z, w : (unused)
+ ```
+
+### Custom Processors
+
+Custom Processors can be created in your project, to extend the features of Image Sequencer. Custom processors differ from Custom Material Processors as they can access more of the ImageSequencer features:
+
+* Output a sequence length that's different from the input sequence length
+* Output a sequence of images of different pixel dimensions from the input sequence pixel dimensions.
+* Change the **numU** and **numV** texture sheet cells.
+* Perform multiple shader calls per execution
+* Display a custom inspector and custom canvas overlay
+
+#### Creating a new Custom Processor
+
+To create a new custom processor so you need the following: 
+
+* A C# class that extends `UnityEditor.Experimental.VFX.Toolbox.ImageSequencer.ProcessorBase`
+
+  * This class is for use with **UnityEditor** assembly only and must be stored into an `Editor` folder.
+  * The C# class must implement the `[Processor("Category","Name")]` class attribute to be visible in the add menu.
+
+* A Shader file that will be referenced and used by the C# class.
+
+  
+
+Here is a sample C# code that you can use as a starting base.
+
+```c#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.Experimental.VFX.Toolbox.ImageSequencer;
+using UnityEngine;
+
+[Processor("Category","Sample Processor")]
+public class SampleProcessor : ProcessorBase
+{
+    /// <summary>
+    /// The Shader Path (in the project) of the Shader File
+    /// </summary>
+    public override string shaderPath => "Assets/Path/To/Shader.shader";
+
+    /// <summary>
+    /// The Processor Name (as it will appear in the list)
+    /// </summary>
+    public override string processorName => "Sample Processor";
+
+
+    /// <summary>
+    /// Default() configures a default instance of the processor
+    /// of the processor (e.g: when it will be added from the menu)
+    /// </summary>
+    public override void Default()
+    {
+    }
+
+    /// <summary>
+    ///  OnInspectorGUI() displays the properties in the left pane editor.
+    /// use the serializedObject to fetch serializedProperties
+    /// </summary>
+    public override bool OnInspectorGUI(bool changed, SerializedObject serializedObject)
+    {
+        return changed;
+    }
+
+    /// <summary>
+    /// Process(int frame) method is called when the frame needs to be processed.
+    /// ProcessFrame(int, texture) needs to be called in order to run the shader on the full frame. 
+    /// You can still perform Graphics.Blit() if you need to perform multiple blits.
+    /// </summary>
+    public override bool Process(int frame)
+    {
+        Texture inputFrame = RequestInputTexture(frame);
+        ProcessFrame(frame, inputFrame);
+        return true;
+    }
+}
+
+```
+
+Here is the corresponding Shader code:
+
+```c
+Shader "Hidden/VFXToolbox/ImageSequencer/SampleProcessor"
+{
+	Properties
+	{
+		_MainTex("Texture", 2D) = "white" {}
+	}
+	SubShader
+	{
+		// No culling or depth
+		Cull Off ZWrite Off ZTest Always
+
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#include "UnityCG.cginc"
+
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
+			};
+
+			struct v2f
+			{
+				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
+			};
+
+			sampler2D _MainTex;
+
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.uv = v.uv;
+				return o;
+			}
+
+			fixed4 frag(v2f i) : SV_Target
+			{
+				return tex2D(_MainTex, i.uv);
+			}
+			ENDCG
+		}
+	}
+}
+```
 
