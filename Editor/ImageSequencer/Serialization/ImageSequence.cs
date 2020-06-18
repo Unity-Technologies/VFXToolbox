@@ -18,6 +18,7 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
         {
             public string fileName;
             public ushort frameCount;
+            public OutputMode outputShape;
             public ExportMode exportMode;
             public bool exportAlpha;
             public bool exportSeparateAlpha;
@@ -29,6 +30,8 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
             public FilterMode filterMode;
             public DataContents dataContents;
         }
+
+       
 
         public static ExportSettings defaultExportSettings
         {
@@ -77,6 +80,13 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
             Targa = 0,
             EXR = 1,
             PNG = 2
+        }
+
+        [System.Serializable]
+        public enum OutputMode
+        {
+            Texture2D = 0,
+            Texture2DArray = 1
         }
 
         [System.Serializable]

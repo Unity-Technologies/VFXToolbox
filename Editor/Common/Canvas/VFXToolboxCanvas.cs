@@ -185,7 +185,7 @@ namespace UnityEditor.Experimental.VFX.Toolbox
         }
         private Texture m_Texture;
 
-        internal CanvasGUIDelegate onCanvasGUI;
+        internal event CanvasGUIDelegate onCanvasGUI;
         internal delegate void CanvasGUIDelegate();
 
         internal VFXToolboxCanvas(Rect displayRect, string shaderName = "Packages/com.unity.vfx-toolbox/Editor/Common/Canvas/Shaders/VFXToolboxCanvas.shader") 
