@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -185,12 +186,7 @@ namespace UnityEditor.Experimental.VFX.Toolbox
         }
         private Texture m_Texture;
 
-        // @mschweitzer-sd ADD BEGIN
-        // warning CS0649: Field 'VFXToolboxCanvas.onCanvasGUI' is never assigned to, and will always have its default value null
-        #pragma warning disable CS0649
-        internal CanvasGUIDelegate onCanvasGUI;
-        internal delegate void CanvasGUIDelegate();
-        #pragma warning restore CS0649
+        internal event EventHandler onCanvasGUI;
 
         internal VFXToolboxCanvas(Rect displayRect, string shaderName = "Packages/com.unity.vfx-toolbox/Editor/Common/Canvas/Shaders/VFXToolboxCanvas.shader") 
         {
@@ -507,8 +503,7 @@ namespace UnityEditor.Experimental.VFX.Toolbox
 #endif
 
                 if (showGrid) DrawGrid();
-                if (onCanvasGUI != null)
-                    onCanvasGUI();
+                onCanvasGUI?.Invoke(this, EventArgs.Empty);
             }
             else
                 GUI.Label(LocalRect, VFXToolboxGUIUtility.Get("No Texture"), EditorStyles.centeredGreyMiniLabel);
