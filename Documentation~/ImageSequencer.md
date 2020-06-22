@@ -5,7 +5,7 @@
 ![Screenshot of Image Sequencer](images/ImageSequencer.png)
 
 ## Introduction
-The VFX Image Sequencer is a tool which provide Visual Effect Artists with the means to process sequences of images, and generate texture assets such as flipbooks texture sheets. 
+The VFX Image Sequencer is a tool which provides Visual Effect Artists with the means to process sequences of images, and generates texture assets such as flipbooks texture sheets. 
 
 ![Image Sequencer Workflow](Images/ImageSequencerWorkflow.png)
 
@@ -58,18 +58,18 @@ You can import images in the sequence by clicking the **Input Frames** tab Butto
 
 ![](images/ImageSequencer-Processors.png)
 
-After adding Input Frames, by clicking the Processors Tab button, you can enter the Processors editing Mode. In this view you can add processors in the reorderable list, edit them and iterate to generate texture sheets. 
+After adding Input Frames, by clicking the Processors Tab button, you can enter the Processors editing Mode. In this view, you can add processors in the reorderable list, edit them and iterate to generate texture sheets. 
 
-In this mode you will be able to perform operations on textures such as Assembling and Disassembling Texture Sheets, Adjusting Timing of a Sequence, Make an image Sequence looping, Crop images to save empty space, Fix borders, adjust Colors, and many more actions.
+In this mode, you will be able to perform operations on textures such as Assembling and Disassembling Texture Sheets, Adjusting Timing of a Sequence, Make an image Sequence looping, Crop images to save empty space, Fix borders, adjust Colors, and many more actions.
 
-> For more information, see the Processors Workflow  section of this document.
+> For more information, see the Processors Workflow section of this document.
 >
 
 #### Exporting Images
 
 ![](images/ImageSequencer-Export.png)
 
-After Adding Processors, when you have a result that suits you, you can click the third Tab Button "Export" to enter Export Mode. In this mode you can configure the texture generation options and also the texture import options. 
+After Adding Processors, when you have a result that suits you, you can click the third Tab Button "Export" to enter Export Mode. In this mode, you can configure the texture generation options and also the texture import options. 
 
 In this view you will be able to set up your output textures either as color, masks or normal maps and ensure they are exported correctly.
 
@@ -83,7 +83,7 @@ In this view you will be able to set up your output textures either as color, ma
 Upon selecting an Image Sequence Asset, the inspector displays an overview of this asset, with its input frames, processors overview, and optionally the Exported file (if any). This is only a read-only overview of the processing information of this sequence. 
 
 - To edit this sequence, click the **Edit Sequence** button, this will open the Image Sequencer Editor Window.
-- You can preview input sequence of images by clicking the preview button.
+- You can preview the input sequence of images by clicking the preview button.
 
 ## Image Sequencer Window
 
@@ -93,7 +93,7 @@ The Image Sequence editor window comes with two zones:
 
 * The **Toolbar** at the top provides controls to access the currently edited Image sequence, and display controls for the Canvas.
 * The **Inspector** (left pane) displays contextual controls for adding input frames, configure processing, and export to other textures.
-* The **Canvas** (right pane) offers preview of the processed sequence at different stages (input sequence, processors, exported texture). It contains play controls at the bottom, view options in the top toolbar, and handles panning and zooming using mouse.
+* The **Canvas** (right pane) offers a preview of the processed sequence at different stages (input sequence, processors, exported texture). It contains play controls at the bottom, view options in the top toolbar, and handles panning and zooming using the mouse.
 
 ### Inspector
 
@@ -103,11 +103,11 @@ The inspector lies in the left part of the window and is the part of the window 
 
 ### Canvas
 
-The canvas is in the right side of the window and is used to preview the changes made in the Image Sequencer Inspector. It displays contextually either the Input Frames, the output of a processor, or the exported texture.
+The canvas is on the right side of the window and is used to preview the changes made in the Image Sequencer Inspector. It displays contextually either the Input Frames, the output of a processor, or the exported texture.
 
 Navigation in the canvas is made by using the mouse or trackpad. 
 
-Some keyboard shortcuts enable access to same features accessible with the mouse:
+Some keyboard shortcuts enable access to the same features accessible with the mouse:
 
 * Alt+Left Mouse Drag : Pan the viewport
 
@@ -171,7 +171,7 @@ The toolbar contains the following elements:
 #### Options popup menu
 ![img](images/ImageSequencer-OptionsPopup.png)
 
-The Options popup menu is accessed via the toolbar button on the right.It contains toggles & buttons for visibility, and commands for the view.
+The Options popup menu is accessed via the toolbar button on the right. It contains toggles & buttons for visibility, and commands for the view.
 
 * Viewport Options:
   * Grid Outline (Toggle) : Toggles Outline around Sub Image Cells and around texture.
@@ -184,7 +184,7 @@ The Options popup menu is accessed via the toolbar button on the right.It contai
 
 ## Workflow
 
-This section details how to use the Image Sequencer and create output Texture Sheets. The workflow for a new Image Sequence is as follows:
+This section details how to use Image Sequencer and create output Texture Sheets. The workflow for a new Image Sequence is as follows:
 
 1. Import and Configure Source Images
 2. Create Image Sequence Asset and Open It
@@ -200,7 +200,7 @@ Your source images will be imported inside the project for full efficiency, but 
 
 #### Manual settings
 
-Texture configuration for the source images answers the “lossless quality” requirement : at this stage of workflow, you do not want to degrade quality, so importing your textures at maximum quality is required here. 
+Texture configuration for the source images answers the “lossless quality” requirement : at this stage of the workflow, you do not want to degrade quality, so importing your textures at maximum quality is required here. 
 In order to stay at lossless quality, make sure you have the following:
 
 - Keep your textures uncompressed : 
@@ -302,7 +302,7 @@ namespace UnityEditor.VFXToolbox
 Here are some guidelines for handling various situations when your source image changes:
 
 - Source file changes: In order to update these sources (i.e. you make changes inside your 3D VFX package and render your frames again), just overwrite the files. Source sequence length increases: If your sequence length ever changes, you will have to manually adjust your sequence length. A safe way to do this is to remove all the frames in the input sequence by clearing the list, then drag and drop the folder again.
-- Source sequence length decreases: this corner case is not yet automatically addressed so you will have to manually trim the exceeding frames by deleting them in the project view. (or use a post-render script in your 3D Package to remove the files and the meta files)
+- Source sequence length decreases: this corner case is not yet automatically addressed so you will have to manually trim the exceeding frames by deleting them in the project view. (or use a post-render script in your 3D Package to remove the files and the metafiles)
 
 ### Creating an Image Sequence
 
@@ -315,7 +315,7 @@ You can create image sequences using the Create Asset Menu:
 
 After Clicking the item in the menu, enter the name of your Image Sequence asset in the Project View, then press Return key to validate.
 
-Alternatively, When the Image Sequencer window is opened with no asset selected (eg: when  opened from the menu), the Image Sequencer Window displays a message that informs that no Asset is selected, and provides the option to Create an image sequence from a button. When clicked, you can save a file for your new asset.
+Alternatively, When the Image Sequencer window is opened with no asset selected (eg: when opened from the menu), the Image Sequencer Window displays a message that informs that no Asset is selected, and provides the option to create an image sequence from a button. When clicked, you can save a file for your new asset.
 
 ![](Images/ImageSequencerNoAsset.png)
 
@@ -329,7 +329,7 @@ After Creating the Image Sequence, you can either:
 
 ### Input Frames
 
-The first operation you need to do when working on an Image Sequence asset is to add Input Images to this sequence. These Images need to be already imported into your project and it is advised that they have particular settings in order to keep them as maximum quality. (See Importing and Configuring Source images)
+The first operation you need to do when working on an Image Sequence asset is to add Input Images to this sequence. These Images need to be already imported into your project and it is advised that they have particular settings in order to keep them as the maximum quality. (See Importing and Configuring Source images)
 
 ![](images/ImageSequencer-InputFrames.png)
 
@@ -371,18 +371,18 @@ In order to add processors to the list, click the **+** button located at the bo
 
 ![Add Processor Menu](images/ImageSequencer-AddProcessorMenu.png)
 
-You can use the Input Search Field at the top to filter and refine processors, or navigate the categories by clicking the items, and finally add the processor you want by clicking it in the list.
+You can use the Input Search Field at the top to filter and refine processors or navigate the categories by clicking the items, and finally, add the processor you want by clicking it in the list.
 
 #### Removing Processors
 
-You can remove processor using the following :
+You can remove the processor using the following :
 
 * Select a processor in the list then click the "-" button located at the bottom of the Processor List.
 * Click the Clear button to remove all processors at once.
 
 #### Editing Processors
 
-Upon Selecting a Processor in the list, it displays its properties below the Processors list. You can then edit these properties to modify its behavior.
+Upon Selecting a Processor in the list, it displays its properties below the Processors list. You can then edit these properties to modify its behaviour.
 
 #### Adjusting Processor Visibility
 
@@ -408,7 +408,7 @@ After working on an image sequence, and adding processors, you will end up in a 
 
 ## Built-In Processors
 
-This section details the built-in processors bundled with Image Sequencer and their behavior.
+This section details the built-in processors bundled with Image Sequencer and their behaviour.
 
 ### Main Category
 
@@ -513,7 +513,7 @@ When selecting a Crop processor, the following inspector is displayed:
 * **Left** (Slider) : The amount of pixels to crop at the left edge of the image.
 * **Right** (Slider) : The amount of pixels to crop at the right edge of the image.
 * **Automatic Crop Values** : A tool that computes automatically the Top, Bottom, Left and Right values.
-  * **Alpha Threshold** (Slider) : The alpha threshold taken into account for the closest bound computation
+  * **Alpha Threshold** (Slider) : The alpha threshold is taken into account for the closest bound computation
   * **Find** (Button) : Clicking this button will perform the check on all Crop processor's input frames.
 
 #### Fix Borders
@@ -543,7 +543,7 @@ When selecting a Resize processor, the following inspector is displayed:
 * Width : the desired output width.
 * Height : the desired output height. 
 
->  Use the buttons to access common power of two values.
+>  Use the buttons to access the common power of two values.
 
 #### Rotate
 
@@ -582,7 +582,7 @@ When selecting a Fade processor, the following inspector is displayed:
 
 #### Loop Sequence
 
-The Loop Sequence Processor outputs a sequence that is ensured to loop, based on a longer input sequence, and a sync frame.
+The Loop Sequence Processor outputs a sequence that is ensured to loop, based on a longer input sequence and a sync frame.
 
 Images from the input sequence are blended from a sequence prior to the sync frame and after the sync frame. Then blended using a curve in order to ensure the last and first frame (sync frame and sync frame+1) are contiguous.
 
@@ -590,7 +590,7 @@ When selecting a Loop Sequence processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-Looping.png)
 
-* **Input Sync Frame** : the desired frame index to use as sync point.
+* **Input Sync Frame** : the desired frame index to use as a sync point.
 * **Output Sequence Length** : the desired output sequence length, cannot be greater than half of the input sequence length.
 * **Mix Curve** : The blend curve to apply between the sequence prior to the sync point.
 
@@ -614,7 +614,7 @@ Texture Sheet processors applies processing to image sequences to turn them into
 
 The Assemble Flipbook assembles a sequence of images into a flipbook sprite sheet of given rows and columns.
 
-When selecting a Assemble Flipbook processor, the following inspector is displayed:
+When selecting an Assemble Flipbook processor, the following inspector is displayed:
 
 ![](images/ImageSequencer-AssembleFlipbook.png)
 
@@ -851,4 +851,6 @@ Shader "Hidden/VFXToolbox/ImageSequencer/SampleProcessor"
 	}
 }
 ```
+
+
 
