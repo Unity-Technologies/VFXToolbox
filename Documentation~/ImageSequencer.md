@@ -661,7 +661,7 @@ Shaders for Custom Material processor provide a simple way to write a filter for
 
 #### Writing a shader for Custom Materials
 
-In order to create shaders for Custom material processor you need to create a simple unlit shader from the Project Create Menu : **Shaders > Unlit Shader**. You can alter the default code to match the following code:
+In order to create shaders for Custom material processor you need to create a simple unlit shader from the Project Create Menu : **Visual Effects > Custom Material (Shader)**. You can alter the default code to match the following code:
 
  ```c
 Shader "ImageSequencer/SimpleCustomMaterial"
@@ -751,16 +751,17 @@ Custom Processors can be created in your project, to extend the features of Imag
 
 #### Creating a new Custom Processor
 
-To create a new custom processor so you need the following: 
+You can create both assets by clicking the Create Asset Menu, under **Visual Effects > Custom Processor (C#, Shader)**
+
+This will create the following assets:
 
 * A C# class that extends `UnityEditor.Experimental.VFX.Toolbox.ImageSequencer.ProcessorBase`
 
   * This class is for use with **UnityEditor** assembly only and must be stored into an `Editor` folder.
   * The C# class must implement the `[Processor("Category","Name")]` class attribute to be visible in the add menu.
-
 * A Shader file that will be referenced and used by the C# class.
 
-  
+
 
 Here is a sample C# code that you can use as a starting base.
 
