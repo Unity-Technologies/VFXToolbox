@@ -560,6 +560,19 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 
                 using (new VFXToolboxGUIUtility.HeaderSectionScope("Texture Import Options"))
                 {
+                    m_CurrentAsset.exportSettings.outputShape = (ImageSequence.OutputMode)EditorGUILayout.EnumPopup(VFXToolboxGUIUtility.Get("Output Shape|Selects whether export as simple 2D Texture, flipbook as 2D texture, or full sequence as 2D texture"), m_CurrentAsset.exportSettings.outputShape);
+                    if(m_CurrentAsset.exportSettings.outputShape == ImageSequence.OutputMode.Texture2DArray)
+                    {
+                        ProcessingNode n = m_ProcessingNodeStack.nodes[m_ProcessingNodeStack.nodes.Count - 1];
+                        if(((float)n.OutputWidth / n.NumU)%1.0f > 0.0f || ((float)n.OutputHeight / n.NumV) % 1.0f > 0.0f)
+                        {
+                            EditorGUILayout.HelpBox("Row and Column Counts are not exact multiples of the resolution, some padding will occur in the export", MessageType.Warning);
+                        } else if ((!Mathf.IsPowerOfTwo(n.OutputWidth / n.NumU) || !Mathf.IsPowerOfTwo(n.OutputHeight / n.NumV)) && m_CurrentAsset.exportSettings.compress && m_CurrentAsset.exportSettings.generateMipMaps)
+                        {
+                            EditorGUILayout.HelpBox("Texture 2D Arrays with mip maps cannot be compressed if U and V dimensions are not power of two", MessageType.Warning);
+                        }
+                    }
+
                     m_CurrentAsset.exportSettings.dataContents = (ImageSequence.DataContents)EditorGUILayout.EnumPopup(VFXToolboxGUIUtility.Get("Import as|Sets the importer mode"), m_CurrentAsset.exportSettings.dataContents);
                     if(m_CurrentAsset.exportSettings.dataContents == ImageSequence.DataContents.Sprite)
                     {

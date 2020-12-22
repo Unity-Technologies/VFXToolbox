@@ -93,19 +93,18 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
                 int i = 1;
                 foreach (ProcessingFrame frame in m_ProcessingNodeStack.outputSequence.frames)
                 {
-                    if(VFXToolboxGUIUtility.DisplayProgressBar("Image Sequencer", "Exporting Frame #" + i + "/" + frameCount, (float)i / frameCount, 0, true))
+                    if (VFXToolboxGUIUtility.DisplayProgressBar("Image Sequencer", "Exporting Frame #" + i + "/" + frameCount, (float)i / frameCount, 0, true))
                     {
                         bCanceled = true;
                         break;
                     }
 
                     // Export frame : first, dump data into color array
-
                     Color[] inputs;
                     if (frame.texture is Texture2D) // if using input frame
                     {
                         RenderTexture temp = RenderTexture.GetTemporary(frame.texture.width, frame.texture.height, 0, RenderTextureFormat.ARGBHalf);
-                        Graphics.Blit((Texture2D)frame.texture, temp); 
+                        Graphics.Blit((Texture2D)frame.texture, temp);
                         inputs = ReadBack(temp);
                     }
                     else // frame.texture is RenderTexture
@@ -119,7 +118,7 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
                     // Dump data
                     byte[] bytes;
 
-                    switch(m_CurrentAsset.exportSettings.exportMode)
+                    switch (m_CurrentAsset.exportSettings.exportMode)
                     {
                         case ImageSequence.ExportMode.EXR:
 #if UNITY_5_6_OR_NEWER
@@ -131,10 +130,10 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
                                 bytes = texture.EncodeToEXR();
                             }
 #else
-                            // Old Exporter
-                            {
-                                bytes = MiniEXR.MiniEXR.MiniEXRWrite((ushort)frame.texture.width, (ushort)frame.texture.height, settings.exportAlpha, inputs, true);
-                            }
+                        // Old Exporter
+                        {
+                            bytes = MiniEXR.MiniEXR.MiniEXRWrite((ushort)frame.texture.width, (ushort)frame.texture.height, settings.exportAlpha, inputs, true);
+                        }
 #endif
                             break;
                         case ImageSequence.ExportMode.Targa:
@@ -161,33 +160,50 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
                     AssetDatabase.Refresh();
 
                     // Process Import if saved inside project
-                    if(bIsInsideProject)
+                    if (bIsInsideProject)
                     {
                         TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(fileName);
                         importer.wrapMode = m_CurrentAsset.exportSettings.wrapMode;
                         importer.filterMode = m_CurrentAsset.exportSettings.filterMode;
-                        switch(m_CurrentAsset.exportSettings.dataContents)
+                        switch (m_CurrentAsset.exportSettings.dataContents)
                         {
                             case ImageSequence.DataContents.Color:
                                 importer.textureType = TextureImporterType.Default;
                                 break;
                             case ImageSequence.DataContents.NormalMap:
                                 importer.textureType = TextureImporterType.NormalMap;
-                            importer.convertToNormalmap = false;
-                            break;
-                        case ImageSequence.DataContents.NormalMapFromGrayscale:
-                            importer.textureType = TextureImporterType.NormalMap;
-                            importer.convertToNormalmap = true;
+                                importer.convertToNormalmap = false;
+                                break;
+                            case ImageSequence.DataContents.NormalMapFromGrayscale:
+                                importer.textureType = TextureImporterType.NormalMap;
+                                importer.convertToNormalmap = true;
                                 break;
                             case ImageSequence.DataContents.Sprite:
                                 importer.textureType = TextureImporterType.Sprite;
                                 importer.spriteImportMode = SpriteImportMode.Multiple;
-                                importer.spritesheet = GetSpriteMetaData(frame, m_ProcessingNodeStack.outputSequence.numU, m_ProcessingNodeStack.outputSequence.numV );
+                                importer.spritesheet = GetSpriteMetaData(frame, m_ProcessingNodeStack.outputSequence.numU, m_ProcessingNodeStack.outputSequence.numV);
                                 break;
                         }
+
+                        TextureImporterSettings importerSettings = new TextureImporterSettings();
+                        importer.ReadTextureSettings(importerSettings);
+
+                        if (m_CurrentAsset.exportSettings.outputShape == ImageSequence.OutputMode.Texture2DArray)
+                        {
+                            importerSettings.textureShape = TextureImporterShape.Texture2DArray;
+                            importerSettings.flipbookColumns = m_ProcessingNodeStack.outputSequence.numU;
+                            importerSettings.flipbookRows = m_ProcessingNodeStack.outputSequence.numV;
+                        }
+                        else if (m_CurrentAsset.exportSettings.outputShape == ImageSequence.OutputMode.Texture2D)
+                        {
+                            importerSettings.textureShape = TextureImporterShape.Texture2D;
+                        }
+
+                        importer.SetTextureSettings(importerSettings);
+
                         importer.mipmapEnabled = m_CurrentAsset.exportSettings.generateMipMaps;
 
-                        switch(m_CurrentAsset.exportSettings.exportMode)
+                        switch (m_CurrentAsset.exportSettings.exportMode)
                         {
                             case ImageSequence.ExportMode.Targa:
                                 importer.sRGBTexture = m_CurrentAsset.exportSettings.sRGB;
@@ -214,17 +230,17 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
                     {
                         string alphaFilename = fileName.Substring(0, fileName.Length - 4) + "_alpha.tga";
                         // build alpha
-                        for(int k = 0; k < inputs.Length; k++)
+                        for (int k = 0; k < inputs.Length; k++)
                         {
                             float a = inputs[k].a;
                             inputs[k] = new Color(a, a, a, a);
                         }
-                        MiniTGA.MiniTGAWrite(alphaFilename,(ushort)frame.texture.width, (ushort)frame.texture.height, false, inputs);
+                        MiniTGA.MiniTGAWrite(alphaFilename, (ushort)frame.texture.width, (ushort)frame.texture.height, false, inputs);
 
                         AssetDatabase.Refresh();
 
                         // Process Importer for alpha if inside project
-                        if(bIsInsideProject)
+                        if (bIsInsideProject)
                         {
                             TextureImporter alphaImporter = (TextureImporter)TextureImporter.GetAtPath(alphaFilename);
 
@@ -293,7 +309,7 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 
             if(fileFound)
             {
-                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(fileName);
+                Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(fileName);
                 if (texture != null) EditorGUIUtility.PingObject(texture);
             }
             else
