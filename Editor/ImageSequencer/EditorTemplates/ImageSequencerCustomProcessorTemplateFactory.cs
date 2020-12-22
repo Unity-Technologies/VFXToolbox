@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
 
@@ -79,13 +80,9 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
             StringBuilder sb_monoScript = new StringBuilder();
 
             string friendlyName = ObjectNames.NicifyVariableName(name);
-            string className = name.Trim(
-                ' ', '~', '`', '!', '@', '#', '$',
-                '%', '^', '&', '*', '(', ')', '-',
-                '+', '=', '=', '=', '{', '}',
-                '[', ']', ';', ':', '\'', '"', 
-                '<', '>', '.', ',', '?'
-                );
+            string className = Regex.Replace(name, @"[^0-9a-zA-Z_]+", "");
+            
+            Debug.Log(className);
             sb_monoScript.Append(@"using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
