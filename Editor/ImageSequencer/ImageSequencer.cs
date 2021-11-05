@@ -73,6 +73,11 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 
         void OnEnable()
         {
+            if (EditorGUIUtility.isProSkin)
+                titleContent = styles.proTitle;
+            else
+                titleContent = styles.title;
+
             m_ProcessorDataProvider = null;
 
             if(Selection.activeObject != null && Selection.activeObject is ImageSequence)
@@ -85,6 +90,8 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
                 LoadAsset(m_CurrentAsset);
                 DefaultView();
             }
+
+            minSize = new Vector2(880, 320);
 
         }
 
@@ -213,7 +220,11 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
                 // Construct the RList
                 if (m_CurrentAsset.inheritSettingsReference == null)
                 {
+#if UNITY_2020_1_OR_NEWER
+                    m_ProcessorsReorderableList = new ReorderableList(m_CurrentAsset.processorInfos, typeof(ProcessorInfo), true, false, true, true);
+#else
                     m_ProcessorsReorderableList = new ReorderableList(m_CurrentAssetSerializedObject, m_CurrentAssetSerializedObject.FindProperty("processorInfos"),true,false,true,true);
+#endif
                     m_ProcessorsReorderableList.onAddCallback = ShowAddProcessorMenu;
                     m_ProcessorsReorderableList.onRemoveCallback = MenuRemoveProcessor;
                     m_ProcessorsReorderableList.onReorderCallback = ReorderProcessor;
