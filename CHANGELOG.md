@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Added support for Texture2D Arrays
 * Fixed ImageSequencer for 21.1 and newer versions
+* Houdini Exporters: Upgraded to Python3
+* Houdini Exporters: Added X Axis Inversion options to match Unity's 3D Space 
 
 ## [2.0.0-preview] - 2020-03-23
 
