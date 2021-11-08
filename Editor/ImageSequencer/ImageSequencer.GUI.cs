@@ -10,15 +10,13 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
         private ReorderableList m_InputFramesReorderableList;
         private ReorderableList m_ProcessorsReorderableList;
         private Vector2 m_OptionsViewScroll = Vector2.zero;
-        private Vector2 m_MinimumSize;
+
         private SidePanelMode m_SidePanelViewMode = 0;
         private bool m_Dirty = true;
         private bool m_NeedRedraw = false;
 
         public void InitializeGUI()
         {
-            minSize = m_MinimumSize;
-
             if(m_Splitter == null)
             {
                 m_Splitter = new Splitter(360, DrawEditPanelGUI, DrawCanvasGUI, Splitter.SplitLockMode.LeftMinMax, new Vector2(320.0f, 480.0f));
@@ -34,12 +32,6 @@ namespace UnityEditor.Experimental.VFX.Toolbox.ImageSequencer
 
         public void OnGUI()
         {
-            if(EditorGUIUtility.isProSkin)
-                titleContent = styles.proTitle;
-            else
-                titleContent = styles.title;
-            m_MinimumSize = new Vector2(880, 320);
-
             InitializeGUI();
 
             if(m_CurrentAsset == null)
