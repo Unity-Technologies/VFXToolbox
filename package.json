@@ -12,5 +12,12 @@
   ],
   "type": "tool",
   "hideInEditor": false,
-  "unity": "2020.2"
+  "unity": "2020.2",
+  "samples": [
+    {
+      "displayName": "Vertex Animation Textures (VATs)",
+      "description": "Additional Assets for sampling VertexAnimationTextures. Use the VAT ROP houdini exporter in the package's DCC-Tools~ directory to generate textures from houdini. These samples use ShaderGraph, Visual Effect Graph and High Definition Render Pipeline to render.",
+      "path": "Samples~/VertexAnimationTextures"
+    }
+  ]
 }
