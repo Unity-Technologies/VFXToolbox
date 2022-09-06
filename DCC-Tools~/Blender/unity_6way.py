@@ -2,8 +2,8 @@ import bpy
 import math
 import mathutils
 
-#__base_path = "C:\\Repos\\U\\trunk\\Tests\\SRPTests\\Projects\\VisualEffectGraph_HDRP\\Assets"
-__base_path = "C:\\Users\\GabrieldelaCruz\\Pictures"
+__base_path = "" # ADD YOUR PATH HERE
+
 __6way_filename = "temp"
 __emissive_filename = "emissive"
 
@@ -207,6 +207,7 @@ def create_compositor_node_final_output(tree):
     output_node.format.color_mode = 'RGBA'
     output_node.format.color_depth = '8'
     output_node.format.quality = 100
+    output_node.format.compression = 0
     output_node.format.linear_colorspace_settings.name = 'sRGB'
     output_node.file_slots.remove(output_node.inputs[0])
 
@@ -419,6 +420,9 @@ def compose_final_image():
     compositor_nodes = create_compositor_nodes_final_compositing(scene.node_tree)
 
     bpy.ops.render.render()
+
+    bpy.data.images.remove(compositor_nodes[0].image) #6way
+    bpy.data.images.remove(compositor_nodes[1].image) #extra
 
     destroy_compositor_nodes(scene.node_tree, compositor_nodes)
 
