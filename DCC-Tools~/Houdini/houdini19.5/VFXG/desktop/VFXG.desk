@@ -1,0 +1,47 @@
+fullscreen   -1
+playbarshown 1
+playbar      0
+shelf        0
+menubar      0
+statusbar    0
+radial menu set main
+root {
+    split 0.554167 H {
+        split 0.5 V R {
+            tabs 0 1 {
+                pane pane1 -a 0 -l 10 -H /obj/ -T OBJ -m sceneview
+            }
+            tabs 0 1 {
+                pane panetab2 -a 0 -l 10 -H /obj/ -T OBJ -m details
+            }
+        }
+        tabs 0 1 {
+            pane panetab1 -a 0 -l 10 -H /obj/ -T OBJ -m neteditor
+        }
+    }
+}
+shelfdock -o 1 -l icon_and_text -G 0.50 add unity
+viewerstow -x open -b stow -l stow -m hide -c hide -d open ${DESKNAME}.pane1.world
+vieweroption -a 2 ${DESKNAME}.pane1.world
+viewlayout -s 2 ${DESKNAME}.pane1.world
+viewtype -t ortho_right ${DESKNAME}.pane1.world.`vpname("${DESKNAME}.pane1.world",4)`
+viewtype -t ortho_front ${DESKNAME}.pane1.world.`vpname("${DESKNAME}.pane1.world",3)`
+viewtype -t ortho_top ${DESKNAME}.pane1.world.`vpname("${DESKNAME}.pane1.world",1)`
+viewtype -t perspective ${DESKNAME}.pane1.world.`vpname("${DESKNAME}.pane1.world",2)`
+networkeditor -p '{\n	"showspareinputdep":"1",\n	"showchilddep":"1",\n	"showdep":"0",\n	"showtaskgraphperf":"0",\n	"taskgraphperfstatname":"Cook Time",\n	"perfstatname":"Time",\n	"showperfstats":"1",\n	"grouplistsplit":"0.75",\n	"showtree":"0",\n	"showtypesidebar":"0",\n	"taskgraphsortcriteria":"Automatic",\n	"showparmdialogmax":"1",\n	"treesplit":"0.25",\n	"palettesize":"256 256",\n	"typesidebarsplit":"0.25",\n	"taskgraphcollapsemode":"Off",\n	"workitemcolorattribute":"",\n	"gridmode":"2",\n	"overviewbounds":"0.000000 0.000000 456.556082 510.000000",\n	"overviewmode":"2",\n	"showgrouplist":"0",\n	"palettemode":"0",\n	"useworkitemcolorattribute":"1",\n	"showtasksmenu":"1",\n	"backgroundimageediting":"0",\n	"backgroundimagebrightness":"1.0",\n	"gridystep":"0.5",\n	"palettecolors":"",\n	"showmenu":"1",\n	"gridxstep":"0.5",\n	"showparmdialog":"0"\n}\n' panetab1
+netcolumns -c display,xray,select,origin,capture,bone -n OBJ panetab1
+netcolumns -c display,render,template,selectabletemplate,highlight,unload,bypass,lock -n SOP panetab1
+netcolumns -c delscript,comment -n CHOPNET panetab1
+netcolumns -c display,export,audio,bypass,lock -n CHOP panetab1
+netcolumns -c startrender,bypass,lock -n ROP panetab1
+netcolumns -c delscript,comment -n SHOP panetab1
+netcolumns -c display,render,template,bypass -n COP2 panetab1
+netcolumns -c delscript,comment -n IMG panetab1
+netcolumns -c delscript,comment,input -n VOP panetab1
+netcolumns -c delscript,comment -n VOPNET panetab1
+netcolumns -c delscript,comment -n DOP panetab1
+netcolumns -c delscript,comment -n TOP panetab1
+netcolumns -c delscript,comment -n TOPNET panetab1
+netcolumns -c display,bypass,delscript,comment,input -n LOP panetab1
+netcolumns -c delscript,comment -n MGR panetab1
+netcolumns -c delscript,comment -n DIR panetab1
