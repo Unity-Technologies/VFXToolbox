@@ -987,7 +987,7 @@ class Unity6Way:
         def modal(self, context, event):
             if context.scene.unity6way.is_rendering:
                 return {'RUNNING_MODAL'}
-            #self._restore(context)
+            self._restore(context)
             return {'FINISHED'}
 
         def cancel(self, context):
