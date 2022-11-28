@@ -54,6 +54,14 @@ def _create_compositor_node_exr_multilayer_output(tree):
     output_node.format.quality = 100
     return output_node
 
+def _create_node_group(tree, group_name, fn):
+    if not bpy.data.node_groups.__contains__(group_name):
+        fn()
+
+    group_node = tree.nodes.new(type='CompositorNodeGroup')
+    group_node.node_tree = bpy.data.node_groups[group_name]
+    return group_node
+
 def _get_input_path(directory, filename, extension):
     return "{0}{1}.{2}".format(directory, filename, extension)
 
@@ -166,8 +174,7 @@ def _add_6way_combiner_compositor_node_group():
     tree.outputs.new('NodeSocketColor',"Positive")
     tree.outputs.new('NodeSocketColor',"Negative")
 
-    positive_node = tree.nodes.new(type='CompositorNodeGroup')
-    positive_node.node_tree = bpy.data.node_groups[_rgba_combiner_node_group_name]
+    positive_node = _create_node_group(tree, _rgba_combiner_node_group_name, _add_rgba_combiner_compositor_node_group)
     positive_node.location = (0, 2 * _node_separation[1])
     
     negative_node = tree.nodes.new(type='CompositorNodeGroup')
@@ -230,6 +237,7 @@ class Unity6Way:
         def draw(self, context):
             scene = context.scene
             unity6way = scene.unity6way
+
             self.layout.prop(unity6way, "temp_path")
             self.layout.prop(unity6way, "frames", expand=True)
 
@@ -607,11 +615,6 @@ class Unity6Way:
             bl_label = "Prepare compositing"
             bl_options = {'REGISTER', 'UNDO'}
 
-            def create_compositor_node_6way_combiner(self, tree):
-                lighting_node = tree.nodes.new(type='CompositorNodeGroup')
-                lighting_node.node_tree = bpy.data.node_groups[_6way_combiner_node_group_name]
-                return lighting_node
-    
             def execute(self, context):
                 scene = context.scene
                 unity6way = scene.unity6way
@@ -632,8 +635,7 @@ class Unity6Way:
                         extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.other_path))
                         extra_channel = 0
  
-                combiner_node = self.create_compositor_node_6way_combiner(tree)
-
+                combiner_node = _create_node_group(tree, _6way_combiner_node_group_name, _add_6way_combiner_compositor_node_group)
                 combiner_node.inputs["Lightmap Multiplier"].default_value = unity6way.compositing.lightmap_multiplier
                 combiner_node.inputs["Extra Multiplier"].default_value = unity6way.compositing.extra_multiplier
 
@@ -895,6 +897,7 @@ class Unity6Way:
             bpy.app.handlers.render_cancel.append(_on_render_cancel)
             bpy.app.handlers.render_complete.append(_on_render_complete)
             
+            # should be here, but it needs to be started later or it gets removed
             #self._timer = context.window_manager.event_timer_add(0.1, window=context.window)
 
         def _restore(self, context):
@@ -1070,7 +1073,7 @@ class Unity6WayProperties(bpy.types.PropertyGroup):
     temp_path : bpy.props.StringProperty(
         name="Temp Path",
         description = "Temp Path",
-        default=bpy.path.abspath(bpy.context.scene.render.filepath),
+        default="/tmp\\",
         subtype='DIR_PATH',
         )
     frames : bpy.props.EnumProperty(
@@ -1111,18 +1114,18 @@ classes = (
 
     Unity6Way.Lightmaps.PrepareOperator,
     Unity6Way.Lightmaps.RestoreOperator,
-    Unity6Way.Lightmaps.ViewResultOperator,
+    #Unity6Way.Lightmaps.ViewResultOperator,
 
     Unity6Way.Emissive.PrepareOperator,
     Unity6Way.Emissive.RestoreOperator,
-    Unity6Way.Emissive.ViewResultOperator,
+    #Unity6Way.Emissive.ViewResultOperator,
 
     Unity6Way.Compositing.PrepareOperator,
     Unity6Way.Compositing.RestoreOperator,
-    Unity6Way.Compositing.ViewResultOperator,
+    #Unity6Way.Compositing.ViewResultOperator,
 
     Unity6Way.Flipbook.ExportOperator,
-    Unity6Way.Flipbook.ViewResultOperator,
+    #Unity6Way.Flipbook.ViewResultOperator,
 
     Unity6Way.RenderUndoOperator,
     Unity6Way.RenderAllOperator,
@@ -1137,23 +1140,10 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-
     bpy.types.Scene.unity6way = bpy.props.PointerProperty(type=Unity6WayProperties)
-
-    _remove_compositor_node_group(_rgba_combiner_node_group_name)
-    _remove_compositor_node_group(_6way_combiner_node_group_name)
-    _add_rgba_combiner_compositor_node_group()
-    _add_6way_combiner_compositor_node_group()
     
 
 def unregister():
-    _remove_compositor_node_group(_rgba_combiner_node_group_name)
-    _remove_compositor_node_group(_6way_combiner_node_group_name)
-
     del bpy.types.Scene.unity6way
-
     for cls in classes:
         bpy.utils.unregister_class(cls)
-
-if __name__ == "__main__":
-    register()
