@@ -108,11 +108,11 @@ def _add_rgba_combiner_compositor_node_group():
     tree.inputs.new('NodeSocketColor',"A")
     tree.inputs.new('NodeSocketFloat',"Multiplier")
     tree.inputs.new('NodeSocketFloatFactor',"Premultiplied")
-    
+
     group_outputs = tree.nodes.new('NodeGroupOutput')
     group_outputs.location = (3 * _node_separation[0], 0)
     tree.outputs.new('NodeSocketColor',"Image")
-    
+
     rgba_node = tree.nodes.new(type='CompositorNodeCombRGBA')
     rgba_node.location = (-_node_separation[0], 0)
 
@@ -125,7 +125,7 @@ def _add_rgba_combiner_compositor_node_group():
     premultiply_node = tree.nodes.new(type='CompositorNodePremulKey')
     premultiply_node.location = (_node_separation[0], _node_separation[1])
     premultiply_node.mapping = 'PREMUL_TO_STRAIGHT'
-    
+
     alphamode_node = tree.nodes.new(type='CompositorNodeMixRGB')
     alphamode_node.location = (2 * _node_separation[0], 0)
     alphamode_node.use_clamp = True
@@ -869,6 +869,7 @@ class Unity6Way:
         _restore_end_frame = 0
         _restore_scene_info = {}
         _restore_world_info = {}
+        _restore_nodes = []
         _restore_lights = []
         _restore_lock_interface = False        
 
@@ -884,6 +885,7 @@ class Unity6Way:
             self._prepare_scene(scene)
             self._prepare_world(scene.world)
             self._prepare_frames_range(scene)
+            self._disable_existing_nodes(scene.node_tree)
             self._disable_existing_lights()
 
             _restore_info = {}
@@ -898,7 +900,6 @@ class Unity6Way:
         def _restore(self, context):
             scene = context.scene
             
-            print(self._timer)
             context.window_manager.event_timer_remove(self._timer)
 
             bpy.app.handlers.render_complete.remove(_on_render_complete)
@@ -909,6 +910,7 @@ class Unity6Way:
             _restore_info = {}
 
             self._restore_existing_lights()
+            self._restore_existing_nodes(scene.node_tree)
             self._restore_frames_range(scene)
             self._restore_world(scene.world)
             self._restore_scene(scene)
@@ -958,6 +960,17 @@ class Unity6Way:
             world.use_nodes = self._restore_world_info["use_nodes"]
             world.color = self._restore_world_info["bg_color"]
 
+        def _disable_existing_nodes(self, tree):
+            self._restore_nodes = []
+            for node in tree.nodes:
+                if not node.mute:
+                    self._restore_nodes.append(node)
+                    node.mute = True
+
+        def _restore_existing_nodes(self, tree):
+            for node in self._restore_nodes:
+                node.mute = False
+
         def _disable_existing_lights(self):
             self._restore_lights = []
             for object in bpy.data.objects:
@@ -972,12 +985,9 @@ class Unity6Way:
                 light_object.hide_render = False
 
         def modal(self, context, event):
-            print("render_undo " + self.prepare_operator)
             if context.scene.unity6way.is_rendering:
-                print("rendering...")
                 return {'RUNNING_MODAL'}
-            print("undo")
-            self._restore(context)
+            #self._restore(context)
             return {'FINISHED'}
 
         def cancel(self, context):
@@ -1027,20 +1037,14 @@ class Unity6Way:
             return {'FINISHED'}
 
         def modal(self, context, event):
-            print("render all")
             if context.scene.unity6way.is_locked:
-                print("locked...")
                 return {'RUNNING_MODAL'}
-
-            print("next stage")
 
             self._stage_index += 1
             return self._run_next_stage(context)
 
         def execute(self, context):
             unity6way = context.scene.unity6way
-
-            print("render all start")
 
             self._stages = []
             if unity6way.lightmaps.enabled:
