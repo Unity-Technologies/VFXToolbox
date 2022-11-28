@@ -640,6 +640,8 @@ class Unity6Way:
                 premultiply_value = 1 if unity6way.compositing.premultiplied else 0
                 combiner_node.inputs["Premultiplied"].default_value = premultiply_value
 
+                composite_node = tree.nodes.new(type='CompositorNodeComposite')
+
                 output_node = _create_compositor_node_exr_output(tree)
                 output_node.base_path = unity6way.temp_path
                 output_node.file_slots.remove(output_node.inputs[0])
@@ -655,13 +657,22 @@ class Unity6Way:
                 tree.links.new(combiner_node.outputs["Positive"], output_node.inputs[0])
                 tree.links.new(combiner_node.outputs["Negative"], output_node.inputs[1])
 
+                tree.links.new(combiner_node.outputs["Positive"], composite_node.inputs[0])
+
                 input_node.location = (-_node_separation[0], 0)
                 output_node.location = (_node_separation[0], 0)
+                composite_node.location = (_node_separation[0], -2 * _node_separation[1])
+                if extra_node != input_node:
+                    extra_node.location = (-2*_node_separation[0], 0)
 
                 nodes = []
                 nodes.append(input_node)
                 nodes.append(output_node)
                 nodes.append(combiner_node)
+                nodes.append(composite_node)
+                if extra_node != input_node:
+                    nodes.append(extra_node)
+
                 _restore_info["nodes"] = nodes
                 
                 return {'FINISHED'}     
