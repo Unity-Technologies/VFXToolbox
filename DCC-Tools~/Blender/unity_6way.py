@@ -1003,7 +1003,7 @@ class Unity6Way:
 
             self._prepare(context)
             
-            bpy.ops.render.render('INVOKE_DEFAULT', animation=(unity6way.frames != 'FRAME'))
+            bpy.ops.render.render('INVOKE_DEFAULT', animation=True)
 
             self._timer = context.window_manager.event_timer_add(0.1, window=context.window)
             context.window_manager.modal_handler_add(self)
