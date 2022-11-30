@@ -230,9 +230,10 @@ class Unity6Way:
     
     class Panel(bpy.types.Panel):
         bl_idname = "VIEW3D_PT_unity_6way"
-        bl_label = "Unity 6-Way lighting"
+        bl_label = "6-Way lighting"
         bl_space_type = 'VIEW_3D'
         bl_region_type = 'UI'
+        bl_category = "Unity"
 
         def draw(self, context):
             scene = context.scene
