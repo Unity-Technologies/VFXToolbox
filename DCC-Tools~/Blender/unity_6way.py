@@ -1081,7 +1081,7 @@ class Unity6WayProperties(bpy.types.PropertyGroup):
         name='Frames',
         description='Frames',
         items={
-            ('CURRENT', 'Current', "Current frame range configuration", 0),
+            ('CURRENT', 'Current settings', "Current frame range configuration", 0),
             ('FRAME', 'Frame', "Single Frame", 1),
             ('RANGE', 'Range', "Frame Range", 2),
         },
