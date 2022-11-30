@@ -303,7 +303,7 @@ class Unity6Way:
             def create_lights(self, parent_collection, camera, light_angle):
                 light_data = bpy.data.lights.new(name=self.__name_prefix+"_light", type='SUN')
                 light_data.energy = math.pi
-                light_data.angle = light_angle
+                light_data.angle = math.radians(light_angle)
                 light_data.specular_factor = 0
 
                 lights = {}
