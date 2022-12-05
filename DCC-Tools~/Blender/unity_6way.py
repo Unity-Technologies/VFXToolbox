@@ -1,4 +1,5 @@
 import bpy
+import os
 import math
 import mathutils
 import time
@@ -80,7 +81,11 @@ def _get_format_extension(format):
         case 'PNG':
             return "png"
     return ""
-            
+
+
+def _file_exists(path):
+    return os.path.exists(path)
+
 def _load_image(path):
     filename = bpy.path.basename(path)
     image = bpy.data.images.get(filename)
@@ -93,10 +98,16 @@ def _load_image(path):
     return bpy.data.images.load(path, check_existing=False)
 
 def _show_image(path):
-    #print(bpy.context.window_manager.windows
-    bpy.ops.render.view_cancel('INVOKE_DEFAULT')
+    image = _load_image(path)
     bpy.ops.render.view_show('INVOKE_DEFAULT')
-
+    image_area = None
+    while image_area == None:
+        for window in bpy.context.window_manager.windows:
+            for area in window.screen.areas:
+                if area.type == 'IMAGE_EDITOR':
+                    image_area = area
+    image_area.spaces.active.image = image
+    return image_area
 
 def _remove_compositor_node_group(group_name):
     if bpy.data.node_groups.__contains__(group_name):
@@ -284,13 +295,17 @@ class Unity6Way:
                 self.layout.prop(context.scene.unity6way.lightmaps, "enabled", text="")
             
             def draw(self, context):
-                self.layout.prop(context.scene.unity6way.lightmaps, "filename")
-                self.layout.prop(context.scene.unity6way.lightmaps, "light_angle")
-                #self.layout.operator(Unity6Way.Lightmaps.ViewResultOperator.bl_idname)
-                
+                scene = context.scene
+                unity6way = scene.unity6way
+                self.layout.prop(unity6way.lightmaps, "filename")
+                self.layout.prop(unity6way.lightmaps, "light_angle")                
                 render_operator = self.layout.operator(Unity6Way.RenderUndoOperator.bl_idname)
                 render_operator.prepare_operator = "unity_6way_lightmap_prepare"
                 render_operator.restore_operator = "unity_6way_lightmap_restore"
+                row = self.layout.row()
+                filename = _get_input_path_frame(unity6way.temp_path, unity6way.lightmaps.filename, scene.frame_current, "exr")
+                row.enabled = _file_exists(filename)
+                row.operator(Unity6Way.Lightmaps.ViewResultOperator.bl_idname)
 
         class PrepareOperator(bpy.types.Operator):
             """Unity VFX Graph Six way setup lighting"""    #tooltip
@@ -450,7 +465,10 @@ class Unity6Way:
             bl_options = {'REGISTER', 'UNDO'}
 
             def execute(self, context):
-                bpy.ops.render.view_show('INVOKE_DEFAULT')
+                scene = context.scene
+                unity6way = scene.unity6way
+                filename = _get_input_path_frame(unity6way.temp_path, unity6way.lightmaps.filename, scene.frame_current, "exr")
+                _show_image(filename)
                 return {'FINISHED'}
 
     class Emissive:
@@ -478,11 +496,18 @@ class Unity6Way:
                 self.layout.prop(context.scene.unity6way.emissive, "enabled", text="")
 
             def draw(self, context):
-                self.layout.prop(context.scene.unity6way.emissive, "filename")
+                scene = context.scene
+                unity6way = scene.unity6way
+                self.layout.prop(unity6way.emissive, "filename")
                 #self.layout.operator(Unity6Way.Emissive.ViewResultOperator.bl_idname)
                 render_operator = self.layout.operator(Unity6Way.RenderUndoOperator.bl_idname)
                 render_operator.prepare_operator = "unity_6way_emissive_prepare"
                 render_operator.restore_operator = "unity_6way_emissive_restore"
+
+                row = self.layout.row()
+                filename = _get_input_path_frame(unity6way.temp_path, unity6way.emissive.filename, scene.frame_current, "exr")
+                row.enabled = _file_exists(filename)
+                row.operator(Unity6Way.Emissive.ViewResultOperator.bl_idname)
 
         class PrepareOperator(bpy.types.Operator):
             """Unity VFX Graph Six way emissive"""    #tooltip
@@ -526,7 +551,10 @@ class Unity6Way:
             bl_options = {'REGISTER', 'UNDO'}
 
             def execute(self, context):
-                bpy.ops.render.view_show('INVOKE_DEFAULT')
+                scene = context.scene
+                unity6way = scene.unity6way
+                filename = _get_input_path_frame(unity6way.temp_path, unity6way.emissive.filename, scene.frame_current, "exr")
+                _show_image(filename)
                 return {'FINISHED'}     
 
     class Compositing:
@@ -592,7 +620,8 @@ class Unity6Way:
                 self.layout.prop(context.scene.unity6way.compositing, "enabled", text="")
 
             def draw(self, context):
-                unity6way = context.scene.unity6way
+                scene = context.scene
+                unity6way = scene.unity6way
                 self.layout.prop(unity6way.compositing, "filename1")
                 self.layout.prop(unity6way.compositing, "filename2")
                 self.layout.label(text="Extra channel source:")
@@ -609,6 +638,18 @@ class Unity6Way:
                 render_operator = self.layout.operator(Unity6Way.RenderUndoOperator.bl_idname)
                 render_operator.prepare_operator = "unity_6way_compositing_prepare"
                 render_operator.restore_operator = "unity_6way_compositing_restore"
+                
+                row = self.layout.row()
+                col = row.column()
+                path = _get_input_path_frame(unity6way.temp_path, unity6way.compositing.filename1, scene.frame_current, "exr")
+                col.enabled = _file_exists(path)
+                view_operator = col.operator(Unity6Way.Compositing.ViewResultOperator.bl_idname, text="View last +")
+                view_operator.positive = True
+                col = row.column()
+                path = _get_input_path_frame(unity6way.temp_path, unity6way.compositing.filename2, scene.frame_current, "exr")
+                col.enabled = _file_exists(path)
+                view_operator = col.operator(Unity6Way.Compositing.ViewResultOperator.bl_idname, text="View last -")
+                view_operator.positive = False
 
         class PrepareOperator(bpy.types.Operator):
             """Unity VFX Graph Six way setup lighting"""    #tooltip
@@ -696,8 +737,14 @@ class Unity6Way:
             bl_label = "View last result"
             bl_options = {'REGISTER', 'UNDO'}
 
+            positive: bpy.props.BoolProperty(default = False)
+
             def execute(self, context):
-                bpy.ops.render.view_show('INVOKE_DEFAULT')
+                scene = context.scene
+                unity6way = scene.unity6way
+                filename = unity6way.compositing.filename1 if self.positive else unity6way.compositing.filename2
+                path = _get_input_path_frame(unity6way.temp_path, filename, scene.frame_current, "exr")
+                _show_image(path)
                 return {'FINISHED'}     
 
     class Flipbook:
@@ -785,6 +832,24 @@ class Unity6Way:
                 #self.layout.operator(Unity6Way.Flipbook.ViewResultOperator.bl_idname)
                 self.layout.operator(Unity6Way.Flipbook.ExportOperator.bl_idname)
 
+                row = self.layout.row()
+                output_path = unity6way.temp_path if unity6way.flipbook.use_temp else unity6way.flipbook.dest_path
+                input_filenames = (unity6way.compositing.filename1, unity6way.compositing.filename2)
+                output_filenames = (unity6way.flipbook.filename1, unity6way.flipbook.filename2)
+                filenames = input_filenames if unity6way.flipbook.use_filename else output_filenames
+                extension = _get_format_extension(unity6way.flipbook.dest_format)
+                col = row.column()
+                path = _get_input_path(output_path, filenames[0], extension)
+                col.enabled = _file_exists(path)
+                view_operator = col.operator(Unity6Way.Flipbook.ViewResultOperator.bl_idname, text="View last +")
+                view_operator.positive = True
+                col = row.column()
+                path = _get_input_path(output_path, filenames[1], extension)
+                col.enabled = _file_exists(path)
+                view_operator = col.operator(Unity6Way.Flipbook.ViewResultOperator.bl_idname, text="View last -")
+                view_operator.positive = False
+                
+
         class ExportOperator(bpy.types.Operator):
             """Unity VFX Graph Six way render lighting"""    #tooltip
             bl_idname = "render.unity_6way_flipbook_export"
@@ -850,12 +915,23 @@ class Unity6Way:
 
         class ViewResultOperator(bpy.types.Operator):
             """Unity VFX Graph Six way render lighting"""    #tooltip
-            bl_idname = "render.unity_6way_compositing_view"
+            bl_idname = "render.unity_6way_export_view"
             bl_label = "View last result"
             bl_options = {'REGISTER', 'UNDO'}
 
+            positive: bpy.props.BoolProperty(default = False)
+
             def execute(self, context):
-                _show_image()
+                scene = context.scene
+                unity6way = scene.unity6way
+                index = 0 if self.positive else 1
+                output_path = unity6way.temp_path if unity6way.flipbook.use_temp else unity6way.flipbook.dest_path
+                input_filenames = (unity6way.compositing.filename1, unity6way.compositing.filename2)
+                output_filenames = (unity6way.flipbook.filename1, unity6way.flipbook.filename2)
+                filename = input_filenames[index] if unity6way.flipbook.use_filename else output_filenames[index]
+                extension = _get_format_extension(unity6way.flipbook.dest_format)
+                path = _get_input_path(output_path, filename, extension)
+                _show_image(path)
                 return {'FINISHED'}
 
 
@@ -1115,18 +1191,18 @@ classes = (
 
     Unity6Way.Lightmaps.PrepareOperator,
     Unity6Way.Lightmaps.RestoreOperator,
-    #Unity6Way.Lightmaps.ViewResultOperator,
+    Unity6Way.Lightmaps.ViewResultOperator,
 
     Unity6Way.Emissive.PrepareOperator,
     Unity6Way.Emissive.RestoreOperator,
-    #Unity6Way.Emissive.ViewResultOperator,
+    Unity6Way.Emissive.ViewResultOperator,
 
     Unity6Way.Compositing.PrepareOperator,
     Unity6Way.Compositing.RestoreOperator,
-    #Unity6Way.Compositing.ViewResultOperator,
+    Unity6Way.Compositing.ViewResultOperator,
 
     Unity6Way.Flipbook.ExportOperator,
-    #Unity6Way.Flipbook.ViewResultOperator,
+    Unity6Way.Flipbook.ViewResultOperator,
 
     Unity6Way.RenderUndoOperator,
     Unity6Way.RenderAllOperator,
