@@ -1014,6 +1014,7 @@ class Unity6Way:
         def _prepare(self, context):
             scene = context.scene
             
+            scene.unity6way.is_cancelled = False
             scene.unity6way.is_locked = True
             self._restore_lock_interface = scene.render.use_lock_interface
             scene.render.use_lock_interface = True
@@ -1128,6 +1129,7 @@ class Unity6Way:
             return {'FINISHED'}
 
         def cancel(self, context):
+            context.scene.unity6way.is_cancelled = True
             self._restore(context)
  
         def execute(self, context):
@@ -1176,6 +1178,9 @@ class Unity6Way:
         def modal(self, context, event):
             if context.scene.unity6way.is_locked:
                 return {'RUNNING_MODAL'}
+
+            if context.scene.unity6way.is_cancelled:
+                return {'CANCELLED'}
 
             self._stage_index += 1
             return self._run_next_stage(context)
@@ -1238,6 +1243,7 @@ class Unity6WayProperties(bpy.types.PropertyGroup):
     flipbook : bpy.props.PointerProperty(type=Unity6Way.Flipbook.Properties)
     is_rendering: bpy.props.BoolProperty(default = False)
     is_locked: bpy.props.BoolProperty(default = False)
+    is_cancelled: bpy.props.BoolProperty(default = False)
 
 classes = (
     Unity6Way.Panel,
