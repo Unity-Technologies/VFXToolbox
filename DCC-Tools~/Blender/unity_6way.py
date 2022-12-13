@@ -32,11 +32,19 @@ def _get_frames_range(scene):
             frame_start = unity6way.frame_start
             frame_end = unity6way.frame_end
     return frame_start, frame_end
+
+def _get_current_frame(scene):
+    frame_start, frame_end = _get_frames_range(scene)
+    return max(frame_start, min(frame_end, scene.frame_current))
     
-def _create_compositor_node_image_input(tree, image):
+def _create_compositor_node_image_input(tree, image, scene):
     input_node = tree.nodes.new(type='CompositorNodeImage')
     input_node.image = image
+    image.source = 'SEQUENCE'
     input_node.use_straight_alpha_output = True
+    input_node.frame_start = scene.frame_start
+    input_node.frame_duration = scene.frame_end - scene.frame_start + 1
+
     return input_node
 
 def _create_compositor_node_exr_output(tree):
@@ -69,9 +77,6 @@ def _get_input_path(directory, filename, extension):
 def _get_input_path_frame(directory, filename, frame, extension):
     return "{0}{1}{3:04d}.{2}".format(directory, filename, extension, frame)
 
-def _get_input_path_current(directory, filename, extension):
-    return _get_input_path_frame(directory, filename, bpy.context.scene.frame_current, extension)
-
 def _get_format_extension(format):
     match format:
         case 'OPEN_EXR':
@@ -82,9 +87,33 @@ def _get_format_extension(format):
             return "png"
     return ""
 
+def _get_lightmaps_path(unity6way, frame):
+    return _get_input_path_frame(unity6way.temp_path, unity6way.lightmaps.filename, frame, "exr")
+
+def _get_emissive_path(unity6way, frame):
+    return _get_input_path_frame(unity6way.temp_path, unity6way.emissive.filename, frame, "exr")
+
+def _get_compositing_paths(unity6way, frame):
+    path1 = _get_input_path_frame(unity6way.temp_path, unity6way.compositing.filename1, frame, "exr")
+    path2 = _get_input_path_frame(unity6way.temp_path, unity6way.compositing.filename2, frame, "exr")
+    return (path1, path2)
+
+def _get_export_paths(unity6way):
+    output_path = unity6way.temp_path if unity6way.flipbook.use_temp else unity6way.flipbook.dest_path
+    input_filenames = (unity6way.compositing.filename1, unity6way.compositing.filename2)
+    output_filenames = (unity6way.flipbook.filename1, unity6way.flipbook.filename2)
+    filenames = input_filenames if unity6way.flipbook.use_filename else output_filenames
+    extension = _get_format_extension(unity6way.flipbook.dest_format)
+    path1 = _get_input_path(output_path, filenames[0], extension)
+    path2 = _get_input_path(output_path, filenames[1], extension)
+    return (path1, path2)
 
 def _file_exists(path):
     return os.path.exists(path)
+
+def _check_input_path(missing_paths, path):
+    if not _file_exists(path):
+        missing_paths.append(path)
 
 def _load_image(path):
     filename = bpy.path.basename(path)
@@ -303,8 +332,8 @@ class Unity6Way:
                 render_operator.prepare_operator = "unity_6way_lightmap_prepare"
                 render_operator.restore_operator = "unity_6way_lightmap_restore"
                 row = self.layout.row()
-                filename = _get_input_path_frame(unity6way.temp_path, unity6way.lightmaps.filename, scene.frame_current, "exr")
-                row.enabled = _file_exists(filename)
+                dest_path = _get_lightmaps_path(unity6way, _get_current_frame(scene))
+                row.enabled = _file_exists(dest_path)
                 row.operator(Unity6Way.Lightmaps.ViewResultOperator.bl_idname)
 
         class PrepareOperator(bpy.types.Operator):
@@ -467,7 +496,7 @@ class Unity6Way:
             def execute(self, context):
                 scene = context.scene
                 unity6way = scene.unity6way
-                filename = _get_input_path_frame(unity6way.temp_path, unity6way.lightmaps.filename, scene.frame_current, "exr")
+                filename = _get_lightmaps_path(unity6way, _get_current_frame(scene))
                 _show_image(filename)
                 return {'FINISHED'}
 
@@ -499,14 +528,13 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 self.layout.prop(unity6way.emissive, "filename")
-                #self.layout.operator(Unity6Way.Emissive.ViewResultOperator.bl_idname)
                 render_operator = self.layout.operator(Unity6Way.RenderUndoOperator.bl_idname)
                 render_operator.prepare_operator = "unity_6way_emissive_prepare"
                 render_operator.restore_operator = "unity_6way_emissive_restore"
 
                 row = self.layout.row()
-                filename = _get_input_path_frame(unity6way.temp_path, unity6way.emissive.filename, scene.frame_current, "exr")
-                row.enabled = _file_exists(filename)
+                dest_path = _get_emissive_path(unity6way, _get_current_frame(scene))
+                row.enabled = _file_exists(dest_path)
                 row.operator(Unity6Way.Emissive.ViewResultOperator.bl_idname)
 
         class PrepareOperator(bpy.types.Operator):
@@ -553,7 +581,7 @@ class Unity6Way:
             def execute(self, context):
                 scene = context.scene
                 unity6way = scene.unity6way
-                filename = _get_input_path_frame(unity6way.temp_path, unity6way.emissive.filename, scene.frame_current, "exr")
+                filename = _get_emissive_path(unity6way, _get_current_frame(scene))
                 _show_image(filename)
                 return {'FINISHED'}     
 
@@ -640,14 +668,13 @@ class Unity6Way:
                 render_operator.restore_operator = "unity_6way_compositing_restore"
                 
                 row = self.layout.row()
+                dest_paths = _get_compositing_paths(unity6way, _get_current_frame(scene))
                 col = row.column()
-                path = _get_input_path_frame(unity6way.temp_path, unity6way.compositing.filename1, scene.frame_current, "exr")
-                col.enabled = _file_exists(path)
+                col.enabled = _file_exists(dest_paths[0])
                 view_operator = col.operator(Unity6Way.Compositing.ViewResultOperator.bl_idname, text="View last +")
                 view_operator.positive = True
                 col = row.column()
-                path = _get_input_path_frame(unity6way.temp_path, unity6way.compositing.filename2, scene.frame_current, "exr")
-                col.enabled = _file_exists(path)
+                col.enabled = _file_exists(dest_paths[1])
                 view_operator = col.operator(Unity6Way.Compositing.ViewResultOperator.bl_idname, text="View last -")
                 view_operator.positive = False
 
@@ -657,27 +684,59 @@ class Unity6Way:
             bl_label = "Prepare compositing"
             bl_options = {'REGISTER', 'UNDO'}
 
+            def check_input_paths(self, scene):
+                missing_paths = []
+
+                unity6way = scene.unity6way
+                
+                if unity6way.compositing.extra == 'OTHER' and scene.frame_start == scene.frame_end:
+                    _check_input_path(missing_paths, unity6way.extra.other_path)
+                
+                for frame in range(scene.frame_start, scene.frame_end + 1):
+                    _check_input_path(missing_paths, _get_lightmaps_path(unity6way, frame))
+                    if unity6way.compositing.extra == 'EMISSIVE':
+                        _check_input_path(missing_paths, _get_emissive_path(unity6way, frame))
+                    if unity6way.compositing.extra == 'OTHER' and scene.frame_start < scene.frame_end:
+                        _check_input_path(missing_paths, unity6way.extra.other_path) #TODO add frame number
+
+                    if len(missing_paths) > 10:
+                        break
+                
+                return missing_paths
+
             def execute(self, context):
                 scene = context.scene
                 unity6way = scene.unity6way
 
-                tree = scene.node_tree
-                lightmaps_path = _get_input_path_current(unity6way.temp_path, unity6way.lightmaps.filename, "exr")
-                input_node = _create_compositor_node_image_input(tree, _load_image(lightmaps_path))
-                
+                nodes = []
+                _restore_info["nodes"] = nodes
+
+                missing_paths = self.check_input_paths(scene)
+                if missing_paths:
+                    self.report({'INFO'}, "Input image(s) not found: " + missing_paths)
+                    return {'CANCELLED'}
+
+                tree = scene.node_tree                
+                lightmaps_path = _get_lightmaps_path(unity6way, scene.frame_start)
+                input_node = _create_compositor_node_image_input(tree, _load_image(lightmaps_path), scene)
+                nodes.append(input_node)
+                                
                 match unity6way.compositing.extra:
                     case 'NONE':
                         extra_node = input_node
                         extra_channel = "Alpha"
                     case 'EMISSIVE':
-                        emissive_path = _get_input_path_current(unity6way.temp_path, unity6way.emissive.filename, "exr")
-                        extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path))
+                        emissive_path = _get_emissive_path(unity6way, scene.frame_start)
+                        extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path), scene)
                         extra_channel = 0
                     case 'OTHER':
-                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.other_path))
+                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.other_path), scene)
                         extra_channel = 0
+                if extra_node != input_node:
+                    nodes.append(extra_node)
  
                 combiner_node = _create_node_group(tree, _6way_combiner_node_group_name, _add_6way_combiner_compositor_node_group)
+                nodes.append(combiner_node)
                 combiner_node.inputs["Lightmap Multiplier"].default_value = unity6way.compositing.lightmap_multiplier
                 combiner_node.inputs["Extra Multiplier"].default_value = unity6way.compositing.extra_multiplier
 
@@ -685,8 +744,10 @@ class Unity6Way:
                 combiner_node.inputs["Premultiplied"].default_value = premultiply_value
 
                 composite_node = tree.nodes.new(type='CompositorNodeComposite')
+                nodes.append(composite_node)
 
                 output_node = _create_compositor_node_exr_output(tree)
+                nodes.append(output_node)
                 output_node.base_path = unity6way.temp_path
                 output_node.file_slots.remove(output_node.inputs[0])
                 for slot_name in (unity6way.compositing.filename1, unity6way.compositing.filename2):
@@ -708,16 +769,6 @@ class Unity6Way:
                 composite_node.location = (_node_separation[0], -2 * _node_separation[1])
                 if extra_node != input_node:
                     extra_node.location = (-2*_node_separation[0], 0)
-
-                nodes = []
-                nodes.append(input_node)
-                nodes.append(output_node)
-                nodes.append(combiner_node)
-                nodes.append(composite_node)
-                if extra_node != input_node:
-                    nodes.append(extra_node)
-
-                _restore_info["nodes"] = nodes
                 
                 return {'FINISHED'}     
 
@@ -742,10 +793,9 @@ class Unity6Way:
             def execute(self, context):
                 scene = context.scene
                 unity6way = scene.unity6way
-                filename = unity6way.compositing.filename1 if self.positive else unity6way.compositing.filename2
-                path = _get_input_path_frame(unity6way.temp_path, filename, scene.frame_current, "exr")
-                _show_image(path)
-                return {'FINISHED'}     
+                dest_paths = _get_compositing_paths(unity6way, _get_current_frame(scene))
+                _show_image(dest_paths[0] if self.positive else dest_paths[1])
+                return {'FINISHED'}
 
     class Flipbook:
 
@@ -829,23 +879,16 @@ class Unity6Way:
                 self.layout.prop(unity6way.flipbook, "dest_format", expand=True)
                 self.layout.prop(unity6way.flipbook, "image_size")
                 self.layout.prop(unity6way.flipbook, "tiling")
-                #self.layout.operator(Unity6Way.Flipbook.ViewResultOperator.bl_idname)
                 self.layout.operator(Unity6Way.Flipbook.ExportOperator.bl_idname)
 
                 row = self.layout.row()
-                output_path = unity6way.temp_path if unity6way.flipbook.use_temp else unity6way.flipbook.dest_path
-                input_filenames = (unity6way.compositing.filename1, unity6way.compositing.filename2)
-                output_filenames = (unity6way.flipbook.filename1, unity6way.flipbook.filename2)
-                filenames = input_filenames if unity6way.flipbook.use_filename else output_filenames
-                extension = _get_format_extension(unity6way.flipbook.dest_format)
+                output_paths = _get_export_paths(unity6way)
                 col = row.column()
-                path = _get_input_path(output_path, filenames[0], extension)
-                col.enabled = _file_exists(path)
+                col.enabled = _file_exists(output_paths[0])
                 view_operator = col.operator(Unity6Way.Flipbook.ViewResultOperator.bl_idname, text="View last +")
                 view_operator.positive = True
                 col = row.column()
-                path = _get_input_path(output_path, filenames[1], extension)
-                col.enabled = _file_exists(path)
+                col.enabled = _file_exists(output_paths[1])
                 view_operator = col.operator(Unity6Way.Flipbook.ViewResultOperator.bl_idname, text="View last -")
                 view_operator.positive = False
                 
@@ -856,11 +899,29 @@ class Unity6Way:
             bl_label = "Export Flipbook"
             bl_options = {'REGISTER', 'UNDO'}
 
+            def check_input_paths(self, unity6way, frame_start, frame_end):
+                missing_paths = []
+                
+                for frame in range(frame_start, frame_end + 1):
+                    input_paths = _get_compositing_paths(unity6way, frame)
+                    _check_input_path(missing_paths, input_paths[0])
+                    _check_input_path(missing_paths, input_paths[1])
+
+                    if len(missing_paths) > 8:
+                        break
+                
+                return missing_paths
+
             def execute(self, context):
                 scene = context.scene
                 unity6way = scene.unity6way
 
                 frame_start, frame_end = _get_frames_range(scene)
+
+                missing_paths = self.check_input_paths(unity6way, frame_start, frame_end)
+                if missing_paths:
+                    self.report({'INFO'}, "Input image(s) not found: " + missing_paths)
+                    return {'CANCELLED'}
 
                 tiling = unity6way.flipbook.tiling
 
@@ -872,19 +933,19 @@ class Unity6Way:
                 tile_height = flipbook_size[1] // tiling[1]
                 tile_row = tile_width * 4
 
+                dst_pixels = [0] * (flipbook_total * 2)
+
                 wm = context.window_manager
                 wm.progress_begin(frame_start, frame_end + 1)
 
-                dst_pixels = [0] * (flipbook_total * 2)
-                input_filenames = (unity6way.compositing.filename1, unity6way.compositing.filename2)
                 for frame in range(frame_start, frame_end + 1):
                     frame_index = frame - frame_start
                     tile_x = frame_index % tiling[0]
                     tile_y = frame_index // tiling[0]
                     if tile_y < tiling[1]:
+                        input_paths = _get_compositing_paths(unity6way, frame)
                         for i in range(2):
-                            input_path = _get_input_path_frame(unity6way.temp_path, input_filenames[i], frame, "exr")
-                            src_image = _load_image(input_path)
+                            src_image = _load_image(input_paths[i])
                             src_image.scale(tile_width, tile_height)
                             src_pixels = list(src_image.pixels)
                             
@@ -900,16 +961,18 @@ class Unity6Way:
 
                 wm.progress_end()
 
-                output_path = unity6way.temp_path if unity6way.flipbook.use_temp else unity6way.flipbook.dest_path
-                output_filenames = (unity6way.flipbook.filename1, unity6way.flipbook.filename2)
+                output_paths = _get_export_paths(unity6way)
                 for i in range(2):
-                    output_filename = input_filenames[i] if unity6way.flipbook.use_filename else output_filenames[i]
-                    extension = _get_format_extension(unity6way.flipbook.dest_format)
-                    output_image = bpy.data.images.new(output_filename+"."+extension, width=flipbook_size[0], height=flipbook_size[1], alpha=True)
+                    output_image = bpy.data.images.get(output_paths[i])
+                    if output_image != None:
+                        bpy.data.images.remove(output_image)
+                    output_image = bpy.data.images.new(bpy.path.basename(output_paths[i]), width=flipbook_size[0], height=flipbook_size[1], alpha=True)
                     output_image.pixels = dst_pixels[flipbook_total*i:flipbook_total*(i+1)]
-                    output_image.filepath_raw = _get_input_path(output_path, output_filename, extension)
+                    output_image.filepath_raw = output_paths[i]
                     output_image.file_format = unity6way.flipbook.dest_format
                     output_image.save() 
+
+                _show_image(output_paths[0])
                                 
                 return {'FINISHED'}     
 
@@ -924,14 +987,8 @@ class Unity6Way:
             def execute(self, context):
                 scene = context.scene
                 unity6way = scene.unity6way
-                index = 0 if self.positive else 1
-                output_path = unity6way.temp_path if unity6way.flipbook.use_temp else unity6way.flipbook.dest_path
-                input_filenames = (unity6way.compositing.filename1, unity6way.compositing.filename2)
-                output_filenames = (unity6way.flipbook.filename1, unity6way.flipbook.filename2)
-                filename = input_filenames[index] if unity6way.flipbook.use_filename else output_filenames[index]
-                extension = _get_format_extension(unity6way.flipbook.dest_format)
-                path = _get_input_path(output_path, filename, extension)
-                _show_image(path)
+                output_paths = _get_export_paths(unity6way)
+                _show_image(output_paths[0] if self.positive else output_paths[1])
                 return {'FINISHED'}
 
 
