@@ -42,10 +42,9 @@ def _create_compositor_node_image_input(tree, image, scene):
     input_node.image = image
     image.source = 'SEQUENCE'
     input_node.use_straight_alpha_output = True
-    input_node.frame_start = 1
     input_node.frame_offset = scene.frame_start - 1
-    input_node.frame_duration = scene.frame_end - input_node.frame_offset
-
+    input_node.frame_start = scene.frame_start
+    input_node.frame_duration = scene.frame_end - scene.frame_start + 1
     return input_node
 
 def _create_compositor_node_exr_output(tree):
