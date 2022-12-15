@@ -139,6 +139,12 @@ def _show_image(path):
     image_area.spaces.active.image = image
     return image_area
 
+def _report_missing_inputs(operator, missing_paths):
+    message = "Input image(s) not found: "
+    for missing_path in missing_paths:
+        message += "\n" + missing_path
+    operator.report({'WARNING'}, message)
+
 def _remove_compositor_node_group(group_name):
     if bpy.data.node_groups.__contains__(group_name):
         bpy.data.node_groups.remove(bpy.data.node_groups[group_name])
@@ -714,7 +720,7 @@ class Unity6Way:
 
                 missing_paths = self.check_input_paths(scene)
                 if missing_paths:
-                    self.report({'INFO'}, "Input image(s) not found: " + missing_paths)
+                    _report_missing_inputs(self, missing_paths)
                     return {'CANCELLED'}
 
                 tree = scene.node_tree                
@@ -921,7 +927,7 @@ class Unity6Way:
 
                 missing_paths = self.check_input_paths(unity6way, frame_start, frame_end)
                 if missing_paths:
-                    self.report({'INFO'}, "Input image(s) not found: " + missing_paths)
+                    _report_missing_inputs(self, missing_paths)
                     return {'CANCELLED'}
 
                 tiling = unity6way.flipbook.tiling
