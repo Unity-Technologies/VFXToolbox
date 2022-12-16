@@ -119,11 +119,7 @@ def _load_image(path):
     filename = bpy.path.basename(path)
     image = bpy.data.images.get(filename)
     if image != None:
-        #image.reload()
         bpy.data.images.remove(image)
-    #else:
-        #image = bpy.data.images.load(path, check_existing=False)
-    #return image
     return bpy.data.images.load(path, check_existing=False)
 
 def _show_image(path, alpha_mode):
@@ -971,11 +967,12 @@ class Unity6Way:
 
                 output_paths = _get_export_paths(unity6way)
                 for i in range(2):
-                    print(output_paths[i])
-                    output_image = bpy.data.images.get(output_paths[i])#use base_path
+                    
+                    output_filename = bpy.path.basename(output_paths[i])
+                    output_image = bpy.data.images.get(output_filename)
                     if output_image != None:
                         bpy.data.images.remove(output_image)
-                    output_image = bpy.data.images.new(bpy.path.basename(output_paths[i]), width=flipbook_size[0], height=flipbook_size[1], alpha=True)
+                    output_image = bpy.data.images.new(output_filename, width=flipbook_size[0], height=flipbook_size[1], alpha=True)
                     output_image.alpha_mode = 'CHANNEL_PACKED'
                     output_image.filepath_raw = output_paths[i]
                     output_image.file_format = unity6way.flipbook.dest_format
