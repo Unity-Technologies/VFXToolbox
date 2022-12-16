@@ -614,14 +614,14 @@ class Unity6Way:
                 description='Extra Channel',
                 items={
                     ('NONE', 'None', "None (keep alpha)"),
-                    ('EMISSIVE', 'Emissive', "Emissive"),
-                    ('OTHER', 'Other', "Other"),
+                    ('EMISSIVE', 'Emissive', "Pack emissive information as gray-scale"),
+                    ('CUSTOM', 'Custom', "Pack custom image data in extra channel"),
                 },
                 default='NONE'
             )
-            other_path : bpy.props.StringProperty(
-                name="Other Path",
-                description = "Other Path",
+            custom_path : bpy.props.StringProperty(
+                name="Custom image path",
+                description = "Custom image path",
                 default="",
                 subtype='FILE_PATH',
             )
@@ -662,8 +662,8 @@ class Unity6Way:
                 self.layout.label(text="Extra channel source:")
                 self.layout.prop(unity6way.compositing, "extra", expand=True)
                 row = self.layout.row()
-                row.enabled = unity6way.compositing.extra == 'OTHER'
-                row.prop(unity6way.compositing, "other_path")
+                row.enabled = unity6way.compositing.extra == 'CUSTOM'
+                row.prop(unity6way.compositing, "custom_path")
                 self.layout.prop(unity6way.compositing, "premultiplied")
                 self.layout.prop(unity6way.compositing, "lightmap_multiplier")
                 row = self.layout.row()
@@ -696,15 +696,15 @@ class Unity6Way:
 
                 unity6way = scene.unity6way
                 
-                if unity6way.compositing.extra == 'OTHER' and scene.frame_start == scene.frame_end:
-                    _check_input_path(missing_paths, unity6way.extra.other_path)
+                if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start == scene.frame_end:
+                    _check_input_path(missing_paths, unity6way.extra.custom_path)
                 
                 for frame in range(scene.frame_start, scene.frame_end + 1):
                     _check_input_path(missing_paths, _get_lightmaps_path(unity6way, frame))
                     if unity6way.compositing.extra == 'EMISSIVE':
                         _check_input_path(missing_paths, _get_emissive_path(unity6way, frame))
-                    if unity6way.compositing.extra == 'OTHER' and scene.frame_start < scene.frame_end:
-                        _check_input_path(missing_paths, unity6way.extra.other_path) #TODO add frame number
+                    if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start < scene.frame_end:
+                        _check_input_path(missing_paths, unity6way.extra.custom_path) #TODO add frame number
 
                     if len(missing_paths) > 10:
                         break
@@ -736,8 +736,8 @@ class Unity6Way:
                         emissive_path = _get_emissive_path(unity6way, scene.frame_start)
                         extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path), scene)
                         extra_channel = 0
-                    case 'OTHER':
-                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.other_path), scene)
+                    case 'CUSTOM':
+                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.custom_path), scene)
                         extra_channel = 0
                 if extra_node != input_node:
                     nodes.append(extra_node)
