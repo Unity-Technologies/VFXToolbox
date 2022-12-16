@@ -128,6 +128,7 @@ def _load_image(path):
 
 def _show_image(path):
     image = _load_image(path)
+    image.alpha_mode = 'CHANNEL_PACKED'
     bpy.ops.render.view_show('INVOKE_DEFAULT')
     image_area = None
     while image_area == None:
@@ -969,16 +970,36 @@ class Unity6Way:
 
                 output_paths = _get_export_paths(unity6way)
                 for i in range(2):
-                    output_image = bpy.data.images.get(output_paths[i])
+                    print(output_paths[i])
+                    output_image = bpy.data.images.get(output_paths[i])#use base_path
                     if output_image != None:
                         bpy.data.images.remove(output_image)
                     output_image = bpy.data.images.new(bpy.path.basename(output_paths[i]), width=flipbook_size[0], height=flipbook_size[1], alpha=True)
-                    output_image.pixels = dst_pixels[flipbook_total*i:flipbook_total*(i+1)]
+                    output_image.alpha_mode = 'CHANNEL_PACKED'
                     output_image.filepath_raw = output_paths[i]
                     output_image.file_format = unity6way.flipbook.dest_format
-                    output_image.save() 
+                    output_image.pixels = dst_pixels[flipbook_total*i:flipbook_total*(i+1)]
 
-                _show_image(output_paths[0])
+                    #workaround to save files to different formats (save not working properly)
+                    #read scene settings
+                    settings = scene.render.image_settings
+                    current_format = settings.file_format
+                    current_mode = settings.color_mode
+                    current_depth = settings.color_depth
+                    
+                    #set image scene settings
+                    settings.file_format = unity6way.flipbook.dest_format
+                    settings.color_mode = 'RGBA'
+                    settings.color_depth = '16' if unity6way.flipbook.dest_format == 'OPEN_EXR' else '8'                    
+
+                    output_image.save_render(filepath=output_paths[i]) 
+
+                    #restore scene settings
+                    settings.file_format = current_format
+                    settings.color_mode = current_mode
+                    settings.color_depth = current_depth
+
+                _show_image(output_paths[1])
                                 
                 return {'FINISHED'}     
 
