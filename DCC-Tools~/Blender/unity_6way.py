@@ -42,10 +42,9 @@ def _create_compositor_node_image_input(tree, image, scene):
     input_node.image = image
     image.source = 'SEQUENCE'
     input_node.use_straight_alpha_output = True
-    input_node.frame_start = 1
     input_node.frame_offset = scene.frame_start - 1
-    input_node.frame_duration = scene.frame_end - input_node.frame_offset
-
+    input_node.frame_start = scene.frame_start
+    input_node.frame_duration = scene.frame_end - scene.frame_start + 1
     return input_node
 
 def _create_compositor_node_exr_output(tree):
@@ -120,15 +119,12 @@ def _load_image(path):
     filename = bpy.path.basename(path)
     image = bpy.data.images.get(filename)
     if image != None:
-        #image.reload()
         bpy.data.images.remove(image)
-    #else:
-        #image = bpy.data.images.load(path, check_existing=False)
-    #return image
     return bpy.data.images.load(path, check_existing=False)
 
-def _show_image(path):
+def _show_image(path, alpha_mode):
     image = _load_image(path)
+    image.alpha_mode = alpha_mode
     bpy.ops.render.view_show('INVOKE_DEFAULT')
     image_area = None
     while image_area == None:
@@ -504,7 +500,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 filename = _get_lightmaps_path(unity6way, _get_current_frame(scene))
-                _show_image(filename)
+                _show_image(filename, 'PREMUL')
                 return {'FINISHED'}
 
     class Emissive:
@@ -589,7 +585,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 filename = _get_emissive_path(unity6way, _get_current_frame(scene))
-                _show_image(filename)
+                _show_image(filename, 'PREMUL')
                 return {'FINISHED'}     
 
     class Compositing:
@@ -614,14 +610,14 @@ class Unity6Way:
                 description='Extra Channel',
                 items={
                     ('NONE', 'None', "None (keep alpha)"),
-                    ('EMISSIVE', 'Emissive', "Emissive"),
-                    ('OTHER', 'Other', "Other"),
+                    ('EMISSIVE', 'Emissive', "Pack emissive information as gray-scale"),
+                    ('CUSTOM', 'Custom', "Pack custom image data in extra channel"),
                 },
                 default='NONE'
             )
-            other_path : bpy.props.StringProperty(
-                name="Other Path",
-                description = "Other Path",
+            custom_path : bpy.props.StringProperty(
+                name="Custom image path",
+                description = "Custom image path",
                 default="",
                 subtype='FILE_PATH',
             )
@@ -662,8 +658,8 @@ class Unity6Way:
                 self.layout.label(text="Extra channel source:")
                 self.layout.prop(unity6way.compositing, "extra", expand=True)
                 row = self.layout.row()
-                row.enabled = unity6way.compositing.extra == 'OTHER'
-                row.prop(unity6way.compositing, "other_path")
+                row.enabled = unity6way.compositing.extra == 'CUSTOM'
+                row.prop(unity6way.compositing, "custom_path")
                 self.layout.prop(unity6way.compositing, "premultiplied")
                 self.layout.prop(unity6way.compositing, "lightmap_multiplier")
                 row = self.layout.row()
@@ -696,15 +692,15 @@ class Unity6Way:
 
                 unity6way = scene.unity6way
                 
-                if unity6way.compositing.extra == 'OTHER' and scene.frame_start == scene.frame_end:
-                    _check_input_path(missing_paths, unity6way.extra.other_path)
+                if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start == scene.frame_end:
+                    _check_input_path(missing_paths, unity6way.extra.custom_path)
                 
                 for frame in range(scene.frame_start, scene.frame_end + 1):
                     _check_input_path(missing_paths, _get_lightmaps_path(unity6way, frame))
                     if unity6way.compositing.extra == 'EMISSIVE':
                         _check_input_path(missing_paths, _get_emissive_path(unity6way, frame))
-                    if unity6way.compositing.extra == 'OTHER' and scene.frame_start < scene.frame_end:
-                        _check_input_path(missing_paths, unity6way.extra.other_path) #TODO add frame number
+                    if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start < scene.frame_end:
+                        _check_input_path(missing_paths, unity6way.extra.custom_path) #TODO add frame number
 
                     if len(missing_paths) > 10:
                         break
@@ -736,8 +732,8 @@ class Unity6Way:
                         emissive_path = _get_emissive_path(unity6way, scene.frame_start)
                         extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path), scene)
                         extra_channel = 0
-                    case 'OTHER':
-                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.other_path), scene)
+                    case 'CUSTOM':
+                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.custom_path), scene)
                         extra_channel = 0
                 if extra_node != input_node:
                     nodes.append(extra_node)
@@ -801,7 +797,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 dest_paths = _get_compositing_paths(unity6way, _get_current_frame(scene))
-                _show_image(dest_paths[0] if self.positive else dest_paths[1])
+                _show_image(dest_paths[0] if self.positive else dest_paths[1], 'PREMUL')
                 return {'FINISHED'}
 
     class Flipbook:
@@ -821,7 +817,7 @@ class Unity6Way:
                 default="",
                 subtype='DIR_PATH')
             use_filename: bpy.props.BoolProperty(
-                name = "Use EXR filename",
+                name = "Use Compositing filename",
                 default = True,
             )
             filename1 : bpy.props.StringProperty(
@@ -840,7 +836,7 @@ class Unity6Way:
                 items={
                     ('PNG', '.png', "PNG"),
                     ('TARGA', '.tga', "Targa"),
-                    ('OPEN_EXR', '.exr', "Open EXR"),
+                    #('OPEN_EXR', '.exr', "Open EXR"),
                 },
                 default='PNG'
             )
@@ -950,6 +946,7 @@ class Unity6Way:
                     tile_x = frame_index % tiling[0]
                     tile_y = frame_index // tiling[0]
                     if tile_y < tiling[1]:
+                        tile_y = tiling[1] - tile_y - 1
                         input_paths = _get_compositing_paths(unity6way, frame)
                         for i in range(2):
                             src_image = _load_image(input_paths[i])
@@ -970,16 +967,37 @@ class Unity6Way:
 
                 output_paths = _get_export_paths(unity6way)
                 for i in range(2):
-                    output_image = bpy.data.images.get(output_paths[i])
+                    
+                    output_filename = bpy.path.basename(output_paths[i])
+                    output_image = bpy.data.images.get(output_filename)
                     if output_image != None:
                         bpy.data.images.remove(output_image)
-                    output_image = bpy.data.images.new(bpy.path.basename(output_paths[i]), width=flipbook_size[0], height=flipbook_size[1], alpha=True)
-                    output_image.pixels = dst_pixels[flipbook_total*i:flipbook_total*(i+1)]
+                    output_image = bpy.data.images.new(output_filename, width=flipbook_size[0], height=flipbook_size[1], alpha=True)
+                    output_image.alpha_mode = 'CHANNEL_PACKED'
                     output_image.filepath_raw = output_paths[i]
                     output_image.file_format = unity6way.flipbook.dest_format
-                    output_image.save() 
+                    output_image.pixels = dst_pixels[flipbook_total*i:flipbook_total*(i+1)]
 
-                _show_image(output_paths[0])
+                    #workaround to save files to different formats (save not working properly)
+                    #read scene settings
+                    settings = scene.render.image_settings
+                    current_format = settings.file_format
+                    current_mode = settings.color_mode
+                    current_depth = settings.color_depth
+                    
+                    #set image scene settings
+                    settings.file_format = unity6way.flipbook.dest_format
+                    settings.color_mode = 'RGBA'
+                    settings.color_depth = '16' if unity6way.flipbook.dest_format == 'OPEN_EXR' else '8'                    
+
+                    output_image.save_render(filepath=output_paths[i]) 
+
+                    #restore scene settings
+                    settings.file_format = current_format
+                    settings.color_mode = current_mode
+                    settings.color_depth = current_depth
+
+                _show_image(output_paths[0], 'CHANNEL_PACKED')
                                 
                 return {'FINISHED'}     
 
@@ -995,7 +1013,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 output_paths = _get_export_paths(unity6way)
-                _show_image(output_paths[0] if self.positive else output_paths[1])
+                _show_image(output_paths[0] if self.positive else output_paths[1], 'CHANNEL_PACKED')
                 return {'FINISHED'}
 
 
