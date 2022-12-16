@@ -126,9 +126,9 @@ def _load_image(path):
     #return image
     return bpy.data.images.load(path, check_existing=False)
 
-def _show_image(path):
+def _show_image(path, alpha_mode):
     image = _load_image(path)
-    image.alpha_mode = 'CHANNEL_PACKED'
+    image.alpha_mode = alpha_mode
     bpy.ops.render.view_show('INVOKE_DEFAULT')
     image_area = None
     while image_area == None:
@@ -504,7 +504,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 filename = _get_lightmaps_path(unity6way, _get_current_frame(scene))
-                _show_image(filename)
+                _show_image(filename, 'PREMUL')
                 return {'FINISHED'}
 
     class Emissive:
@@ -589,7 +589,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 filename = _get_emissive_path(unity6way, _get_current_frame(scene))
-                _show_image(filename)
+                _show_image(filename, 'PREMUL')
                 return {'FINISHED'}     
 
     class Compositing:
@@ -801,7 +801,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 dest_paths = _get_compositing_paths(unity6way, _get_current_frame(scene))
-                _show_image(dest_paths[0] if self.positive else dest_paths[1])
+                _show_image(dest_paths[0] if self.positive else dest_paths[1], 'PREMUL')
                 return {'FINISHED'}
 
     class Flipbook:
@@ -1000,7 +1000,7 @@ class Unity6Way:
                     settings.color_mode = current_mode
                     settings.color_depth = current_depth
 
-                _show_image(output_paths[0])
+                _show_image(output_paths[0], 'CHANNEL_PACKED')
                                 
                 return {'FINISHED'}     
 
@@ -1016,7 +1016,7 @@ class Unity6Way:
                 scene = context.scene
                 unity6way = scene.unity6way
                 output_paths = _get_export_paths(unity6way)
-                _show_image(output_paths[0] if self.positive else output_paths[1])
+                _show_image(output_paths[0] if self.positive else output_paths[1], 'CHANNEL_PACKED')
                 return {'FINISHED'}
 
 
