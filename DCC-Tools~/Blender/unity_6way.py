@@ -821,7 +821,7 @@ class Unity6Way:
                 default="",
                 subtype='DIR_PATH')
             use_filename: bpy.props.BoolProperty(
-                name = "Use EXR filename",
+                name = "Use Compositing filename",
                 default = True,
             )
             filename1 : bpy.props.StringProperty(
