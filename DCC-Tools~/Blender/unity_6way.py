@@ -1000,7 +1000,7 @@ class Unity6Way:
                     settings.color_mode = current_mode
                     settings.color_depth = current_depth
 
-                _show_image(output_paths[1])
+                _show_image(output_paths[0])
                                 
                 return {'FINISHED'}     
 
