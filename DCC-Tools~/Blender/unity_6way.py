@@ -840,7 +840,7 @@ class Unity6Way:
                 items={
                     ('PNG', '.png', "PNG"),
                     ('TARGA', '.tga', "Targa"),
-                    ('OPEN_EXR', '.exr', "Open EXR"),
+                    #('OPEN_EXR', '.exr', "Open EXR"),
                 },
                 default='PNG'
             )
