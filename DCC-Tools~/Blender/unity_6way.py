@@ -950,6 +950,7 @@ class Unity6Way:
                     tile_x = frame_index % tiling[0]
                     tile_y = frame_index // tiling[0]
                     if tile_y < tiling[1]:
+                        tile_y = tiling[1] - tile_y - 1
                         input_paths = _get_compositing_paths(unity6way, frame)
                         for i in range(2):
                             src_image = _load_image(input_paths[i])
