@@ -848,8 +848,8 @@ class Unity6Way:
                 min = 1,
             )
             tiling: bpy.props.IntVectorProperty(
-                name = "Tiling",
-                description = "Tiling",
+                name = "Rows / Columns",
+                description = "Rows and columns of the flipbook",
                 default = (1,1),
                 size = 2,
                 min = 1,
