@@ -854,6 +854,13 @@ class Unity6Way:
                 size = 2,
                 min = 1,
             )
+
+            frame_step: bpy.props.IntProperty(
+                name = "Frame step",
+                description = "Frame step",
+                default = 1,
+                min = 1,
+            )
                         
         class Panel(bpy.types.Panel):
             bl_idname = "VIEW3D_PT_unity_6way_flipbook"
@@ -882,6 +889,8 @@ class Unity6Way:
                 self.layout.prop(unity6way.flipbook, "dest_format", expand=True)
                 self.layout.prop(unity6way.flipbook, "image_size")
                 self.layout.prop(unity6way.flipbook, "tiling")
+                row = self.layout.row()
+                row.prop(unity6way.flipbook, "frame_step")
                 self.layout.operator(Unity6Way.Flipbook.ExportOperator.bl_idname)
 
                 row = self.layout.row()
@@ -947,12 +956,13 @@ class Unity6Way:
                     tile_y = frame_index // tiling[0]
                     if tile_y < tiling[1]:
                         tile_y = tiling[1] - tile_y - 1
-                        input_paths = _get_compositing_paths(unity6way, frame)
+                        img_index = min(frame_end, max(1, (frame * unity6way.flipbook.frame_step) - 1))
+                        input_paths = _get_compositing_paths(unity6way, img_index)
                         for i in range(2):
                             src_image = _load_image(input_paths[i])
                             src_image.scale(tile_width, tile_height)
                             src_pixels = list(src_image.pixels)
-                            
+
                             src_offset = 0
                             dst_offset = flipbook_total * i + tile_x * tile_row + tile_y * tile_height * flipbook_row
                             for y in range(tile_height):
@@ -1026,6 +1036,7 @@ class Unity6Way:
         prepare_operator: bpy.props.StringProperty()
         restore_operator: bpy.props.StringProperty()
 
+        
         _restore_start_frame = 0
         _restore_end_frame = 0
         _restore_scene_info = {}
@@ -1084,9 +1095,9 @@ class Unity6Way:
         def _prepare_frames_range(self, scene):
             self._restore_frame_start = scene.frame_start
             self._restore_frame_end = scene.frame_end
-            frame_start, frame_end = _get_frames_range(scene)
-            scene.frame_start = frame_start
-            scene.frame_end = frame_end
+            _frame_start, _frame_end = _get_frames_range(scene)
+            scene.frame_start = _frame_start
+            scene.frame_end = _frame_end
 
         def _restore_frames_range(self, scene):
             scene.frame_start = self._restore_frame_start
@@ -1160,9 +1171,10 @@ class Unity6Way:
         def execute(self, context):
             scene = context.scene
             unity6way = scene.unity6way
-
-            self._prepare(context)
             
+            self._prepare(context)
+            _frame_start, _frame_end = _get_frames_range(scene)
+
             bpy.ops.render.render('INVOKE_DEFAULT', animation=True)
 
             self._timer = context.window_manager.event_timer_add(0.1, window=context.window)
