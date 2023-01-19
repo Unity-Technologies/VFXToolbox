@@ -693,7 +693,7 @@ class Unity6Way:
                 unity6way = scene.unity6way
                 
                 if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start == scene.frame_end:
-                    _check_input_path(missing_paths, unity6way.extra.custom_path)
+                    _check_input_path(missing_paths, unity6way.compositing.custom_path)
                 
                 for frame in range(scene.frame_start, scene.frame_end + 1):
                     _check_input_path(missing_paths, _get_lightmaps_path(unity6way, frame))
@@ -733,7 +733,7 @@ class Unity6Way:
                         extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path), scene)
                         extra_channel = 0
                     case 'CUSTOM':
-                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.custom_path), scene)
+                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.compositing.custom_path), scene)
                         extra_channel = 0
                 if extra_node != input_node:
                     nodes.append(extra_node)
