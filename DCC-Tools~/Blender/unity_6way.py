@@ -18,6 +18,7 @@ _node_separation = (200, 100)
 _rgba_combiner_node_group_name = "UnityRGBACombinerGroup"
 _6way_combiner_node_group_name = "Unity6wayCombinerGroup"
 
+_compositor_debug = True
 
 def _get_frames_range(scene):
     unity6way = scene.unity6way
@@ -256,6 +257,9 @@ def _add_6way_combiner_compositor_node_group():
     tree.links.new(extra_node.outputs["Image"], group_outputs.inputs["Negative"])
 
 def _destroy_compositor_nodes(tree, nodes):
+    if _compositor_debug:
+        return
+
     for node in nodes:
         tree.nodes.remove(node)
 
@@ -734,11 +738,17 @@ class Unity6Way:
                         extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path), scene)
                         extra_channel = 0
                     case 'CUSTOM':
-                        extra_node = _create_compositor_node_image_input(tree, _load_image( bpy.path.abspath(unity6way.compositing.custom_path)), scene)
+                        extra_image = _load_image(bpy.path.abspath(unity6way.compositing.custom_path))
+                        extra_node = _create_compositor_node_image_input(tree, extra_image, scene)
                         extra_channel = 0
                 if extra_node != input_node:
                     nodes.append(extra_node)
                 
+                scale_node = tree.nodes.new(type='CompositorNodeScale')
+                scale_node.space = 'RENDER_SIZE'
+                scale_node.frame_method = 'STRETCH'
+                nodes.append(scale_node)
+
                 combiner_node = _create_node_group(tree, _6way_combiner_node_group_name, _add_6way_combiner_compositor_node_group)
                 nodes.append(combiner_node)
                 combiner_node.inputs["Lightmap Multiplier"].default_value = unity6way.compositing.lightmap_multiplier
@@ -761,19 +771,25 @@ class Unity6Way:
                 for dir_name in _light_direction_names:
                     tree.links.new(input_node.outputs[dir_name], combiner_node.inputs[dir_name])
                 tree.links.new(input_node.outputs["Alpha"], combiner_node.inputs["Alpha"])
-                tree.links.new(extra_node.outputs[extra_channel], combiner_node.inputs["Extra"])
-
+               
+                tree.links.new(extra_node.outputs[extra_channel], scale_node.inputs["Image"])
+                tree.links.new(scale_node.outputs["Image"], combiner_node.inputs["Extra"])
+                
                 tree.links.new(combiner_node.outputs["Positive"], output_node.inputs[0])
                 tree.links.new(combiner_node.outputs["Negative"], output_node.inputs[1])
 
                 tree.links.new(combiner_node.outputs["Positive"], composite_node.inputs[0])
 
-                input_node.location = (-_node_separation[0], 0)
+                input_node.location = (-2 * _node_separation[0], 0)
                 output_node.location = (_node_separation[0], 0)
+
                 composite_node.location = (_node_separation[0], -2 * _node_separation[1])
                 if extra_node != input_node:
-                    extra_node.location = (-2*_node_separation[0], 0)
+                    extra_node.location = (-3*_node_separation[0], 0)
+                    scale_node.location = (-2 * _node_separation[0], 0)
                 
+                scale_node.location = (-1 * _node_separation[0], 0)
+
                 return {'FINISHED'}     
 
         class RestoreOperator(bpy.types.Operator):
@@ -1175,7 +1191,7 @@ class Unity6Way:
             
             self._prepare(context)
             _frame_start, _frame_end = _get_frames_range(scene)
-            
+
             bpy.ops.render.render('INVOKE_DEFAULT', animation=True)
 
             self._timer = context.window_manager.event_timer_add(0.1, window=context.window)
