@@ -693,14 +693,15 @@ class Unity6Way:
                 unity6way = scene.unity6way
                 
                 if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start == scene.frame_end:
-                    _check_input_path(missing_paths, unity6way.compositing.custom_path)
+                    _check_input_path(missing_paths, bpy.path.abspath(unity6way.compositing.custom_path))
                 
                 for frame in range(scene.frame_start, scene.frame_end + 1):
                     _check_input_path(missing_paths, _get_lightmaps_path(unity6way, frame))
                     if unity6way.compositing.extra == 'EMISSIVE':
                         _check_input_path(missing_paths, _get_emissive_path(unity6way, frame))
+                    
                     if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start < scene.frame_end:
-                        _check_input_path(missing_paths, unity6way.extra.custom_path) #TODO add frame number
+                        _check_input_path(missing_paths,  bpy.path.abspath(unity6way.compositing.custom_path)) #TODO add frame number
 
                     if len(missing_paths) > 10:
                         break
@@ -712,8 +713,8 @@ class Unity6Way:
                 unity6way = scene.unity6way
 
                 nodes = []
-                _restore_info["nodes"] = nodes
 
+                _restore_info["nodes"] = nodes   
                 missing_paths = self.check_input_paths(scene)
                 if missing_paths:
                     _report_missing_inputs(self, missing_paths)
@@ -733,11 +734,11 @@ class Unity6Way:
                         extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path), scene)
                         extra_channel = 0
                     case 'CUSTOM':
-                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.compositing.custom_path), scene)
+                        extra_node = _create_compositor_node_image_input(tree, _load_image( bpy.path.abspath(unity6way.compositing.custom_path)), scene)
                         extra_channel = 0
                 if extra_node != input_node:
                     nodes.append(extra_node)
- 
+                
                 combiner_node = _create_node_group(tree, _6way_combiner_node_group_name, _add_6way_combiner_compositor_node_group)
                 nodes.append(combiner_node)
                 combiner_node.inputs["Lightmap Multiplier"].default_value = unity6way.compositing.lightmap_multiplier
@@ -1095,9 +1096,9 @@ class Unity6Way:
         def _prepare_frames_range(self, scene):
             self._restore_frame_start = scene.frame_start
             self._restore_frame_end = scene.frame_end
-            _frame_start, _frame_end = _get_frames_range(scene)
-            scene.frame_start = _frame_start
-            scene.frame_end = _frame_end
+            frame_start, frame_end = _get_frames_range(scene)
+            scene.frame_start = frame_start
+            scene.frame_end = frame_end
 
         def _restore_frames_range(self, scene):
             scene.frame_start = self._restore_frame_start
@@ -1174,7 +1175,7 @@ class Unity6Way:
             
             self._prepare(context)
             _frame_start, _frame_end = _get_frames_range(scene)
-
+            
             bpy.ops.render.render('INVOKE_DEFAULT', animation=True)
 
             self._timer = context.window_manager.event_timer_add(0.1, window=context.window)
