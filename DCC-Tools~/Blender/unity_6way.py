@@ -18,7 +18,7 @@ _node_separation = (200, 100)
 _rgba_combiner_node_group_name = "UnityRGBACombinerGroup"
 _6way_combiner_node_group_name = "Unity6wayCombinerGroup"
 
-_compositor_debug = True
+_compositor_debug = False
 
 def _get_frames_range(scene):
     unity6way = scene.unity6way
@@ -39,9 +39,13 @@ def _get_current_frame(scene):
     return max(frame_start, min(frame_end, scene.frame_current))
     
 def _create_compositor_node_image_input(tree, image, scene):
+    unity6way = scene.unity6way
     input_node = tree.nodes.new(type='CompositorNodeImage')
     input_node.image = image
-    image.source = 'SEQUENCE'
+    if unity6way.frames == 'FRAME':
+        image.source = 'FILE'
+    else:
+        image.source = 'SEQUENCE'
     input_node.use_straight_alpha_output = True
     input_node.frame_offset = scene.frame_start - 1
     input_node.frame_start = scene.frame_start
@@ -743,7 +747,7 @@ class Unity6Way:
                         extra_channel = 0
                 if extra_node != input_node:
                     nodes.append(extra_node)
-                
+
                 scale_node = tree.nodes.new(type='CompositorNodeScale')
                 scale_node.space = 'RENDER_SIZE'
                 scale_node.frame_method = 'STRETCH'
