@@ -18,6 +18,7 @@ _node_separation = (200, 100)
 _rgba_combiner_node_group_name = "UnityRGBACombinerGroup"
 _6way_combiner_node_group_name = "Unity6wayCombinerGroup"
 
+_compositor_debug = False
 
 def _get_frames_range(scene):
     unity6way = scene.unity6way
@@ -38,9 +39,13 @@ def _get_current_frame(scene):
     return max(frame_start, min(frame_end, scene.frame_current))
     
 def _create_compositor_node_image_input(tree, image, scene):
+    unity6way = scene.unity6way
     input_node = tree.nodes.new(type='CompositorNodeImage')
     input_node.image = image
-    image.source = 'SEQUENCE'
+    if unity6way.frames == 'FRAME':
+        image.source = 'FILE'
+    else:
+        image.source = 'SEQUENCE'
     input_node.use_straight_alpha_output = True
     input_node.frame_offset = scene.frame_start - 1
     input_node.frame_start = scene.frame_start
@@ -256,6 +261,9 @@ def _add_6way_combiner_compositor_node_group():
     tree.links.new(extra_node.outputs["Image"], group_outputs.inputs["Negative"])
 
 def _destroy_compositor_nodes(tree, nodes):
+    if _compositor_debug:
+        return
+
     for node in nodes:
         tree.nodes.remove(node)
 
@@ -693,14 +701,15 @@ class Unity6Way:
                 unity6way = scene.unity6way
                 
                 if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start == scene.frame_end:
-                    _check_input_path(missing_paths, unity6way.extra.custom_path)
+                    _check_input_path(missing_paths, bpy.path.abspath(unity6way.compositing.custom_path))
                 
                 for frame in range(scene.frame_start, scene.frame_end + 1):
                     _check_input_path(missing_paths, _get_lightmaps_path(unity6way, frame))
                     if unity6way.compositing.extra == 'EMISSIVE':
                         _check_input_path(missing_paths, _get_emissive_path(unity6way, frame))
+                    
                     if unity6way.compositing.extra == 'CUSTOM' and scene.frame_start < scene.frame_end:
-                        _check_input_path(missing_paths, unity6way.extra.custom_path) #TODO add frame number
+                        _check_input_path(missing_paths,  bpy.path.abspath(unity6way.compositing.custom_path)) #TODO add frame number
 
                     if len(missing_paths) > 10:
                         break
@@ -712,8 +721,8 @@ class Unity6Way:
                 unity6way = scene.unity6way
 
                 nodes = []
-                _restore_info["nodes"] = nodes
 
+                _restore_info["nodes"] = nodes   
                 missing_paths = self.check_input_paths(scene)
                 if missing_paths:
                     _report_missing_inputs(self, missing_paths)
@@ -733,11 +742,17 @@ class Unity6Way:
                         extra_node = _create_compositor_node_image_input(tree, _load_image(emissive_path), scene)
                         extra_channel = 0
                     case 'CUSTOM':
-                        extra_node = _create_compositor_node_image_input(tree, _load_image(unity6way.extra.custom_path), scene)
+                        extra_image = _load_image(bpy.path.abspath(unity6way.compositing.custom_path))
+                        extra_node = _create_compositor_node_image_input(tree, extra_image, scene)
                         extra_channel = 0
                 if extra_node != input_node:
                     nodes.append(extra_node)
- 
+
+                scale_node = tree.nodes.new(type='CompositorNodeScale')
+                scale_node.space = 'RENDER_SIZE'
+                scale_node.frame_method = 'STRETCH'
+                nodes.append(scale_node)
+
                 combiner_node = _create_node_group(tree, _6way_combiner_node_group_name, _add_6way_combiner_compositor_node_group)
                 nodes.append(combiner_node)
                 combiner_node.inputs["Lightmap Multiplier"].default_value = unity6way.compositing.lightmap_multiplier
@@ -760,19 +775,25 @@ class Unity6Way:
                 for dir_name in _light_direction_names:
                     tree.links.new(input_node.outputs[dir_name], combiner_node.inputs[dir_name])
                 tree.links.new(input_node.outputs["Alpha"], combiner_node.inputs["Alpha"])
-                tree.links.new(extra_node.outputs[extra_channel], combiner_node.inputs["Extra"])
-
+               
+                tree.links.new(extra_node.outputs[extra_channel], scale_node.inputs["Image"])
+                tree.links.new(scale_node.outputs["Image"], combiner_node.inputs["Extra"])
+                
                 tree.links.new(combiner_node.outputs["Positive"], output_node.inputs[0])
                 tree.links.new(combiner_node.outputs["Negative"], output_node.inputs[1])
 
                 tree.links.new(combiner_node.outputs["Positive"], composite_node.inputs[0])
 
-                input_node.location = (-_node_separation[0], 0)
+                input_node.location = (-2 * _node_separation[0], 0)
                 output_node.location = (_node_separation[0], 0)
+
                 composite_node.location = (_node_separation[0], -2 * _node_separation[1])
                 if extra_node != input_node:
-                    extra_node.location = (-2*_node_separation[0], 0)
+                    extra_node.location = (-3*_node_separation[0], 0)
+                    scale_node.location = (-2 * _node_separation[0], 0)
                 
+                scale_node.location = (-1 * _node_separation[0], 0)
+
                 return {'FINISHED'}     
 
         class RestoreOperator(bpy.types.Operator):
@@ -848,10 +869,17 @@ class Unity6Way:
                 min = 1,
             )
             tiling: bpy.props.IntVectorProperty(
-                name = "Tiling",
-                description = "Tiling",
+                name = "Rows / Columns",
+                description = "Rows and columns of the flipbook",
                 default = (1,1),
                 size = 2,
+                min = 1,
+            )
+
+            frame_step: bpy.props.IntProperty(
+                name = "Frame step",
+                description = "Frame step",
+                default = 1,
                 min = 1,
             )
                         
@@ -882,6 +910,8 @@ class Unity6Way:
                 self.layout.prop(unity6way.flipbook, "dest_format", expand=True)
                 self.layout.prop(unity6way.flipbook, "image_size")
                 self.layout.prop(unity6way.flipbook, "tiling")
+                row = self.layout.row()
+                row.prop(unity6way.flipbook, "frame_step")
                 self.layout.operator(Unity6Way.Flipbook.ExportOperator.bl_idname)
 
                 row = self.layout.row()
@@ -947,12 +977,13 @@ class Unity6Way:
                     tile_y = frame_index // tiling[0]
                     if tile_y < tiling[1]:
                         tile_y = tiling[1] - tile_y - 1
-                        input_paths = _get_compositing_paths(unity6way, frame)
+                        img_index = min(frame_end, max(1, (frame * unity6way.flipbook.frame_step) - 1))
+                        input_paths = _get_compositing_paths(unity6way, img_index)
                         for i in range(2):
                             src_image = _load_image(input_paths[i])
                             src_image.scale(tile_width, tile_height)
                             src_pixels = list(src_image.pixels)
-                            
+
                             src_offset = 0
                             dst_offset = flipbook_total * i + tile_x * tile_row + tile_y * tile_height * flipbook_row
                             for y in range(tile_height):
@@ -1026,6 +1057,7 @@ class Unity6Way:
         prepare_operator: bpy.props.StringProperty()
         restore_operator: bpy.props.StringProperty()
 
+        
         _restore_start_frame = 0
         _restore_end_frame = 0
         _restore_scene_info = {}
@@ -1160,9 +1192,10 @@ class Unity6Way:
         def execute(self, context):
             scene = context.scene
             unity6way = scene.unity6way
-
-            self._prepare(context)
             
+            self._prepare(context)
+            _frame_start, _frame_end = _get_frames_range(scene)
+
             bpy.ops.render.render('INVOKE_DEFAULT', animation=True)
 
             self._timer = context.window_manager.event_timer_add(0.1, window=context.window)
