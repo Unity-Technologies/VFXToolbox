@@ -6,7 +6,7 @@ import time
 
 bl_info = {
     "name": "Unity VFX Graph Six way lighting",
-    "blender": (3, 3, 0),
+    "blender": (4, 2, 0),
     "category": "Import-Export",
 }
 
@@ -158,16 +158,17 @@ def _add_rgba_combiner_compositor_node_group():
     
     group_inputs = tree.nodes.new('NodeGroupInput')
     group_inputs.location = (-3 * _node_separation[0], 0)
-    tree.inputs.new('NodeSocketColor',"R")
-    tree.inputs.new('NodeSocketColor',"G")
-    tree.inputs.new('NodeSocketColor',"B")
-    tree.inputs.new('NodeSocketColor',"A")
-    tree.inputs.new('NodeSocketFloat',"Multiplier")
-    tree.inputs.new('NodeSocketFloatFactor',"Premultiplied")
+
+    tree.interface.new_socket("R", in_out='INPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("G", in_out='INPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("B", in_out='INPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("A", in_out='INPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("Multiplier", in_out='INPUT', socket_type='NodeSocketFloat')
+    tree.interface.new_socket("Premultiplied", in_out='INPUT', socket_type='NodeSocketFloat') #NodeSocketFloatFactor
 
     group_outputs = tree.nodes.new('NodeGroupOutput')
     group_outputs.location = (3 * _node_separation[0], 0)
-    tree.outputs.new('NodeSocketColor',"Image")
+    tree.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
 
     rgba_node = tree.nodes.new(type='CompositorNodeCombRGBA')
     rgba_node.location = (-_node_separation[0], 0)
@@ -209,18 +210,18 @@ def _add_6way_combiner_compositor_node_group():
     
     group_inputs = tree.nodes.new('NodeGroupInput')
     group_inputs.location = (-1.5 * _node_separation[0], 0)
-    for slot_name in _light_direction_names:
-        tree.inputs.new('NodeSocketColor',slot_name)
-    tree.inputs.new('NodeSocketColor',"Alpha")
-    tree.inputs.new('NodeSocketColor',"Extra")
-    tree.inputs.new('NodeSocketFloat',"Lightmap Multiplier")
-    tree.inputs.new('NodeSocketFloat',"Extra Multiplier")
-    tree.inputs.new('NodeSocketFloatFactor',"Premultiplied")
+    for slot_name in _light_direction_names:        
+        tree.interface.new_socket(slot_name, in_out='INPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("Alpha", in_out='INPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("Extra", in_out='INPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("Lightmap Multiplier", in_out='INPUT', socket_type='NodeSocketFloat')
+    tree.interface.new_socket("Extra Multiplier", in_out='INPUT', socket_type='NodeSocketFloat')
+    tree.interface.new_socket("Premultiplied", in_out='INPUT', socket_type='NodeSocketFloat') #NodeSocketFloatFactor
 
     group_outputs = tree.nodes.new('NodeGroupOutput')
     group_outputs.location = (2 * _node_separation[0], 0)
-    tree.outputs.new('NodeSocketColor',"Positive")
-    tree.outputs.new('NodeSocketColor',"Negative")
+    tree.interface.new_socket("Positive", in_out='OUTPUT', socket_type='NodeSocketColor')
+    tree.interface.new_socket("Negative", in_out='OUTPUT', socket_type='NodeSocketColor')
 
     positive_node = _create_node_group(tree, _rgba_combiner_node_group_name, _add_rgba_combiner_compositor_node_group)
     positive_node.location = (0, 2 * _node_separation[1])
