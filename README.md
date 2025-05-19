@@ -1,6 +1,11 @@
 # VFXToolbox
 Additional tools for Visual Effect Artists.
 
+## Disclaimer
+
+The content in this repository is provided by Unity Technologies as-is as open-source content under the [Unity Companion License](https://unity.com/legal/licenses/unity-companion-license).
+Updates, improvements, follow-ups, or bug fixes are not guaranteed in a timely manner for the content provided due to the limited resources available for this project.
+
 ## Install VFX Toolbox Unity Package
 
 #### Local Package Install : 
@@ -34,5 +39,9 @@ By using templates, you can go back, make adjustments then re-export with only o
 DCC Tools enable the export of .pcache and .vf files to be used with Visual Effect Graph. They are available for the following DCCs at the moment:
 
 #### Houdini
-* Point Cache
+* Point Cache Baker
 * Volume Exporter
+* 6-way lighting texture Baker [(More Info)](https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
+
+#### Blender
+* 6-way lighting texture Baker [(More Info)](https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
