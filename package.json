@@ -1,7 +1,7 @@
 {
   "name": "com.unity.vfx-toolbox",
   "displayName": "VFX Toolbox",
-  "version": "2.0.0-preview",
+  "version": "2.1.0-preview",
   "description": "Additional Tools for VFX Artists.\n\n* Image Sequencer\n* Houdini Exporters for Visual Effect Graph",
   "keywords": [
     "vfx",
@@ -12,5 +12,12 @@
   ],
   "type": "tool",
   "hideInEditor": false,
-  "unity": "2019.3"
+  "unity": "2020.2",
+  "samples": [
+    {
+      "displayName": "Vertex Animation Textures (VATs)",
+      "description": "Additional Assets for sampling VertexAnimationTextures. Use the VAT ROP houdini exporter in the package's DCC-Tools~ directory to generate textures from houdini. These samples use ShaderGraph, Visual Effect Graph and High Definition Render Pipeline to render.",
+      "path": "Samples~/VertexAnimationTextures"
+    }
+  ]
 }

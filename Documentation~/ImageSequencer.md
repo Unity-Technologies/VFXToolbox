@@ -67,14 +67,11 @@ In this mode, you will be able to perform operations on textures such as Assembl
 
 #### Exporting Images
 
-![](images/ImageSequencer-Export.png)
-
 After Adding Processors, when you have a result that suits you, you can click the third Tab Button "Export" to enter Export Mode. In this mode, you can configure the texture generation options and also the texture import options. 
 
 In this view you will be able to set up your output textures either as color, masks or normal maps and ensure they are exported correctly.
 
-> For more information, see the Export Workflow section of this document.
->
+For more information, see the Export Workflow section of this document.
 
 ## Image Sequence Inspector
 
@@ -406,6 +403,28 @@ When in **locked preview state**, you can still select and edit other processors
 
 After working on an image sequence, and adding processors, you will end up in a state where you want to generate a texture out of the result of this image sequence. 
 
+The Export Tab enables option in order to generate an image file and import it into the project. Once exported once, the texture can be updated by clicking the Update Exported Assets button, or the Update button in the Viewport.
+
+![](Images/ImageSequencer-Export.png)
+
+**Export Options:**
+
+* Export Format : lets you choose between Targa, PNG and EXR file formats. EXR file format will output an HDR texture.
+* File Name (read only) : lets you review the file name of the texture.
+* sRGB : will perform a sRGB conversion of the color data while writing the file (does not apply to EXR)
+* Export Alpha : will export the alpha channel as part of the main texture.
+* Separate Alpha : will export the alpha channel as separate, grayscale texture
+
+**Texture Import Options:**
+
+* Output Shape : Whether to export as simple Texture 2D or Texture 2D Array. In the case of Texture 2D Array, the texture importer will be set from given rows and columns defined in the image sequence. In case of incorrect size, a warning will be displayed.
+* Import As : Whether to import the texture as Color, Sprite or Normal map
+* sRGB: will set the sRGB import flag accordingly.
+* Compress: whether the imported texture needs to be compressed.
+* Generate MipMaps: whether the imported texture needs to have mip-maps generated.
+* Wrap Mode: the wrap mode applied to the imported texture
+* Filter Mode: the filter mode applied to the imported texture 
+
 ## Built-In Processors
 
 This section details the built-in processors bundled with Image Sequencer and their behaviour.
@@ -642,7 +661,7 @@ Shaders for Custom Material processor provide a simple way to write a filter for
 
 #### Writing a shader for Custom Materials
 
-In order to create shaders for Custom material processor you need to create a simple unlit shader from the Project Create Menu : **Shaders > Unlit Shader**. You can alter the default code to match the following code:
+In order to create shaders for Custom material processor you need to create a simple unlit shader from the Project Create Menu : **Visual Effects > Custom Material (Shader)**. You can alter the default code to match the following code:
 
  ```c
 Shader "ImageSequencer/SimpleCustomMaterial"
@@ -732,16 +751,17 @@ Custom Processors can be created in your project, to extend the features of Imag
 
 #### Creating a new Custom Processor
 
-To create a new custom processor so you need the following: 
+You can create both assets by clicking the Create Asset Menu, under **Visual Effects > Custom Processor (C#, Shader)**
+
+This will create the following assets:
 
 * A C# class that extends `UnityEditor.Experimental.VFX.Toolbox.ImageSequencer.ProcessorBase`
 
   * This class is for use with **UnityEditor** assembly only and must be stored into an `Editor` folder.
   * The C# class must implement the `[Processor("Category","Name")]` class attribute to be visible in the add menu.
-
 * A Shader file that will be referenced and used by the C# class.
 
-  
+
 
 Here is a sample C# code that you can use as a starting base.
 

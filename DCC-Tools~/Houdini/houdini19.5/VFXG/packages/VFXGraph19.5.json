@@ -1,0 +1,11 @@
+{
+    "path": "$VFXG",
+    "load_package_once": true,
+    "enable": "houdini_version >= '19.5' and houdini_version < '19.6'",
+    "version": "19.5.303",
+    "env": [
+        {
+            "VFXG": "C:/VFXToolbox/DCC-Tools~/Houdini/houdini19.5/VFXG"
+        }
+    ]
+}
