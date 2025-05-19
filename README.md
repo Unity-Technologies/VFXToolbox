@@ -39,5 +39,9 @@ By using templates, you can go back, make adjustments then re-export with only o
 DCC Tools enable the export of .pcache and .vf files to be used with Visual Effect Graph. They are available for the following DCCs at the moment:
 
 #### Houdini
-* Point Cache
+* Point Cache Baker
 * Volume Exporter
+* 6-way lighting texture Baker [(More Info)}(https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
+
+#### Blender
+* 6-way lighting texture Baker [(More Info)}(https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
