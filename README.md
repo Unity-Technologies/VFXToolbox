@@ -41,7 +41,7 @@ DCC Tools enable the export of .pcache and .vf files to be used with Visual Effe
 #### Houdini
 * Point Cache Baker
 * Volume Exporter
-* 6-way lighting texture Baker [(More Info)}(https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
+* 6-way lighting texture Baker [(More Info)](https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
 
 #### Blender
-* 6-way lighting texture Baker [(More Info)}(https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
+* 6-way lighting texture Baker [(More Info)](https://unity.com/blog/engine-platform/realistic-smoke-with-6-way-lighting-in-vfx-graph)
